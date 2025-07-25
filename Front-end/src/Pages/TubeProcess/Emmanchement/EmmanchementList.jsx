@@ -5,12 +5,13 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { EmmanchementColumns } from "./EmmanchementColumns";
 import { ReparationApi } from "../../../Api/ReparationApi";
+import { EmmanchementApi } from "../../../Api/Emmanchement";
 
 export default function EmmanchementList() {
   // Fetch reparation data
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['reparations'],
-    queryFn: ReparationApi.getAll,
+    queryKey: ['emmanchements'],
+    queryFn: EmmanchementApi.getAll,
     onError: (error) => {
       toast.error("Échec du chargement des réparations", {
         description: error.message,

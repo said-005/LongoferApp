@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Form,
@@ -26,6 +26,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AutocompleteInput from "../../../AutoComplet/AutoCompletInput";
 import { cn } from '../../../lib/utils';
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // API imports
 import { ProductionApi } from "../../../Api/ProductionApi";
@@ -34,12 +45,13 @@ import { CausseApi } from "../../../Api/causseApi";
 import { DefautApi } from "../../../Api/defautApi";
 import { OperateurApi } from "../../../Api/operateurApi";
 import { StatutApi } from "../../../Api/StatutApi";
-import { ReparationApi } from "../../../Api/ReparationApi";
+import { SablageIntApi } from './../../../Api/SablageIntApi';
 import SheetCloseComponent from "../../SheetClose";
 
+// Schema moved to separate file for better organization
 const formSchema = z.object({
   ref_production: z.string().min(1, "La référence production est requise"),
-  code_reparation: z.string()
+  code_Sablage_Interne: z.string()
     .min(2, "Le code doit contenir au moins 2 caractères")
     .max(50, "Le code est trop long"),
   date: z.date({
@@ -56,127 +68,137 @@ const formSchema = z.object({
 });
 
 export default function UpdateSablageInt({ id }) {
+  const queryClient = useQueryClient();
+  
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [formData, setFormData] = useState(null);
+
   const queryOptions = {
     staleTime: 1000 * 60 * 5, // 5 minutes
     onError: (error) => toast.error(`Erreur de chargement: ${error.message}`),
   };
 
-  // Fetch all required data in parallel
-  const { 
-    data: reparationData, 
-    isLoading: isLoadingReparation 
-  } = useQuery({
-    queryKey: ['reparation', id],
-    queryFn: () => ReparationApi.getReparationById(id),
-    ...queryOptions
-  });
+  // Custom hook for fetching all required data
+  const useFetchAllData = () => {
+    const { data: reparationData, isLoading: isLoadingReparation } = useQuery({
+      queryKey: ['sablage-interne', id],
+      queryFn: () => SablageIntApi.getSablage_intById(id),
+      ...queryOptions
+    });
 
-  const { 
-    data: productions = [], 
-    isLoading: isLoadingProductions 
-  } = useQuery({
-    queryKey: ['productions'],
-    queryFn: async () => {
-      const response = await ProductionApi.getAll();
-      return response.data.data.map(pro => ({
-        label: pro.production_code,
-        value: pro.production_code
-      }));
-    },
-    ...queryOptions
-  });
+    const { data: productions = [], isLoading: isLoadingProductions } = useQuery({
+      queryKey: ['productions'],
+      queryFn: async () => {
+        const response = await ProductionApi.getAll();
+        return response.data.data.map(pro => ({
+          label: pro.production_code,
+          value: pro.production_code
+        }));
+      },
+      ...queryOptions
+    });
 
-  const { 
-    data: machines = [], 
-    isLoading: isLoadingMachines 
-  } = useQuery({
-    queryKey: ['machines'],
-    queryFn: async () => {
-      const response = await MachineApi.getAll();
-      return response.data.data.map(machine => ({
-        label: `${machine.codeMachine} - ${machine.MachineName}`,
-        value: machine.codeMachine
-      }));
-    },
-    ...queryOptions
-  });
+    const { data: machines = [], isLoading: isLoadingMachines } = useQuery({
+      queryKey: ['machines'],
+      queryFn: async () => {
+        const response = await MachineApi.getAll();
+        return response.data.data.map(machine => ({
+          label: `${machine.codeMachine} - ${machine.MachineName}`,
+          value: machine.codeMachine
+        }));
+      },
+      ...queryOptions
+    });
 
-  const { 
-    data: statusOptions = [], 
-    isLoading: isLoadingStatus 
-  } = useQuery({
-    queryKey: ['statusOptions'],
-    queryFn: async () => {
-      const response = await StatutApi.getAll();
-      return response.data.data.map(status => ({
-        label: status.Statut,
-        value: status.Statut
-      }));
-    },
-    ...queryOptions
-  });
+    const { data: statusOptions = [], isLoading: isLoadingStatus } = useQuery({
+      queryKey: ['statusOptions'],
+      queryFn: async () => {
+        const response = await StatutApi.getAll();
+        return response.data.data.map(status => ({
+          label: status.Statut,
+          value: status.Statut
+        }));
+      },
+      ...queryOptions
+    });
 
-  const { 
-    data: defects = [], 
-    isLoading: isLoadingDefects 
-  } = useQuery({
-    queryKey: ['defects'],
-    queryFn: async () => {
-      const res = await DefautApi.getAll();
-      return res.data.data.map(defect => ({
-        label: defect.codeDefaut,
-        value: defect.codeDefaut
-      }));
-    },
-    ...queryOptions
-  });
+    const { data: defects = [], isLoading: isLoadingDefects } = useQuery({
+      queryKey: ['defects'],
+      queryFn: async () => {
+        const res = await DefautApi.getAll();
+        return res.data.data.map(defect => ({
+          label: defect.codeDefaut,
+          value: defect.codeDefaut
+        }));
+      },
+      ...queryOptions
+    });
 
-  const { 
-    data: causes = [], 
-    isLoading: isLoadingCauses 
-  } = useQuery({
-    queryKey: ['causes'],
-    queryFn: async () => {
-      const response = await CausseApi.getAll();
-      return response.data.data.map(cause => ({
-        label: cause.code_causse,
-        value: cause.code_causse
-      }));
-    },
-    ...queryOptions
-  });
+    const { data: causes = [], isLoading: isLoadingCauses } = useQuery({
+      queryKey: ['causes'],
+      queryFn: async () => {
+        const response = await CausseApi.getAll();
+        return response.data.data.map(cause => ({
+          label: cause.code_causse,
+          value: cause.code_causse
+        }));
+      },
+      ...queryOptions
+    });
 
-  const { 
-    data: operateurs = { operators: [], welders: [], inspectors: [] }, 
-    isLoading: isLoadingOperateurs 
-  } = useQuery({
-    queryKey: ['operateurs'],
-    queryFn: async () => {
-      const response = await OperateurApi.getAll();
-      const data = response.data.data;
-      return {
-        operators: data.map(op => ({
-          label: `${op.operateur} - ${op.nom_complete}`,
-          value: op.operateur
-        })),
-        welders: data.filter(op => op.Fonction === 'soudeur').map(op => ({
-          label: `${op.operateur} - ${op.nom_complete}`,
-          value: op.operateur
-        })),
-        inspectors: data.filter(op => op.Fonction === 'inspecteur').map(op => ({
-          label: `${op.operateur} - ${op.nom_complete}`,
-          value: op.operateur
-        }))
-      };
-    },
-    ...queryOptions
-  });
+    const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoading: isLoadingOperateurs } = useQuery({
+      queryKey: ['operateurs'],
+      queryFn: async () => {
+        const response = await OperateurApi.getAll();
+        const data = response.data.data;
+        return {
+          operators: data.map(op => ({
+            label: `${op.operateur} - ${op.nom_complete}`,
+            value: op.operateur
+          })),
+          welders: data.filter(op => op.Fonction === 'soudeur').map(op => ({
+            label: `${op.operateur} - ${op.nom_complete}`,
+            value: op.operateur
+          })),
+          inspectors: data.filter(op => op.Fonction === 'inspecteur').map(op => ({
+            label: `${op.operateur} - ${op.nom_complete}`,
+            value: op.operateur
+          }))
+        };
+      },
+      ...queryOptions
+    });
+
+    return {
+      reparationData,
+      productions,
+      machines,
+      statusOptions,
+      defects,
+      causes,
+      operateurs,
+      isLoading: isLoadingReparation || isLoadingProductions || isLoadingMachines || 
+                isLoadingStatus || isLoadingDefects || isLoadingCauses || 
+                isLoadingOperateurs
+    };
+  };
+
+  const {
+    reparationData,
+    productions,
+    machines,
+    statusOptions,
+    defects,
+    causes,
+    operateurs,
+    isLoading
+  } = useFetchAllData();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       ref_production: '',
-      code_reparation: '',
+      code_Sablage_Interne: '',
       date: undefined,
       machine: '',
       status: '',
@@ -194,9 +216,9 @@ export default function UpdateSablageInt({ id }) {
     if (reparationData?.data?.data) {
       const data = reparationData.data.data;
       form.reset({
-        ref_production: data.ref_production  || '',
-        code_reparation: data.code_Reparation || '',
-        date: data.date_reparation ? new Date(data.date_reparation) : undefined,
+        ref_production: data.ref_production || '',
+        code_Sablage_Interne: data.code_Sablage_Interne || '',
+        date: data.date_Sablage_Interne ? new Date(data.date_Sablage_Interne) : undefined,
         machine: data.machine || '',
         status: data.statut || '',
         defect: data.defaut || '',
@@ -207,13 +229,14 @@ export default function UpdateSablageInt({ id }) {
       });
     }
   }, [reparationData, form]);
-  const queryClinet=useQueryClient()
-  const { mutate: updateReparation, isPending: isSubmitting } = useMutation({
-    mutationFn: (reparationData) => 
-      ReparationApi.updateReparation(id, reparationData),
+
+  const { mutate: updateSablageInt, isPending: isSubmitting } = useMutation({
+    mutationFn: (sablageData) => 
+      SablageIntApi.updateSablage_int(id, sablageData),
     onSuccess: () => {
-      toast.success("Réparation mise à jour avec succès");
-      queryClinet.invalidateQueries('reparations')
+      toast.success("Sablage interne mis à jour avec succès");
+      queryClient.invalidateQueries(['sablage-interne', id]);
+      queryClient.invalidateQueries('sablage-interne');
     },
     onError: (error) => {
       toast.error("Erreur lors de la mise à jour", {
@@ -222,32 +245,45 @@ export default function UpdateSablageInt({ id }) {
     }
   });
 
-  const onSubmit = (values) => {
-    const payload = {
-      ref_production: values.ref_production,
-      code_Reparation: values.code_reparation,
-      date_reparation: format(values.date, "yyyy-MM-dd HH:mm:ss"),
-      machine: values.machine,
-      statut: values.status,
-      defaut: values.defect || null,
-      causse: values.cause || null,
-      operateur: values.operator,
-      soudeur: values.welder,
-      controleur: values.inspector,
-    };
-    
-    updateReparation(payload);
+  const handleSubmit = (values) => {
+    setFormData(values);
+    setShowConfirmation(true);
   };
 
-  const isLoadingData = isLoadingProductions || isLoadingMachines || 
-                       isLoadingStatus || isLoadingDefects || isLoadingCauses || 
-                       isLoadingOperateurs || isLoadingReparation;
+  const confirmUpdate = () => {
+    const payload = {
+      code_Sablage_Interne: formData.code_Sablage_Interne,
+      ref_production: formData.ref_production,
+      date_Sablage_Interne: format(formData.date, "yyyy-MM-dd HH:mm:ss"),
+      machine: formData.machine,
+      statut: formData.status,
+      defaut: formData.defect || null,
+      causse: formData.cause || null,
+      operateur: formData.operator,
+      soudeur: formData.welder,
+      controleur: formData.inspector,
+    };
+    
+    updateSablageInt(payload);
+    setShowConfirmation(false);
+  };
 
-  if (isLoadingData) {
+  if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Chargement des données...</span>
+      <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-8 md:mt-12 space-y-4">
+        <Skeleton className="h-8 w-1/3 mx-auto" />
+        <div className="space-y-4">
+          {[...Array(9)].map((_, i) => (
+            <div key={i} className="space-y-2">
+              <Skeleton className="h-4 w-1/4" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-center gap-4 pt-4">
+          <Skeleton className="h-10 w-32" />
+          <Skeleton className="h-10 w-32" />
+        </div>
       </div>
     );
   }
@@ -255,12 +291,12 @@ export default function UpdateSablageInt({ id }) {
   return (
     <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-8 md:mt-12">
       <h1 className="text-xl md:text-2xl font-bold mb-6 text-center text-gray-800">
-        Modifier la Réparation
+        Modifier le Sablage Interne
       </h1>
       
-        <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
-          <div className="flex flex-col gap-2">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 md:space-y-6">
+          <div className="flex flex-col gap-3">
             {/* Production Reference */}
             <FormField
               control={form.control}
@@ -283,16 +319,16 @@ export default function UpdateSablageInt({ id }) {
               )}
             />
 
-            {/* Repair Code */}
+            {/* Sablage Code */}
             <FormField
               control={form.control}
-              name="code_reparation"
+              name="code_Sablage_Interne"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Code Réparation</FormLabel>
+                  <FormLabel>Code Sablage Interne</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Entrez le code réparation"
+                      placeholder="Entrez le code sablage"
                       {...field}
                     />
                   </FormControl>
@@ -333,6 +369,7 @@ export default function UpdateSablageInt({ id }) {
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
+                        disabled={(date) => date > new Date()}
                       />
                     </PopoverContent>
                   </Popover>
@@ -495,9 +532,9 @@ export default function UpdateSablageInt({ id }) {
           </div>
 
           <div className="flex justify-center items-center gap-4 mt-8 pt-4 border-t">
-           <div className="w-1/3">
-            <SheetCloseComponent/>
-           </div>
+            <div className="w-1/3">
+              <SheetCloseComponent/>
+            </div>
             <Button 
               type="submit"
               className="min-w-[120px] bg-blue-600 hover:bg-blue-700" 
@@ -513,6 +550,22 @@ export default function UpdateSablageInt({ id }) {
           </div>
         </form>
       </Form>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la modification</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir modifier cet enregistrement de sablage interne ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmUpdate}>Confirmer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

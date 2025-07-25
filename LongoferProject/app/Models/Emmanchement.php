@@ -24,7 +24,7 @@ class Emmanchement extends Model
 'operateur',
 'soudeur',
 'controleur',
-	'code_Reparation'
+
   ];
   protected $hidden=[
    'created_at',

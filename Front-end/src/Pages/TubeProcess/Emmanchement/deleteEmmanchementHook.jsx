@@ -12,7 +12,7 @@ export const useDeleteEmmanchement= () => {
     mutationFn: (id) =>EmmanchementApi.deleteEmmanchement(id), // Accept string directly
     onSuccess: (_, id) => {
       toast.success(`Emmanchement  ${id} deleted successfully`);
-      queryClient.invalidateQueries({ queryKey: ['reparations'] });
+      queryClient.invalidateQueries({ queryKey: ['emmanchements'] });
     },
     onError: (error) => {
       toast.error(

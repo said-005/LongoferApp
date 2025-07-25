@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AutocompleteInput from "../../../AutoComplet/AutoCompletInput";
 import { cn } from '../../../lib/utils';
+import SheetCloseComponent from "../../SheetClose";
 
 // API imports
 import { ProductionApi } from "../../../Api/ProductionApi";
@@ -34,12 +35,11 @@ import { CausseApi } from "../../../Api/causseApi";
 import { DefautApi } from "../../../Api/defautApi";
 import { OperateurApi } from "../../../Api/operateurApi";
 import { StatutApi } from "../../../Api/StatutApi";
-import { ReparationApi } from "../../../Api/ReparationApi";
-import SheetCloseComponent from "../../SheetClose";
+import { PeintureIntApi } from "../../../Api/peinture_intApi";
 
 const formSchema = z.object({
   ref_production: z.string().min(1, "La référence production est requise"),
-  code_reparation: z.string()
+  code_Peinture_internes: z.string()
     .min(2, "Le code doit contenir au moins 2 caractères")
     .max(50, "Le code est trop long"),
   date: z.date({
@@ -63,11 +63,11 @@ export default function UpdatePeintureInt({ id }) {
 
   // Fetch all required data in parallel
   const { 
-    data: reparationData, 
-    isLoading: isLoadingReparation 
+    data: peintureData, 
+    isLoading: isLoadingPeinture 
   } = useQuery({
-    queryKey: ['reparation', id],
-    queryFn: () => ReparationApi.getReparationById(id),
+    queryKey: ['peinture_interne', id],
+    queryFn: () => PeintureIntApi.getPeinture_intById(id),
     ...queryOptions
   });
 
@@ -176,7 +176,7 @@ export default function UpdatePeintureInt({ id }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       ref_production: '',
-      code_reparation: '',
+      code_Peinture_internes: '',
       date: undefined,
       machine: '',
       status: '',
@@ -189,14 +189,14 @@ export default function UpdatePeintureInt({ id }) {
     mode: 'onBlur',
   });
 
-  // Reset form when reparation data is loaded
+  // Reset form when peinture data is loaded
   useEffect(() => {
-    if (reparationData?.data?.data) {
-      const data = reparationData.data.data;
+    if (peintureData?.data?.data) {
+      const data = peintureData.data.data;
       form.reset({
-        ref_production: data.ref_production  || '',
-        code_reparation: data.code_Reparation || '',
-        date: data.date_reparation ? new Date(data.date_reparation) : undefined,
+        ref_production: data.ref_production || '',
+        code_Peinture_internes: data.code_Peinture_internes || '',
+        date: data.date_Peinture_Interne ? new Date(data.date_Peinture_Interne) : undefined,
         machine: data.machine || '',
         status: data.statut || '',
         defect: data.defaut || '',
@@ -206,14 +206,16 @@ export default function UpdatePeintureInt({ id }) {
         inspector: data.controleur || '',
       });
     }
-  }, [reparationData, form]);
-  const queryClinet=useQueryClient()
-  const { mutate: updateReparation, isPending: isSubmitting } = useMutation({
-    mutationFn: (reparationData) => 
-      ReparationApi.updateReparation(id, reparationData),
+  }, [peintureData, form]);
+
+  const queryClient = useQueryClient();
+  const { mutate: updatePeinture, isPending: isSubmitting } = useMutation({
+    mutationFn: (peintureData) => 
+      PeintureIntApi.updatePeinture_int(id, peintureData),
     onSuccess: () => {
-      toast.success("Réparation mise à jour avec succès");
-      queryClinet.invalidateQueries('reparations')
+      toast.success("Peinture interne mise à jour avec succès");
+      queryClient.invalidateQueries(['peinture_interne', id]);
+      queryClient.invalidateQueries('peinture_interne');
     },
     onError: (error) => {
       toast.error("Erreur lors de la mise à jour", {
@@ -225,8 +227,8 @@ export default function UpdatePeintureInt({ id }) {
   const onSubmit = (values) => {
     const payload = {
       ref_production: values.ref_production,
-      code_Reparation: values.code_reparation,
-      date_reparation: format(values.date, "yyyy-MM-dd HH:mm:ss"),
+      code_Peinture_internes: values.code_Peinture_internes,
+      date_Peinture_Interne: format(values.date, "yyyy-MM-dd HH:mm:ss"),
       machine: values.machine,
       statut: values.status,
       defaut: values.defect || null,
@@ -236,12 +238,12 @@ export default function UpdatePeintureInt({ id }) {
       controleur: values.inspector,
     };
     
-    updateReparation(payload);
+    updatePeinture(payload);
   };
 
   const isLoadingData = isLoadingProductions || isLoadingMachines || 
                        isLoadingStatus || isLoadingDefects || isLoadingCauses || 
-                       isLoadingOperateurs || isLoadingReparation;
+                       isLoadingOperateurs || isLoadingPeinture;
 
   if (isLoadingData) {
     return (
@@ -255,7 +257,7 @@ export default function UpdatePeintureInt({ id }) {
   return (
     <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-8 md:mt-12">
       <h1 className="text-xl md:text-2xl font-bold mb-6 text-center text-gray-800">
-        Modifier la Réparation
+        Modifier la Peinture Interne
       </h1>
       
       <Form {...form}>
@@ -283,16 +285,16 @@ export default function UpdatePeintureInt({ id }) {
               )}
             />
 
-            {/* Repair Code */}
+            {/* Peinture Code */}
             <FormField
               control={form.control}
-              name="code_reparation"
+              name="code_Peinture_internes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Code Réparation</FormLabel>
+                  <FormLabel>Code Peinture Interne</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Entrez le code réparation"
+                      placeholder="Entrez le code peinture"
                       {...field}
                     />
                   </FormControl>
@@ -495,9 +497,9 @@ export default function UpdatePeintureInt({ id }) {
           </div>
 
           <div className="flex justify-center items-center gap-4 mt-8 pt-4 border-t">
-           <div className="w-1/3">
-            <SheetCloseComponent/>
-           </div>
+            <div className="w-1/3">
+              <SheetCloseComponent/>
+            </div>
             <Button 
               type="submit"
               className="min-w-[120px] bg-blue-600 hover:bg-blue-700" 

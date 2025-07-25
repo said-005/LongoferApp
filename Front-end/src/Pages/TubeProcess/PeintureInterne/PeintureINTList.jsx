@@ -5,14 +5,15 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { PeintureINTColumns } from "./PeintureINTColumns";
 import { ReparationApi } from "../../../Api/ReparationApi";
+import { PeintureIntApi } from "../../../Api/peinture_intApi";
 
 export default function PeintureINTList() {
   // Fetch reparation data
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['reparations'],
-    queryFn: ReparationApi.getAll,
+    queryKey: ['peinture_internes'],
+    queryFn: PeintureIntApi.getAll,
     onError: (error) => {
-      toast.error("Échec du chargement des réparations", {
+      toast.error("Échec du chargement des Peinture Externe", {
         description: error.message,
       });
     },

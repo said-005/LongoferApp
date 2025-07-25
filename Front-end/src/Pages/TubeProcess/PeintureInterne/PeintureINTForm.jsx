@@ -34,13 +34,15 @@ import { StatutApi } from "../../../Api/StatutApi";
 import AutocompleteInput from "../../../AutoComplet/AutoCompletInput";
 import { useNavigate } from "react-router-dom";
 import { cn } from '../../../lib/utils';
-import { ReparationApi } from "../../../Api/ReparationApi";
+
+import { SablageEXTApi } from './../../../Api/Sablage_Ext';
+import { PeintureIntApi } from "../../../Api/peinture_intApi";
 
 const MAX_DESCRIPTION_LENGTH = 500;
 
 const formSchema = z.object({
   ref_production: z.string().min(1, "La référence production est requise"),
-  code_reparation: z.string()
+  code_Peinture_internes: z.string()
     .min(1, "Le code réparation est requis")
     .min(2, "Le code doit contenir au moins 2 caractères")
     .max(50, "Le code est trop long"),
@@ -156,7 +158,7 @@ export default function PeintureINTForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       ref_production: '',
-      code_reparation: '',
+      code_Peinture_internes: '',
       date: undefined,
       machine: '',
       status: '',
@@ -165,8 +167,6 @@ export default function PeintureINTForm() {
       operator: '',
       welder: '',
       inspector: '',
-      qte_produite: 1,
-      description: ''
     },
     mode: 'onBlur',
   });
@@ -176,13 +176,13 @@ export default function PeintureINTForm() {
                       isLoadingOperateurs;
 
   // Mutation for creating reparation
-  const { mutate: createReparation, isPending: isSubmitting } = useMutation({
-    mutationFn: (reparationData) => 
-      ReparationApi.createReparation(reparationData),
+  const { mutate: createSablageInt, isPending: isSubmitting } = useMutation({
+    mutationFn: (Data) => 
+      PeintureIntApi.createPeinture_intt(Data),
     onSuccess: () => {
-      toast.success("Réparation créée avec succès");
+      toast.success("Sablage Int créée avec succès");
       form.reset();
-      navigate('/reparation');
+      navigate('/sablage_int');
     },
     onError: (error) => {
       toast.error("Erreur lors de la création", {
@@ -191,12 +191,13 @@ export default function PeintureINTForm() {
     }
   });
 
+
   const onSubmit = (values) => {
    
     const payload = {
-      ref_production: values.ref_production,
-      code_Reparation : values.code_reparation,
-      date_reparation: format(values.date, "yyyy-MM-dd HH:mm:ss"),
+      code_Peinture_internes : values.code_Peinture_internes,
+      ref_production  : values.ref_production ,
+      date_Peinture_Interne: format(values.date, "yyyy-MM-dd HH:mm:ss"),
       machine: values.machine,
       statut: values.status,
       defaut: values.defect || null,
@@ -205,8 +206,8 @@ export default function PeintureINTForm() {
       soudeur: values.welder,
       controleur: values.inspector,
     };
-     console.log(payload)
-    createReparation(payload);
+   
+    createSablageInt(payload);
   };
 
   if (isLoadingData) {
@@ -220,7 +221,7 @@ export default function PeintureINTForm() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-30">
-      <h1 className="text-2xl font-bold mb-8 text-center text-gray-800">Formulaire de Réparation</h1>
+      <h1 className="text-2xl font-bold mb-8 text-center text-gray-800">Formulaire de Peiture Interne</h1>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -249,13 +250,13 @@ export default function PeintureINTForm() {
             {/* Repair Code */}
             <FormField
               control={form.control}
-              name="code_reparation"
+              name="code_Peinture_internes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Code Réparation</FormLabel>
+                  <FormLabel>Code Sablage Interne</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Entrez le code réparation"
+                      placeholder="Entrez le code  de sablage interne"
                       {...field}
                       value={field.value || ''}
                     />
@@ -462,7 +463,7 @@ export default function PeintureINTForm() {
             <Button 
               type="button" 
               variant="outline" 
-              onClick={() => navigate('/peinture_int')}
+              onClick={() => navigate('/sablage_int')}
               className="min-w-[120px]"
             >
               Annuler

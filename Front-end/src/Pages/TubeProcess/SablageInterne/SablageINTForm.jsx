@@ -6,11 +6,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
+import { cn } from '../../../lib/utils';
 
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,24 +25,19 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { ProductionApi } from "../../../Api/ProductionApi";
-import { MachineApi } from "../../../Api/machineApi";
+import AutocompleteInput from "../../../AutoComplet/AutoCompletInput";
+import { ReparationApi } from "../../../Api/ReparationApi";
+import { OperateurApi } from "../../../Api/operateurApi";
 import { CausseApi } from "../../../Api/causseApi";
 import { DefautApi } from "../../../Api/defautApi";
-import { OperateurApi } from "../../../Api/operateurApi";
 import { StatutApi } from "../../../Api/StatutApi";
-import AutocompleteInput from "../../../AutoComplet/AutoCompletInput";
-import { useNavigate } from "react-router-dom";
-import { cn } from '../../../lib/utils';
-import { ReparationApi } from "../../../Api/ReparationApi";
-
-const MAX_DESCRIPTION_LENGTH = 500;
+import { MachineApi } from "../../../Api/machineApi";
+import { ProductionApi } from "../../../Api/ProductionApi";
+import { SablageIntApi } from "../../../Api/SablageIntApi";
 
 const formSchema = z.object({
   ref_production: z.string().min(1, "La référence production est requise"),
-  code_reparation: z.string()
-    .min(1, "Le code réparation est requis")
+  code_Sablage_Interne: z.string()
     .min(2, "Le code doit contenir au moins 2 caractères")
     .max(50, "Le code est trop long"),
   date: z.date({
@@ -57,30 +53,27 @@ const formSchema = z.object({
   inspector: z.string().min(1, "L'inspecteur est requis"),
 });
 
-
-
 export default function SablageINTForm() {
   const navigate = useNavigate();
   
   const queryOptions = {
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5, // 5 minutes
     onError: (error) => toast.error(`Erreur de chargement: ${error.message}`),
   };
 
-  // Fetch production references
+  // Fetch all required data
   const { data: productions = [], isLoading: isLoadingProductions } = useQuery({
     queryKey: ['productions'],
     queryFn: async () => {
       const response = await ProductionApi.getAll();
       return response.data.data.map((pro) => ({
-        label: `${pro.production_code}`,
+        label: pro.production_code,
         value: pro.production_code
       }));
     },
     ...queryOptions
   });
 
-  // Fetch other data
   const { data: machines = [], isLoading: isLoadingMachines } = useQuery({
     queryKey: ['machines'],
     queryFn: async () => {
@@ -156,7 +149,7 @@ export default function SablageINTForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       ref_production: '',
-      code_reparation: '',
+      code_Sablage_Interne: '',
       date: undefined,
       machine: '',
       status: '',
@@ -165,8 +158,6 @@ export default function SablageINTForm() {
       operator: '',
       welder: '',
       inspector: '',
-      qte_produite: 1,
-      description: ''
     },
     mode: 'onBlur',
   });
@@ -175,28 +166,26 @@ export default function SablageINTForm() {
                       isLoadingStatus || isLoadingDefects || isLoadingCauses || 
                       isLoadingOperateurs;
 
-  // Mutation for creating reparation
-  const { mutate: createReparation, isPending: isSubmitting } = useMutation({
-    mutationFn: (reparationData) => 
-      ReparationApi.createReparation(reparationData),
+  const { mutate: createSablageINT, isPending: isSubmitting } = useMutation({
+    mutationFn: (data) => SablageIntApi.createSablage_int(data),
     onSuccess: () => {
-      toast.success("Réparation créée avec succès");
+      toast.success("Sablage interne créé avec succès");
       form.reset();
       navigate('/sablage_int');
     },
     onError: (error) => {
-      toast.error("Erreur lors de la création", {
-        description: error.response?.data?.message || error.message,
-      });
+      const errorMessage = error.response?.data?.message || 
+                         error.response?.data?.error || 
+                         error.message;
+      toast.error(`Erreur lors de la création: ${errorMessage}`);
     }
   });
 
   const onSubmit = (values) => {
-   
     const payload = {
       ref_production: values.ref_production,
-      code_Reparation : values.code_reparation,
-      date_reparation: format(values.date, "yyyy-MM-dd HH:mm:ss"),
+      code_Sablage_Interne: values.code_Sablage_Interne,
+      date_Sablage_Interne: format(values.date, "yyyy-MM-dd") + " 00:00:00",
       machine: values.machine,
       statut: values.status,
       defaut: values.defect || null,
@@ -205,8 +194,9 @@ export default function SablageINTForm() {
       soudeur: values.welder,
       controleur: values.inspector,
     };
-     console.log(payload)
-    createReparation(payload);
+    console.log(payload)
+    
+    createSablageINT(payload);
   };
 
   if (isLoadingData) {
@@ -219,8 +209,8 @@ export default function SablageINTForm() {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-30">
-      <h1 className="text-2xl font-bold mb-8 text-center text-gray-800">Formulaire de Réparation</h1>
+    <div className="p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-8">
+      <h1 className="text-2xl font-bold mb-8 text-center text-gray-800">Formulaire de Sablage Interne</h1>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -236,8 +226,8 @@ export default function SablageINTForm() {
                       data={productions}
                       text="Sélectionnez une référence production"
                       place="Choisissez parmi les suggestions"
-                      value={field.value || ''}
-                      onChange={(value) => field.onChange(value || '')}
+                      value={field.value}
+                      onChange={field.onChange}
                       required
                     />
                   </FormControl>
@@ -246,18 +236,17 @@ export default function SablageINTForm() {
               )}
             />
 
-            {/* Repair Code */}
+            {/* Sablage Interne Code */}
             <FormField
               control={form.control}
-              name="code_reparation"
+              name="code_Sablage_Interne"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Code Réparation</FormLabel>
+                  <FormLabel>Code Sablage Interne</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Entrez le code réparation"
+                      placeholder="Entrez le code de sablage interne"
                       {...field}
-                      value={field.value || ''}
                     />
                   </FormControl>
                   <FormMessage />
@@ -305,21 +294,20 @@ export default function SablageINTForm() {
               )}
             />
 
-
             {/* Machine */}
             <FormField
               control={form.control}
               name="machine"
               render={({ field }) => (
                 <FormItem>
-                 
+                  <FormLabel>Machine</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={machines}
                       text="Sélectionnez une machine"
                       place="Choisissez parmi les suggestions"
-                      value={field.value || ''}
-                      onChange={(value) => field.onChange(value || '')}
+                      value={field.value}
+                      onChange={field.onChange}
                       required
                     />
                   </FormControl>
@@ -334,14 +322,14 @@ export default function SablageINTForm() {
               name="status"
               render={({ field }) => (
                 <FormItem>
-                
+                  <FormLabel>Statut</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={statusOptions}
                       text="Sélectionnez un statut"
                       place="Choisissez parmi les suggestions"
-                      value={field.value || ''}
-                      onChange={(value) => field.onChange(value || '')}
+                      value={field.value}
+                      onChange={field.onChange}
                       required
                     />
                   </FormControl>
@@ -356,14 +344,14 @@ export default function SablageINTForm() {
               name="defect"
               render={({ field }) => (
                 <FormItem>
-             
+                  <FormLabel>Défaut (optionnel)</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={defects}
                       text="Sélectionnez un défaut"
                       place="Choisissez parmi les suggestions"
-                      value={field.value || ''}
-                      onChange={(value) => field.onChange(value || '')}
+                      value={field.value}
+                      onChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />
@@ -377,14 +365,14 @@ export default function SablageINTForm() {
               name="cause"
               render={({ field }) => (
                 <FormItem>
-                
+                  <FormLabel>Cause (optionnel)</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={causes}
                       text="Sélectionnez une cause"
                       place="Choisissez parmi les suggestions"
-                      value={field.value || ''}
-                      onChange={(value) => field.onChange(value || '')}
+                      value={field.value}
+                      onChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />
@@ -398,14 +386,14 @@ export default function SablageINTForm() {
               name="operator"
               render={({ field }) => (
                 <FormItem>
-                  
+                  <FormLabel>Opérateur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.operators}
                       text="Sélectionnez un opérateur"
                       place="Choisissez parmi les suggestions"
-                      value={field.value || ''}
-                      onChange={(value) => field.onChange(value || '')}
+                      value={field.value}
+                      onChange={field.onChange}
                       required
                     />
                   </FormControl>
@@ -420,14 +408,14 @@ export default function SablageINTForm() {
               name="welder"
               render={({ field }) => (
                 <FormItem>
-                 
+                  <FormLabel>Soudeur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.welders}
                       text="Sélectionnez un soudeur"
                       place="Choisissez parmi les suggestions"
-                      value={field.value || ''}
-                      onChange={(value) => field.onChange(value || '')}
+                      value={field.value}
+                      onChange={field.onChange}
                       required
                     />
                   </FormControl>
@@ -442,14 +430,14 @@ export default function SablageINTForm() {
               name="inspector"
               render={({ field }) => (
                 <FormItem>
-               
+                  <FormLabel>Inspecteur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.inspectors}
                       text="Sélectionnez un inspecteur"
                       place="Choisissez parmi les suggestions"
-                      value={field.value || ''}
-                      onChange={(value) => field.onChange(value || '')}
+                      value={field.value}
+                      onChange={field.onChange}
                       required
                     />
                   </FormControl>
@@ -458,6 +446,7 @@ export default function SablageINTForm() {
               )}
             />
           </div>
+
           <div className="flex justify-center gap-4 mt-8 pt-4 border-t">
             <Button 
               type="button" 

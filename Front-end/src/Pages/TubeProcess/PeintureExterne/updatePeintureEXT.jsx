@@ -36,10 +36,11 @@ import { OperateurApi } from "../../../Api/operateurApi";
 import { StatutApi } from "../../../Api/StatutApi";
 import { ReparationApi } from "../../../Api/ReparationApi";
 import SheetCloseComponent from "../../SheetClose";
+import { PeintureExtApi } from "../../../Api/peinture_extApi";
 
 const formSchema = z.object({
   ref_production: z.string().min(1, "La référence production est requise"),
-  code_reparation: z.string()
+  code_Peinture_Externe: z.string()
     .min(2, "Le code doit contenir au moins 2 caractères")
     .max(50, "Le code est trop long"),
   date: z.date({
@@ -63,11 +64,11 @@ export default function UpdatePeintureExt({ id }) {
 
   // Fetch all required data in parallel
   const { 
-    data: reparationData, 
-    isLoading: isLoadingReparation 
+    data: PeintureextData, 
+    isLoading: isLoadingPeintureEXT 
   } = useQuery({
-    queryKey: ['reparation', id],
-    queryFn: () => ReparationApi.getReparationById(id),
+    queryKey: ['peinture_externe', id],
+    queryFn: () => PeintureExtApi.getPeinture_extById(id),
     ...queryOptions
   });
 
@@ -176,7 +177,7 @@ export default function UpdatePeintureExt({ id }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       ref_production: '',
-      code_reparation: '',
+      code_Peinture_Externe: '',
       date: undefined,
       machine: '',
       status: '',
@@ -191,12 +192,12 @@ export default function UpdatePeintureExt({ id }) {
 
   // Reset form when reparation data is loaded
   useEffect(() => {
-    if (reparationData?.data?.data) {
-      const data = reparationData.data.data;
+    if (PeintureextData?.data?.data) {
+      const data = PeintureextData.data.data;
       form.reset({
         ref_production: data.ref_production  || '',
-        code_reparation: data.code_Reparation || '',
-        date: data.date_reparation ? new Date(data.date_reparation) : undefined,
+        code_Peinture_Externe: data.code_Peinture_Externe || '',
+        date: data.date_Peinture_Externe ? new Date(data.date_Peinture_Externe) : undefined,
         machine: data.machine || '',
         status: data.statut || '',
         defect: data.defaut || '',
@@ -206,13 +207,13 @@ export default function UpdatePeintureExt({ id }) {
         inspector: data.controleur || '',
       });
     }
-  }, [reparationData, form]);
+  }, [PeintureextData, form]);
   const queryClinet=useQueryClient()
-  const { mutate: updateReparation, isPending: isSubmitting } = useMutation({
-    mutationFn: (reparationData) => 
-      ReparationApi.updateReparation(id, reparationData),
+  const { mutate: updatePeintureEXT, isPending: isSubmitting } = useMutation({
+    mutationFn: (Data) => 
+      PeintureExtApi.updatePeinture_ext(id,Data),
     onSuccess: () => {
-      toast.success("Réparation mise à jour avec succès");
+      toast.success("Peinture Externe mise à jour avec succès");
       queryClinet.invalidateQueries('reparations')
     },
     onError: (error) => {
@@ -225,8 +226,8 @@ export default function UpdatePeintureExt({ id }) {
   const onSubmit = (values) => {
     const payload = {
       ref_production: values.ref_production,
-      code_Reparation: values.code_reparation,
-      date_reparation: format(values.date, "yyyy-MM-dd HH:mm:ss"),
+      code_Peinture_Externe: values.code_Peinture_Externe,
+      date_Peinture_Externe: format(values.date, "yyyy-MM-dd HH:mm:ss"),
       machine: values.machine,
       statut: values.status,
       defaut: values.defect || null,
@@ -236,12 +237,12 @@ export default function UpdatePeintureExt({ id }) {
       controleur: values.inspector,
     };
     
-    updateReparation(payload);
+    updatePeintureEXT(payload);
   };
 
   const isLoadingData = isLoadingProductions || isLoadingMachines || 
                        isLoadingStatus || isLoadingDefects || isLoadingCauses || 
-                       isLoadingOperateurs || isLoadingReparation;
+                       isLoadingOperateurs || isLoadingPeintureEXT;
 
   if (isLoadingData) {
     return (
@@ -286,10 +287,10 @@ export default function UpdatePeintureExt({ id }) {
             {/* Repair Code */}
             <FormField
               control={form.control}
-              name="code_reparation"
+              name="code_Peinture_Externe"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Code Réparation</FormLabel>
+                  <FormLabel>Code Peiture Externe</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Entrez le code réparation"

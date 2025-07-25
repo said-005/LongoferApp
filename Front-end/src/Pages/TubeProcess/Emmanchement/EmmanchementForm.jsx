@@ -6,11 +6,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,24 +24,21 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { ProductionApi } from "../../../Api/ProductionApi";
-import { MachineApi } from "../../../Api/machineApi";
-import { CausseApi } from "../../../Api/causseApi";
-import { DefautApi } from "../../../Api/defautApi";
-import { OperateurApi } from "../../../Api/operateurApi";
-import { StatutApi } from "../../../Api/StatutApi";
 import AutocompleteInput from "../../../AutoComplet/AutoCompletInput";
-import { useNavigate } from "react-router-dom";
 import { cn } from '../../../lib/utils';
 import { ReparationApi } from "../../../Api/ReparationApi";
-
-const MAX_DESCRIPTION_LENGTH = 500;
+import { OperateurApi } from "../../../Api/operateurApi";
+import { StatutApi } from "../../../Api/StatutApi";
+import { DefautApi } from "../../../Api/defautApi";
+import { CausseApi } from "../../../Api/causseApi";
+import { ProductionApi } from "../../../Api/ProductionApi";
+import { MachineApi } from "../../../Api/machineApi";
+import { EmmanchementApi } from "../../../Api/Emmanchement";
 
 const formSchema = z.object({
   ref_production: z.string().min(1, "La référence production est requise"),
-  code_reparation: z.string()
-    .min(1, "Le code réparation est requis")
+  code_Emmanchement: z.string()
+    .min(1, "Le code Emmanchement est requis")
     .min(2, "Le code doit contenir au moins 2 caractères")
     .max(50, "Le code est trop long"),
   date: z.date({
@@ -56,8 +53,6 @@ const formSchema = z.object({
   welder: z.string().min(1, "Le soudeur est requis"),
   inspector: z.string().min(1, "L'inspecteur est requis"),
 });
-
-
 
 export default function EmmanchementForm() {
   const navigate = useNavigate();
@@ -134,7 +129,7 @@ export default function EmmanchementForm() {
     queryFn: async () => {
       const response = await OperateurApi.getAll();
       const data = response.data.data;
-      return {
+      return { 
         operators: data.map((op) => ({
           label: `${op.operateur} - ${op.nom_complete}`,
           value: op.operateur
@@ -156,7 +151,7 @@ export default function EmmanchementForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       ref_production: '',
-      code_reparation: '',
+      code_Emmanchement: '',
       date: undefined,
       machine: '',
       status: '',
@@ -165,8 +160,6 @@ export default function EmmanchementForm() {
       operator: '',
       welder: '',
       inspector: '',
-      qte_produite: 1,
-      description: ''
     },
     mode: 'onBlur',
   });
@@ -176,13 +169,13 @@ export default function EmmanchementForm() {
                       isLoadingOperateurs;
 
   // Mutation for creating reparation
-  const { mutate: createReparation, isPending: isSubmitting } = useMutation({
-    mutationFn: (reparationData) => 
-      ReparationApi.createReparation(reparationData),
+  const { mutate: createEmmanchement, isPending: isSubmitting } = useMutation({
+    mutationFn: (Data) => 
+      EmmanchementApi.createEmmanchement(Data),
     onSuccess: () => {
-      toast.success("Réparation créée avec succès");
+      toast.success("Emmanchement créé avec succès");
       form.reset();
-      navigate('/reparation');
+      navigate('/emmanchement');
     },
     onError: (error) => {
       toast.error("Erreur lors de la création", {
@@ -192,11 +185,10 @@ export default function EmmanchementForm() {
   });
 
   const onSubmit = (values) => {
-   
     const payload = {
       ref_production: values.ref_production,
-      code_Reparation : values.code_reparation,
-      date_reparation: format(values.date, "yyyy-MM-dd HH:mm:ss"),
+      code_Emmanchement: values.code_Emmanchement,
+      date_Emmanchement: format(values.date, "yyyy-MM-dd HH:mm:ss"),
       machine: values.machine,
       statut: values.status,
       defaut: values.defect || null,
@@ -205,8 +197,8 @@ export default function EmmanchementForm() {
       soudeur: values.welder,
       controleur: values.inspector,
     };
-     console.log(payload)
-    createReparation(payload);
+    
+    createEmmanchement(payload);
   };
 
   if (isLoadingData) {
@@ -220,7 +212,7 @@ export default function EmmanchementForm() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-30">
-      <h1 className="text-2xl font-bold mb-8 text-center text-gray-800">Formulaire de Réparation</h1>
+      <h1 className="text-2xl font-bold mb-8 text-center text-gray-800">Formulaire d'Emmanchement</h1>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -231,6 +223,7 @@ export default function EmmanchementForm() {
               name="ref_production"
               render={({ field }) => (
                 <FormItem>
+                  
                   <FormControl>
                     <AutocompleteInput
                       data={productions}
@@ -246,16 +239,16 @@ export default function EmmanchementForm() {
               )}
             />
 
-            {/* Repair Code */}
+            {/* Emmanchement Code */}
             <FormField
               control={form.control}
-              name="code_reparation"
+              name="code_Emmanchement"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Code Réparation</FormLabel>
+                  <FormLabel>Code Emmanchement</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Entrez le code réparation"
+                      placeholder="Entrez le code Emmanchement"
                       {...field}
                       value={field.value || ''}
                     />
@@ -305,14 +298,13 @@ export default function EmmanchementForm() {
               )}
             />
 
-
             {/* Machine */}
             <FormField
               control={form.control}
               name="machine"
               render={({ field }) => (
                 <FormItem>
-                 
+                  <FormLabel>Machine</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={machines}
@@ -334,7 +326,7 @@ export default function EmmanchementForm() {
               name="status"
               render={({ field }) => (
                 <FormItem>
-                
+                  <FormLabel>Statut</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={statusOptions}
@@ -356,7 +348,7 @@ export default function EmmanchementForm() {
               name="defect"
               render={({ field }) => (
                 <FormItem>
-             
+                  <FormLabel>Défaut (optionnel)</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={defects}
@@ -377,7 +369,7 @@ export default function EmmanchementForm() {
               name="cause"
               render={({ field }) => (
                 <FormItem>
-                
+                  <FormLabel>Cause (optionnel)</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={causes}
@@ -398,7 +390,7 @@ export default function EmmanchementForm() {
               name="operator"
               render={({ field }) => (
                 <FormItem>
-                  
+                  <FormLabel>Opérateur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.operators}
@@ -420,7 +412,7 @@ export default function EmmanchementForm() {
               name="welder"
               render={({ field }) => (
                 <FormItem>
-                 
+                  <FormLabel>Soudeur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.welders}
@@ -442,7 +434,7 @@ export default function EmmanchementForm() {
               name="inspector"
               render={({ field }) => (
                 <FormItem>
-               
+                  <FormLabel>Inspecteur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.inspectors}
@@ -458,6 +450,7 @@ export default function EmmanchementForm() {
               )}
             />
           </div>
+
           <div className="flex justify-center gap-4 mt-8 pt-4 border-t">
             <Button 
               type="button" 

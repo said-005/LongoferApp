@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { useEffect } from "react";
 
 import {
@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AutocompleteInput from "../../../AutoComplet/AutoCompletInput";
 import { cn } from '../../../lib/utils';
+import SheetCloseComponent from "../../SheetClose";
 
 // API imports
 import { ProductionApi } from "../../../Api/ProductionApi";
@@ -34,13 +35,11 @@ import { CausseApi } from "../../../Api/causseApi";
 import { DefautApi } from "../../../Api/defautApi";
 import { OperateurApi } from "../../../Api/operateurApi";
 import { StatutApi } from "../../../Api/StatutApi";
-import { ReparationApi } from "../../../Api/ReparationApi";
-import SheetCloseComponent from "../../SheetClose";
 import { SablageEXTApi } from "../../../Api/Sablage_Ext";
 
 const formSchema = z.object({
   ref_production: z.string().min(1, "La référence production est requise"),
-  code_Sablage_Externe : z.string()
+  code_Sablage_Externe: z.string()
     .min(2, "Le code doit contenir au moins 2 caractères")
     .max(50, "Le code est trop long"),
   date: z.date({
@@ -57,25 +56,25 @@ const formSchema = z.object({
 });
 
 export default function UpdateSablageEXT({ id }) {
+  const queryClient = useQueryClient();
+  
   const queryOptions = {
     staleTime: 1000 * 60 * 5, // 5 minutes
     onError: (error) => toast.error(`Erreur de chargement: ${error.message}`),
   };
 
-  // Fetch all required data in parallel
+  // Fetch all required data
   const { 
     data: sablageEXTData, 
-    isLoading: isLoadingSablageEXT 
+    isLoading: isLoadingSablageEXT,
+    isError: isSablageEXTError
   } = useQuery({
     queryKey: ['sablage_externe', id],
     queryFn: () => SablageEXTApi.getSablage_extById(id),
     ...queryOptions
   });
 
-  const { 
-    data: productions = [], 
-    isLoading: isLoadingProductions 
-  } = useQuery({
+  const { data: productions = [] } = useQuery({
     queryKey: ['productions'],
     queryFn: async () => {
       const response = await ProductionApi.getAll();
@@ -87,10 +86,7 @@ export default function UpdateSablageEXT({ id }) {
     ...queryOptions
   });
 
-  const { 
-    data: machines = [], 
-    isLoading: isLoadingMachines 
-  } = useQuery({
+  const { data: machines = [] } = useQuery({
     queryKey: ['machines'],
     queryFn: async () => {
       const response = await MachineApi.getAll();
@@ -102,10 +98,7 @@ export default function UpdateSablageEXT({ id }) {
     ...queryOptions
   });
 
-  const { 
-    data: statusOptions = [], 
-    isLoading: isLoadingStatus 
-  } = useQuery({
+  const { data: statusOptions = [] } = useQuery({
     queryKey: ['statusOptions'],
     queryFn: async () => {
       const response = await StatutApi.getAll();
@@ -117,10 +110,7 @@ export default function UpdateSablageEXT({ id }) {
     ...queryOptions
   });
 
-  const { 
-    data: defects = [], 
-    isLoading: isLoadingDefects 
-  } = useQuery({
+  const { data: defects = [] } = useQuery({
     queryKey: ['defects'],
     queryFn: async () => {
       const res = await DefautApi.getAll();
@@ -132,10 +122,7 @@ export default function UpdateSablageEXT({ id }) {
     ...queryOptions
   });
 
-  const { 
-    data: causes = [], 
-    isLoading: isLoadingCauses 
-  } = useQuery({
+  const { data: causes = [] } = useQuery({
     queryKey: ['causes'],
     queryFn: async () => {
       const response = await CausseApi.getAll();
@@ -147,10 +134,7 @@ export default function UpdateSablageEXT({ id }) {
     ...queryOptions
   });
 
-  const { 
-    data: operateurs = { operators: [], welders: [], inspectors: [] }, 
-    isLoading: isLoadingOperateurs 
-  } = useQuery({
+  const { data: operateurs = { operators: [], welders: [], inspectors: [] } } = useQuery({
     queryKey: ['operateurs'],
     queryFn: async () => {
       const response = await OperateurApi.getAll();
@@ -177,7 +161,7 @@ export default function UpdateSablageEXT({ id }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       ref_production: '',
-      code_Sablage_Externe : '',
+      code_Sablage_Externe: '',
       date: undefined,
       machine: '',
       status: '',
@@ -190,14 +174,14 @@ export default function UpdateSablageEXT({ id }) {
     mode: 'onBlur',
   });
 
-  // Reset form when reparation data is loaded
+  // Reset form when sablage data is loaded
   useEffect(() => {
     if (sablageEXTData?.data?.data) {
       const data = sablageEXTData.data.data;
       form.reset({
-        ref_production: data.ref_production  || '',
+        ref_production: data.ref_production || '',
         code_Sablage_Externe: data.code_Sablage_Externe || '',
-        date: data.date_reparation ? new Date(data.date_Sablage_Externe) : undefined,
+        date: data.date_Sablage_Externe ? parseISO(data.date_Sablage_Externe) : undefined,
         machine: data.machine || '',
         status: data.statut || '',
         defect: data.defaut || '',
@@ -208,26 +192,27 @@ export default function UpdateSablageEXT({ id }) {
       });
     }
   }, [sablageEXTData, form]);
-  const queryClinet=useQueryClient()
+
   const { mutate: updateSablageEXT, isPending: isSubmitting } = useMutation({
-    mutationFn: (data) => 
-      SablageEXTApi.updateSablage_ext(id, data),
+    mutationFn: (data) => SablageEXTApi.updateSablage_ext(id, data),
     onSuccess: () => {
-      toast.success("Sablage Externe mise à jour avec succès");
-      queryClinet.invalidateQueries('sablage_externes')
+      toast.success("Sablage externe mis à jour avec succès");
+      queryClient.invalidateQueries(['sablage_externe', id]);
+      queryClient.invalidateQueries('sablage_externes');
     },
     onError: (error) => {
-      toast.error("Erreur lors de la mise à jour", {
-        description: error.response?.data?.message || error.message,
-      });
+      const errorMessage = error.response?.data?.message || 
+                         error.response?.data?.error || 
+                         error.message;
+      toast.error(`Erreur lors de la mise à jour: ${errorMessage}`);
     }
   });
 
   const onSubmit = (values) => {
     const payload = {
       ref_production: values.ref_production,
-      code_Sablage_Externe : values.code_Sablage_Externe ,
-      date_Sablage_Externe: format(values.date, "yyyy-MM-dd HH:mm:ss"),
+      code_Sablage_Externe: values.code_Sablage_Externe,
+      date_Sablage_Externe: format(values.date, "yyyy-MM-dd") + " 00:00:00",
       machine: values.machine,
       statut: values.status,
       defaut: values.defect || null,
@@ -240,11 +225,7 @@ export default function UpdateSablageEXT({ id }) {
     updateSablageEXT(payload);
   };
 
-  const isLoadingData = isLoadingProductions || isLoadingMachines || 
-                       isLoadingStatus || isLoadingDefects || isLoadingCauses || 
-                       isLoadingOperateurs || isLoadingSablageEXT;
-
-  if (isLoadingData) {
+  if (isLoadingSablageEXT) {
     return (
       <div className="flex justify-center items-center h-64">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -253,13 +234,21 @@ export default function UpdateSablageEXT({ id }) {
     );
   }
 
+  if (isSablageEXTError) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <span className="text-red-500">Erreur lors du chargement du sablage externe</span>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-8 md:mt-12">
       <h1 className="text-xl md:text-2xl font-bold mb-6 text-center text-gray-800">
-        Modifier la Réparation
+        Modifier le Sablage Externe
       </h1>
       
-        <Form {...form}>
+      <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
           <div className="flex flex-col gap-2">
             {/* Production Reference */}
@@ -284,16 +273,16 @@ export default function UpdateSablageEXT({ id }) {
               )}
             />
 
-            {/* Repair Code */}
+            {/* Sablage Externe Code */}
             <FormField
               control={form.control}
-              name="code_Sablage_Externe "
+              name="code_Sablage_Externe"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Code Sablage Externe</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Entrez le code réparation"
+                      placeholder="Entrez le code de sablage externe"
                       {...field}
                     />
                   </FormControl>
@@ -496,9 +485,9 @@ export default function UpdateSablageEXT({ id }) {
           </div>
 
           <div className="flex justify-center items-center gap-4 mt-8 pt-4 border-t">
-           <div className="w-1/3">
-            <SheetCloseComponent/>
-           </div>
+            <div className="w-1/3">
+              <SheetCloseComponent />
+            </div>
             <Button 
               type="submit"
               className="min-w-[120px] bg-blue-600 hover:bg-blue-700" 

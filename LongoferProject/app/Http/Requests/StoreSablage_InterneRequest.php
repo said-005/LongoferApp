@@ -25,7 +25,6 @@ class StoreSablage_InterneRequest extends FormRequest
             'code_Sablage_Interne' => 'required|string|unique:sablage_internes,code_Sablage_Interne',
             'date_Sablage_Interne' => 'required|date',
             'ref_production'       => 'required|string',
-            'code_Reparation'      => 'nullable|string',
             'machine'              => 'required|string',
             'statut'               => 'required|string|',
             'defaut'               => 'nullable|string',
