@@ -135,30 +135,43 @@ class PeintureEXTController extends Controller
      * @param string $id
      * @return JsonResponse
      */
-    public function destroy(string $id): JsonResponse
-    {
-        try {
-            $peinture = Peinture_Externe::find($id);
+public function destroy(string $id): JsonResponse
+{
+    try {
+        $peinture = Peinture_Externe::find($id);
 
-            if (!$peinture) {
-                return response()->json([
-                    'message' => 'Peinture externe not found.'
-                ], Response::HTTP_NOT_FOUND);
-            }
-
-            $peinture->delete();
-
+        if (!$peinture) {
             return response()->json([
-                'message' => 'Peinture externe deleted successfully.'
-            ], Response::HTTP_OK);
-            
-        } catch (\Exception $e) {
-            Log::error('Failed to delete peinture externe: ' . $e->getMessage());
-
-            return response()->json([
-                'message' => 'An error occurred while deleting peinture externe.',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                'message' => 'Peinture externe not found.'
+            ], Response::HTTP_NOT_FOUND);
         }
+
+        if (!$peinture->ref_production) {
+            return response()->json([
+                'message' => 'Missing ref_Production on this record.'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!canDeleteStage('peinture_externes', $peinture->ref_production)) {
+            return response()->json([
+                'message' => 'Cannot delete: subsequent stages exist for this ref_Production.'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $peinture->delete();
+
+        return response()->json([
+            'message' => 'Peinture externe deleted successfully.'
+        ], Response::HTTP_OK);
+
+    } catch (\Exception $e) {
+        Log::error('Failed to delete peinture externe: ' . $e->getMessage());
+
+        return response()->json([
+            'message' => 'An error occurred while deleting peinture externe.',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
+
 }

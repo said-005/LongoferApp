@@ -1,4 +1,3 @@
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 import SheetCloseComponent from "../SheetClose";
 import { useEffect } from "react";
 
- const clientFormSchema = z.object({
+const clientFormSchema = z.object({
   codeClient: z.string().min(2, {
     message: "Code must be at least 2 characters",
   }),
@@ -39,7 +38,6 @@ import { useEffect } from "react";
 
 export function UpdateClient({ codeClient }) {
   const navigate = useNavigate();
-  
   const queryClient = useQueryClient();
 
   const form = useForm({
@@ -52,36 +50,34 @@ export function UpdateClient({ codeClient }) {
       email: "",
     },
   });
-console.log(!!codeClient)
-  // Fetch client data
-const {data, isLoading, isError, isFetching } = useQuery({
-  queryKey: ['client', codeClient],
-queryFn: ({ queryKey }) => {
-  const [, codeClient] = queryKey;
-  console.log("Fetching client with code:", codeClient);
-  return ClientApi.getClientById(codeClient);
-},
 
-  onError: (error) => {
-    console.log(error)
-    toast.error("Failed to load client data", {
-      description: error.message || "Please try again later",
-    });
-  },
-  enabled: !!codeClient,
- 
-});
-useEffect(() => {
-  if (data?.data) {
-    form.reset({
-      codeClient: data.data.data.codeClient,
-      client: data.data.data.Client, // use correct key name (check your API)
-      address: data.data.data.address || "",
-      phone: data.data.data.tele,
-      email: data.data.data.email,
-    });
-  }
-}, [data, form]);
+  // Fetch client data
+  const { data, isLoading, isError, isFetching } = useQuery({
+    queryKey: ['client', codeClient],
+    queryFn: ({ queryKey }) => {
+      const [, codeClient] = queryKey;
+      return ClientApi.getClientById(codeClient);
+    },
+    onError: (error) => {
+      toast.error("Failed to load client data", {
+        description: error.message || "Please try again later",
+      });
+    },
+    enabled: !!codeClient,
+  });
+
+  useEffect(() => {
+    if (data?.data) {
+      form.reset({
+        codeClient: data.data.data.codeClient,
+        client: data.data.data.Client,
+        address: data.data.data.address || "",
+        phone: data.data.data.tele,
+        email: data.data.data.email,
+      });
+    }
+  }, [data, form]);
+
   // Update client mutation
   const { mutate: updateClient, isPending } = useMutation({
     mutationFn: (values) => {
@@ -103,9 +99,8 @@ useEffect(() => {
       navigate('/Client');
     },
     onError: (error) => {
-      console.log(error)
       toast.error("Update failed", {
-        description: error.response.data.message || "There was an error updating the client",
+        description: error.response?.data?.message || "There was an error updating the client",
       });
     }
   });
@@ -117,7 +112,7 @@ useEffect(() => {
   if (isFetching || isLoading) {
     return (
       <div className="w-full h-full flex justify-center items-center p-4">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -125,17 +120,16 @@ useEffect(() => {
   if (isError) {
     return (
       <div className="w-full h-full flex justify-center items-center p-4">
-        <p className="text-red-500">Failed to load client data</p>
+        <p className="text-destructive">Failed to load client data</p>
       </div>
     );
   }
 
   return (
     <div className="w-full h-full flex flex-col p-4">
-    <Card className="w-full max-w-3xl h-full flex flex-col">
-
+      <Card className="w-full max-w-3xl h-full flex flex-col bg-background">
         <CardHeader>
-          <h1 className="text-2xl font-bold text-center">Update Client</h1>
+          <h1 className="text-2xl font-bold text-center text-foreground">Update Client</h1>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -146,12 +140,13 @@ useEffect(() => {
                   name="codeClient"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Client Code*</FormLabel>
+                      <FormLabel className="text-foreground">Client Code*</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="CL-001" 
                           {...field} 
                           disabled={isPending}
+                          className="bg-background text-foreground border-border"
                         />
                       </FormControl>
                       <FormMessage />
@@ -164,12 +159,13 @@ useEffect(() => {
                   name="client"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Client Name*</FormLabel>
+                      <FormLabel className="text-foreground">Client Name*</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Client Name" 
                           {...field} 
                           disabled={isPending}
+                          className="bg-background text-foreground border-border"
                         />
                       </FormControl>
                       <FormMessage />
@@ -182,12 +178,13 @@ useEffect(() => {
                   name="address"
                   render={({ field }) => (
                     <FormItem className="md:col-span-2">
-                      <FormLabel>Address</FormLabel>
+                      <FormLabel className="text-foreground">Address</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="123 Main St, City" 
                           {...field} 
                           disabled={isPending}
+                          className="bg-background text-foreground border-border"
                         />
                       </FormControl>
                       <FormMessage />
@@ -200,12 +197,13 @@ useEffect(() => {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone*</FormLabel>
+                      <FormLabel className="text-foreground">Phone*</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="0612345678" 
                           {...field} 
                           disabled={isPending}
+                          className="bg-background text-foreground border-border"
                         />
                       </FormControl>
                       <FormMessage />
@@ -218,12 +216,13 @@ useEffect(() => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email*</FormLabel>
+                      <FormLabel className="text-foreground">Email*</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="contact@company.com" 
                           {...field} 
                           disabled={isPending}
+                          className="bg-background text-foreground border-border"
                         />
                       </FormControl>
                       <FormMessage />
@@ -234,7 +233,7 @@ useEffect(() => {
 
               <div className="flex justify-end items-center pt-4 gap-2">
                 <div className="w-30">
-                  <SheetCloseComponent/>
+                  <SheetCloseComponent />
                 </div>
               
                 <Button 

@@ -41,25 +41,24 @@ export function ClientForm() {
   });
 
   const { mutate: createClient, isPending } = useMutation({
-    mutationFn: (data)=>ClientApi.createClient(data),
+    mutationFn: (data) => ClientApi.createClient(data),
     onSuccess: () => {
       toast.success("Client created successfully");
       navigate(-1); // Go back after successful creation
     },
     onError: (error) => {
       console.log(error)
-      // toast.error(error || "Failed to create client");
+      toast.error(error.message || "Failed to create client");
     }
   });
 
   function onSubmit(values) {
-    const ClientsData={
-      
-address:values.address,
-Client:values.client,
-codeClient:values.codeClient,
-email:values.email,
-tele:values.phone
+    const ClientsData = {
+      address: values.address,
+      Client: values.client,
+      codeClient: values.codeClient,
+      email: values.email,
+      tele: values.phone
     }
     createClient(ClientsData);
   }
@@ -70,9 +69,11 @@ tele:values.phone
 
   return (
     <div className="w-full h-full flex justify-center items-center p-4">
-      <Card className="w-full max-w-3xl">
+      <Card className="w-full max-w-3xl bg-background">
         <CardHeader>
-          <h1 className="text-2xl font-bold text-center">Client Form</h1>
+          <h1 className="text-2xl font-bold text-center text-foreground">
+            Client Form
+          </h1>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -83,9 +84,13 @@ tele:values.phone
                   name="codeClient"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Code Client*</FormLabel>
+                      <FormLabel className="text-foreground">Code Client*</FormLabel>
                       <FormControl>
-                        <Input placeholder="CL-001" {...field} />
+                        <Input 
+                          placeholder="CL-001" 
+                          {...field} 
+                          className="bg-background text-foreground border-border"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -97,9 +102,13 @@ tele:values.phone
                   name="client"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Client Name*</FormLabel>
+                      <FormLabel className="text-foreground">Client Name*</FormLabel>
                       <FormControl>
-                        <Input placeholder="Client Name" {...field} />
+                        <Input 
+                          placeholder="Client Name" 
+                          {...field} 
+                          className="bg-background text-foreground border-border"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -111,9 +120,13 @@ tele:values.phone
                   name="address"
                   render={({ field }) => (
                     <FormItem className="md:col-span-2">
-                      <FormLabel>Address</FormLabel>
+                      <FormLabel className="text-foreground">Address</FormLabel>
                       <FormControl>
-                        <Input placeholder="123 Main St, City" {...field} />
+                        <Input 
+                          placeholder="123 Main St, City" 
+                          {...field} 
+                          className="bg-background text-foreground border-border"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -125,9 +138,13 @@ tele:values.phone
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone</FormLabel>
+                      <FormLabel className="text-foreground">Phone</FormLabel>
                       <FormControl>
-                        <Input placeholder="0612345678" {...field} />
+                        <Input 
+                          placeholder="0612345678" 
+                          {...field} 
+                          className="bg-background text-foreground border-border"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -139,9 +156,13 @@ tele:values.phone
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel className="text-foreground">Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="contact@company.com" {...field} />
+                        <Input 
+                          placeholder="contact@company.com" 
+                          {...field} 
+                          className="bg-background text-foreground border-border"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -27,7 +27,6 @@ import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 import { OfApi } from "../../Api/ofApi";
 
-// Define form schema with TypeScript types
 const formSchema = z.object({
   ofNumber: z.string().min(1, "Le numéro OF est requis"),
   client: z.string().min(1, "Le client est requis"),
@@ -51,27 +50,26 @@ const formSchema = z.object({
 
 export function OFForm() {
   const navigate = useNavigate();
-  const queryClient=useQueryClient()
-  // Fetch clients data
+  const queryClient = useQueryClient();
+
   const { data: clientsData, isLoading: isClientsLoading } = useQuery({
     queryKey: ['clients'],
     queryFn: ClientApi.getAll,
-    staleTime: 1000 * 60 * 5, // 5 minutes cache
+    staleTime: 1000 * 60 * 5,
   });
 
-  // Fetch articles data
   const { data: articlesData, isLoading: isArticlesLoading } = useQuery({
     queryKey: ['articles'],
     queryFn: ArticleApi.getAll,
-    staleTime: 1000 * 60 * 5, // 5 minutes cache
+    staleTime: 1000 * 60 * 5,
   });
 
-  // Mutation for submitting OF data
   const { mutate: submitOF, isPending: isSubmitting } = useMutation({
     mutationFn: (data) => OfApi.createOF(data),
     onSuccess: () => {
       toast.success("Ordre de fabrication créé avec succès");
-        queryClient.invalidateQueries('ofs')
+      queryClient.invalidateQueries('ofs');
+      navigate('/Of');
     },
     onError: (error) => {
       toast.error("Erreur lors de la création de l'OF", {
@@ -80,13 +78,11 @@ export function OFForm() {
     }
   });
 
-  // Prepare client options for Autocomplete
   const clientOptions = clientsData?.data?.data?.map((client) => ({
     label: client.Client,
     value: client.codeClient,
   })) || [];
 
-  // Prepare article options for Autocomplete
   const articleOptions = articlesData?.data?.data?.map((article) => ({
     label: article.ArticleName,
     value: article.codeArticle,
@@ -111,48 +107,40 @@ export function OFForm() {
   });
 
   function onSubmit(values) {
-    console.log(values)
     const formatDate = (date) => date.toISOString().split('T')[0];
 
-const payload = {
-  date_Prevue_Livraison: formatDate(values.deliveryDate),
-  Date_OF: formatDate(values.ofDate)
-};
-    // Format dates to ISO string before submission
-    const formattedValues = {
-     codeOf:values.ofNumber,
-      client :values.client,
-      Article_1 :values.article1,
-      Article_2 :values.article2,
-      Article_3 :values.article3,
-      Article_4 :values.article4,
-      Article_5 :values.article5,
-      Revetement_Ext:values.externalCoating,
-      Revetement_Int:values.internalCoating,
-      Sablage_Ext:values.externalSandblasting,
-      Sablage_Int:values.internalSandblasting,
-      Manchette_ISO:values.isoSleeve,
-      date_Prevue_Livraison: payload.date_Prevue_Livraison, // or toISOString()
-      Date_OF:payload.Date_OF // or toISOString()
-
+    const payload = {
+      codeOf: values.ofNumber,
+      client: values.client,
+      Article_1: values.article1,
+      Article_2: values.article2,
+      Article_3: values.article3,
+      Article_4: values.article4,
+      Article_5: values.article5,
+      Revetement_Ext: values.externalCoating,
+      Revetement_Int: values.internalCoating,
+      Sablage_Ext: values.externalSandblasting,
+      Sablage_Int: values.internalSandblasting,
+      Manchette_ISO: values.isoSleeve,
+      date_Prevue_Livraison: formatDate(values.deliveryDate),
+      Date_OF: formatDate(values.ofDate)
     };
-    submitOF(formattedValues);
+    submitOF(payload);
   }
 
   const handleAnnuler = () => {
     navigate('/Of');
   };
 
-  // Format date for display using date-fns with French locale
   const formatDate = (date) => {
     return format(date, 'dd/MM/yyyy', { locale: fr });
   };
 
   return (
-    <div className="w-full h-full flex justify-center flex-col items-center p-4 mt-10">
-      <Card className="w-full max-w-3xl shadow-lg">
+    <div className="w-full h-full flex justify-center flex-col items-center p-4">
+      <Card className="w-full max-w-3xl">
         <CardHeader className="border-b">
-          <h1 className="text-2xl font-bold text-center text-gray-800 dark:text-white">
+          <h1 className="text-2xl font-bold text-center">
             Ordre de Fabrication
           </h1>
         </CardHeader>
@@ -160,51 +148,45 @@ const payload = {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* OF Number */}
                 <FormField
                   control={form.control}
                   name="ofNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-medium">N° OF*</FormLabel>
+                      <FormLabel>N° OF*</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="OF-12345" 
                           {...field} 
-                          className="focus-visible:ring-2 focus-visible:ring-blue-500"
                         />
                       </FormControl>
-                      <FormMessage className="text-xs" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Client */}
                 <FormField
                   control={form.control}
                   name="client"
                   render={({ field }) => (
                     <FormItem>
-                      
+              
                       <FormControl>
-                        <div className="-mt-1.5">
-                          <AutocompleteInput
-                            data={clientOptions}
-                            text="Sélectionnez un client"
-                            place="Choisissez parmi les suggestions"
-                            value={field.value}
-                            onChange={field.onChange}
-                            required={true}
-                            disabled={isClientsLoading}
-                          />
-                        </div>
+                        <AutocompleteInput
+                          data={clientOptions}
+                          text="Sélectionnez un client"
+                          place="Choisissez parmi les suggestions"
+                          value={field.value}
+                          onChange={field.onChange}
+                          required={true}
+                          disabled={isClientsLoading}
+                        />
                       </FormControl>
-                      <FormMessage className="text-xs" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Articles */}
                 {[1, 2, 3, 4, 5].map((num) => (
                   <FormField
                     key={num}
@@ -212,7 +194,9 @@ const payload = {
                     name={`article${num}`}
                     render={({ field }) => (
                       <FormItem>
-                        
+                        <FormLabel>
+                          Article {num}{num === 1 ? '*' : ''}
+                        </FormLabel>
                         <FormControl>
                           <AutocompleteInput
                             data={articleOptions}
@@ -224,26 +208,25 @@ const payload = {
                             disabled={isArticlesLoading}
                           />
                         </FormControl>
-                        <FormMessage className="text-xs" />
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
                 ))}
 
-                {/* OF Date */}
                 <FormField
                   control={form.control}
                   name="ofDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel className="font-medium">Date OF*</FormLabel>
+                      <FormLabel>Date OF*</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "pl-3 text-left font-normal h-11",
+                                "pl-3 text-left font-normal",
                                 !field.value && "text-muted-foreground"
                               )}
                             >
@@ -257,37 +240,34 @@ const payload = {
                           </FormControl>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                          <div className="rounded-md border shadow-sm">
-                            <input
-                              type="date"
-                              onChange={(e) => field.onChange(new Date(e.target.value))}
-                              value={field.value?.toISOString().split('T')[0] || ''}
-                              className="p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                              min="1900-01-01"
-                              max={new Date().toISOString().split('T')[0]}
-                            />
-                          </div>
+                          <input
+                            type="date"
+                            onChange={(e) => field.onChange(new Date(e.target.value))}
+                            value={field.value?.toISOString().split('T')[0] || ''}
+                            className="p-2 w-full border rounded-md"
+                            min="1900-01-01"
+                            max={new Date().toISOString().split('T')[0]}
+                          />
                         </PopoverContent>
                       </Popover>
-                      <FormMessage className="text-xs" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Delivery Date */}
                 <FormField
                   control={form.control}
                   name="deliveryDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel className="font-medium">Date Prévue livraison*</FormLabel>
+                      <FormLabel>Date Prévue livraison*</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "pl-3 text-left font-normal h-11",
+                                "pl-3 text-left font-normal",
                                 !field.value && "text-muted-foreground"
                               )}
                             >
@@ -301,23 +281,20 @@ const payload = {
                           </FormControl>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                          <div className="rounded-md border shadow-sm">
-                            <input
-                              type="date"
-                              onChange={(e) => field.onChange(new Date(e.target.value))}
-                              value={field.value?.toISOString().split('T')[0] || ''}
-                              className="p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                              min={new Date().toISOString().split('T')[0]}
-                            />
-                          </div>
+                          <input
+                            type="date"
+                            onChange={(e) => field.onChange(new Date(e.target.value))}
+                            value={field.value?.toISOString().split('T')[0] || ''}
+                            className="p-2 w-full border rounded-md"
+                            min={new Date().toISOString().split('T')[0]}
+                          />
                         </PopoverContent>
                       </Popover>
-                      <FormMessage className="text-xs" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Switches */}
                 {[
                   { name: "externalCoating", label: "Revêtement Extérieur" },
                   { name: "externalSandblasting", label: "Sablage Extérieur" },
@@ -330,15 +307,12 @@ const payload = {
                     control={form.control}
                     name={name}
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm hover:shadow transition-shadow">
-                        <div className="space-y-0.5">
-                          <FormLabel className="font-medium">{label}</FormLabel>
-                        </div>
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <FormLabel>{label}</FormLabel>
                         <FormControl>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
-                            className="data-[state=checked]:bg-blue-500"
                           />
                         </FormControl>
                       </FormItem>
@@ -347,19 +321,16 @@ const payload = {
                 ))}
               </div>
 
-              {/* Form Actions */}
               <div className="flex justify-end pt-6 gap-3 border-t">
                 <Button 
                   type="button" 
                   onClick={handleAnnuler} 
                   variant="outline"
-                  className="min-w-24 hover:bg-gray-100"
                 >
                   Annuler
                 </Button>
                 <Button 
                   type="submit"
-                  className="min-w-24 bg-blue-600 hover:bg-blue-700"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Enregistrement..." : "Enregistrer"}

@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateReparationRequest;
 use App\Http\Resources\ReparationResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Response;
 
 class ReparationController extends Controller
 {
@@ -63,24 +64,36 @@ class ReparationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $reparation_code): JsonResponse
-    {
-        try {
-            $reparation = Reparation::where('code_Reparation', $reparation_code)->first();
+public function destroy(string $reparation_code): JsonResponse
+{
+    try {
+        $reparation = Reparation::where('code_Reparation', $reparation_code)->first();
 
-            if (!$reparation) {
-                return response()->json(['message' => 'Reparation not found'], 404);
-            }
-
-            $reparation->delete();
-
-            return response()->json(['message' => 'Reparation deleted successfully']);
-        } catch (\Exception $e) {
-            Log::error('Reparation delete error: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Failed to delete reparation',
-                'error' => $e->getMessage()
-            ], 500);
+        if (!$reparation) {
+            return response()->json(['message' => 'Reparation not found'], Response::HTTP_NOT_FOUND);
         }
+        // Ensure ref_Production exists and is not null
+        if (!$reparation->ref_production) {
+            return response()->json(['message' => 'Missing ref_Production'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Check if this stage can be deleted
+        if (!canDeleteStage('reparations', $reparation->ref_production)) {
+            return response()->json([
+                'message' => 'Cannot delete: later stages exist'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $reparation->delete();
+
+        return response()->json(['message' => 'Reparation deleted successfully'], Response::HTTP_OK);
+
+    } catch (\Exception $e) {
+        Log::error('Reparation delete error: ' . $e->getMessage());
+        return response()->json([
+            'message' => 'Failed to delete reparation',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
 }

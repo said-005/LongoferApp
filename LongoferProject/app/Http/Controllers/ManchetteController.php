@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateManchette_ISORequest;
 use App\Http\Resources\ManchetteResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+
 use Symfony\Component\HttpFoundation\Response;
 
 class ManchetteController extends Controller
@@ -135,30 +136,43 @@ class ManchetteController extends Controller
      * @param string $id
      * @return JsonResponse
      */
-    public function destroy(string $id): JsonResponse
-    {
-        try {
-            $manchette = Manchette_ISO::find($id);
+public function destroy(string $id): JsonResponse
+{
+    try {
+        $manchette = Manchette_ISO::find($id);
 
-            if (!$manchette) {
-                return response()->json([
-                    'message' => 'Manchette ISO not found.'
-                ], Response::HTTP_NOT_FOUND);
-            }
-
-            $manchette->delete();
-
+        if (!$manchette) {
             return response()->json([
-                'message' => 'Manchette ISO deleted successfully.'
-            ], Response::HTTP_OK);
-            
-        } catch (\Exception $e) {
-            Log::error('Failed to delete manchette ISO: ' . $e->getMessage());
-
-            return response()->json([
-                'message' => 'An error occurred while deleting manchette ISO.',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                'message' => 'Manchette ISO not found.'
+            ], Response::HTTP_NOT_FOUND);
         }
+
+        if (!$manchette->ref_production) {
+            return response()->json([
+                'message' => 'Missing ref_Production on this record.'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!canDeleteStage('manchette_isos', $manchette->ref_production)) {
+            return response()->json([
+                'message' => 'Cannot delete: subsequent stages exist for this ref_Production.'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $manchette->delete();
+
+        return response()->json([
+            'message' => 'Manchette ISO deleted successfully.'
+        ], Response::HTTP_OK);
+
+    } catch (\Exception $e) {
+        Log::error('Failed to delete manchette ISO: ' . $e->getMessage());
+
+        return response()->json([
+            'message' => 'An error occurred while deleting manchette ISO.',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
+
 }

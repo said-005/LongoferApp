@@ -1,3 +1,4 @@
+"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -26,24 +27,19 @@ import { OfApi } from "../../Api/ofApi";
 import { useEffect, useMemo } from "react";
 import SheetCloseComponent from './../SheetClose';
 
-// Constants for repeated values
 const REQUIRED_FIELD_MESSAGE = "Ce champ est requis";
-const DATE_CONFIG = {
-  required_error: REQUIRED_FIELD_MESSAGE,
-};
-const STALE_TIME = 1000 * 60 * 5; // 5 minutes
+const STALE_TIME = 1000 * 60 * 5; // 5 minutes cache
 
-// Form schema with improved validation messages
 const formSchema = z.object({
-  ofNumber: z.string().min(1, "Le numéro OF est requis"),
+  ofNumber: z.string().min(1, REQUIRED_FIELD_MESSAGE),
   client: z.string().min(1, REQUIRED_FIELD_MESSAGE),
   article1: z.string().min(1, REQUIRED_FIELD_MESSAGE),
   article2: z.string().optional(),
   article3: z.string().optional(),
   article4: z.string().optional(),
   article5: z.string().optional(),
-  ofDate: z.date(DATE_CONFIG),
-  deliveryDate: z.date(DATE_CONFIG),
+  ofDate: z.date({ required_error: REQUIRED_FIELD_MESSAGE }),
+  deliveryDate: z.date({ required_error: REQUIRED_FIELD_MESSAGE }),
   externalCoating: z.boolean(),
   externalSandblasting: z.boolean(),
   internalSandblasting: z.boolean(),
@@ -51,20 +47,18 @@ const formSchema = z.object({
   isoSleeve: z.boolean(),
 });
 
-
-// Switch configuration for cleaner rendering
 const SWITCH_FIELDS = [
   { name: "externalCoating", label: "Revêtement Extérieur" },
   { name: "externalSandblasting", label: "Sablage Extérieur" },
   { name: "internalSandblasting", label: "Sablage Intérieur" },
   { name: "internalCoating", label: "Revêtement Intérieur" },
   { name: "isoSleeve", label: "Manchette ISO" },
-] ;
+];
 
 export function UpdateOf({ id }) {
   const queryClient = useQueryClient();
 
-  // Fetch existing OF data
+  // Data fetching
   const { data: ofData, isLoading: isOfLoading } = useQuery({
     queryKey: ['of', id],
     queryFn: () => OfApi.getOFById(id),
@@ -72,23 +66,21 @@ export function UpdateOf({ id }) {
     staleTime: STALE_TIME,
   });
 
-  // Fetch clients data
-  const { data: clientsData, isLoading: isClientsLoading } = useQuery({
+  const { data: clientsData } = useQuery({
     queryKey: ['clients'],
     queryFn: ClientApi.getAll,
     staleTime: STALE_TIME,
   });
 
-  // Fetch articles data
-  const { data: articlesData, isLoading: isArticlesLoading } = useQuery({
+  const { data: articlesData } = useQuery({
     queryKey: ['articles'],
     queryFn: ArticleApi.getAll,
     staleTime: STALE_TIME,
   });
 
-  // Prepare options with useMemo for performance
+  // Memoized options
   const clientOptions = useMemo(() => 
-    clientsData?.data?.data?.map((client) => ({
+    clientsData?.data?.data?.map(client => ({
       label: client.Client,
       value: client.codeClient,
     })) || [], 
@@ -96,7 +88,7 @@ export function UpdateOf({ id }) {
   );
 
   const articleOptions = useMemo(() => 
-    articlesData?.data?.data?.map((article) => ({
+    articlesData?.data?.data?.map(article => ({
       label: article.ArticleName,
       value: article.codeArticle,
     })) || [], 
@@ -121,45 +113,40 @@ export function UpdateOf({ id }) {
     },
   });
 
-  // Mutation for updating OF data
+  // Mutation for updating OF
   const { mutate: updateOF, isPending: isUpdating } = useMutation({
     mutationFn: (data) => OfApi.updateOF(id, transformFormData(data)),
     onSuccess: () => {
-      toast.success("Ordre de fabrication mis à jour avec succès");
+      toast.success("OF mis à jour avec succès");
       queryClient.invalidateQueries(['ofs']);
       queryClient.invalidateQueries(['of', id]);
-      
     },
     onError: (error) => {
-      toast.error("Erreur lors de la mise à jour de l'OF", {
-        description: error.message || "Veuillez réessayer",
+      toast.error("Erreur de mise à jour", {
+        description: error.message || "Une erreur est survenue",
       });
     }
   });
 
-  // Transform form data for API payload
-  const transformFormData = (values) => {
-    const formatDate = (date) => date.toISOString().split('T')[0];
-    
-    return {
-      codeOf: values.ofNumber,
-      client: values.client,
-      Article_1: values.article1,
-      Article_2: values.article2 || undefined,
-      Article_3: values.article3 || undefined,
-      Article_4: values.article4 || undefined,
-      Article_5: values.article5 || undefined,
-      Revetement_Ext: values.externalCoating,
-      Revetement_Int: values.internalCoating,
-      Sablage_Ext: values.externalSandblasting,
-      Sablage_Int: values.internalSandblasting,
-      Manchette_ISO: values.isoSleeve,
-      date_Prevue_Livraison: formatDate(values.deliveryDate),
-      Date_OF: formatDate(values.ofDate)
-    };
-  };
+  // Transform form data for API
+  const transformFormData = (values) => ({
+    codeOf: values.ofNumber,
+    client: values.client,
+    Article_1: values.article1,
+    Article_2: values.article2 || undefined,
+    Article_3: values.article3 || undefined,
+    Article_4: values.article4 || undefined,
+    Article_5: values.article5 || undefined,
+    Revetement_Ext: values.externalCoating,
+    Revetement_Int: values.internalCoating,
+    Sablage_Ext: values.externalSandblasting,
+    Sablage_Int: values.internalSandblasting,
+    Manchette_ISO: values.isoSleeve,
+    date_Prevue_Livraison: format(values.deliveryDate, 'yyyy-MM-dd'),
+    Date_OF: format(values.ofDate, 'yyyy-MM-dd')
+  });
 
-  // Pre-fill form when OF data is loaded
+  // Initialize form with fetched data
   useEffect(() => {
     if (ofData?.data) {
       const data = ofData.data;
@@ -182,49 +169,46 @@ export function UpdateOf({ id }) {
     }
   }, [ofData, form]);
 
-  const isLoading = isOfLoading || isClientsLoading || isArticlesLoading;
+  const isLoading = isOfLoading;
 
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b">
-        <h2 className="text-xl font-semibold">Modifier l'Ordre de Fabrication</h2>
+        <h2 className="text-xl font-semibold text-foreground">Modifier l'Ordre de Fabrication</h2>
       </div>
       
-      {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto p-4">
         <Form {...form}>
           <form 
             id="update-of-form" 
-            onSubmit={form.handleSubmit((values) => updateOF(values))} 
+            onSubmit={form.handleSubmit(updateOF)} 
             className="space-y-4"
           >
             <div className="space-y-4">
-              {/* OF Number */}
               <FormField
                 control={form.control}
                 name="ofNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-medium">N° OF*</FormLabel>
+                    <FormLabel>N° OF*</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="OF-12345" 
                         {...field} 
-                        className="focus-visible:ring-2 focus-visible:ring-blue-500"
                         disabled={isLoading}
                       />
                     </FormControl>
-                    <FormMessage className="text-xs" />
+                    <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* Client */}
               <FormField
                 control={form.control}
                 name="client"
                 render={({ field }) => (
                   <FormItem>
+                
                     <FormControl>
                       <AutocompleteInput
                         data={clientOptions}
@@ -236,20 +220,19 @@ export function UpdateOf({ id }) {
                         disabled={isLoading}
                       />
                     </FormControl>
-                    <FormMessage className="text-xs" />
+                    <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* Articles */}
               {[1, 2, 3, 4, 5].map((num) => (
                 <FormField
                   key={num}
                   control={form.control}
-                  name={`article${num}` }
+                  name={`article${num}`}
                   render={({ field }) => (
                     <FormItem>
-                  
+                      <FormLabel>Article {num}{num === 1 ? '*' : ''}</FormLabel>
                       <FormControl>
                         <AutocompleteInput
                           data={articleOptions}
@@ -261,13 +244,12 @@ export function UpdateOf({ id }) {
                           disabled={isLoading}
                         />
                       </FormControl>
-                      <FormMessage className="text-xs" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
               ))}
 
-              {/* OF Date */}
               <DatePickerField 
                 control={form.control}
                 name="ofDate"
@@ -276,31 +258,26 @@ export function UpdateOf({ id }) {
                 maxDate={new Date()}
               />
 
-              {/* Delivery Date */}
               <DatePickerField 
                 control={form.control}
                 name="deliveryDate"
-                label="Date Prévue livraison*"
+                label="Date livraison*"
                 disabled={isLoading}
                 minDate={new Date()}
               />
 
-              {/* Switches */}
               {SWITCH_FIELDS.map(({ name, label }) => (
                 <FormField
                   key={name}
                   control={form.control}
                   name={name}
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm hover:shadow transition-shadow">
-                      <div className="space-y-0.5">
-                        <FormLabel className="font-medium">{label}</FormLabel>
-                      </div>
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <FormLabel>{label}</FormLabel>
                       <FormControl>
                         <Switch
                           checked={field.value}
                           onCheckedChange={field.onChange}
-                          className="data-[state=checked]:bg-blue-500"
                           disabled={isLoading}
                         />
                       </FormControl>
@@ -313,44 +290,30 @@ export function UpdateOf({ id }) {
         </Form>
       </div>
 
-      {/* Fixed footer */}
-      <div className="p-4 border-t flex justify-end items-center gap-2">
-        <div className="w-1/3 -m-0.5">
-          <SheetCloseComponent/>
+      <div className="p-4 border-t flex items-center justify-end gap-2">
+        <div className="w-1/3">
+          <SheetCloseComponent />
         </div>
-
+        
         <Button 
           type="submit" 
           form="update-of-form" 
           disabled={isUpdating || isLoading}
-          className="px-4 py-2 text-sm font-medium transition-colors bg-primary hover:bg-primary/90 text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 disabled:pointer-events-none"
         >
           {isUpdating ? (
-            <span className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Enregistrement...
-            </span>
-          ) : (
-            "Enregistrer les modifications"
-          )}
+            </>
+          ) : "Enregistrer"}
         </Button>
       </div>
     </div>
   );
 }
 
-// Extracted DatePicker component for reuse
-function DatePickerField({
-  control,
-  name,
-  label,
-  disabled,
-  minDate,
-  maxDate,
-}) {
-  const formatDateDisplay = (date) => {
-    return format(date, 'dd/MM/yyyy', { locale: fr });
-  };
+function DatePickerField({ control, name, label, disabled, minDate, maxDate }) {
+  const formatDateDisplay = (date) => format(date, 'dd/MM/yyyy', { locale: fr });
 
   return (
     <FormField
@@ -358,14 +321,14 @@ function DatePickerField({
       name={name}
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel className="font-medium">{label}</FormLabel>
+          <FormLabel>{label}</FormLabel>
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
-                  variant={"outline"}
+                  variant="outline"
                   className={cn(
-                    "pl-3 text-left font-normal h-11",
+                    "pl-3 text-left font-normal",
                     !field.value && "text-muted-foreground"
                   )}
                   disabled={disabled}
@@ -380,19 +343,18 @@ function DatePickerField({
               </FormControl>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <div className="rounded-md border shadow-sm">
-                <input
-                  type="date"
-                  onChange={(e) => field.onChange(new Date(e.target.value))}
-                  value={field.value?.toISOString().split('T')[0] || ''}
-                  className="p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                  min={minDate?.toISOString().split('T')[0]}
-                  max={maxDate?.toISOString().split('T')[0]}
-                />
-              </div>
+              <input
+                type="date"
+                onChange={(e) => field.onChange(new Date(e.target.value))}
+                value={field.value?.toISOString().split('T')[0] || ''}
+                className="p-2 w-full border rounded-md"
+                min={minDate?.toISOString().split('T')[0]}
+                max={maxDate?.toISOString().split('T')[0]}
+                disabled={disabled}
+              />
             </PopoverContent>
           </Popover>
-          <FormMessage className="text-xs" />
+          <FormMessage />
         </FormItem>
       )}
     />

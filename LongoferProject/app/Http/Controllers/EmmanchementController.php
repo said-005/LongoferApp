@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
+
 class EmmanchementController extends Controller
 {
     /**
@@ -143,33 +144,47 @@ class EmmanchementController extends Controller
      * @param string $id
      * @return JsonResponse
      */
-    public function destroy(string $id): JsonResponse
-    {
-        try {
-            $emmanchement = Emmanchement::find($id);
+public function destroy(string $id): JsonResponse
+{
+    try {
+        $emmanchement = Emmanchement::find($id);
 
-            if (!$emmanchement) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Emmanchement not found.'
-                ], Response::HTTP_NOT_FOUND);
-            }
-
-            $emmanchement->delete();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Emmanchement deleted successfully.'
-            ], Response::HTTP_OK);
-            
-        } catch (\Exception $e) {
-            Log::error('Failed to delete emmanchement: ' . $e->getMessage());
-
+        if (!$emmanchement) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'An error occurred while deleting emmanchement.',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                'message' => 'Emmanchement not found.'
+            ], Response::HTTP_NOT_FOUND);
         }
+
+        if (!$emmanchement->ref_production) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Missing ref_Production on this record.'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!canDeleteStage('emmanchements', $emmanchement->ref_production)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Cannot delete: subsequent stages exist for this ref_Production.'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $emmanchement->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Emmanchement deleted successfully.'
+        ], Response::HTTP_OK);
+
+    } catch (\Exception $e) {
+        Log::error('Failed to delete emmanchement: ' . $e->getMessage());
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'An error occurred while deleting emmanchement.',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
 }

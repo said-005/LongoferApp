@@ -6,7 +6,6 @@ use App\Models\Sablage_Externe;
 use App\Http\Requests\StoreSablage_ExterneRequest;
 use App\Http\Requests\UpdateSablage_ExterneRequest;
 use Illuminate\Http\Response;
-use Illuminate\Http\Request;
 
 class SablageEXTController extends Controller
 {
@@ -98,23 +97,40 @@ class SablageEXTController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
-    {
-        try {
-            $sablage = Sablage_Externe::findOrFail($id);
-            $sablage->delete();
-            
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Sablage externe deleted successfully'
-            ], Response::HTTP_OK);
-            
-        } catch (\Exception $e) {
+public function destroy($id)
+{
+    try {
+        $sablage = Sablage_Externe::findOrFail($id);
+
+        // Check that ref_Production exists
+        if (!$sablage->ref_production) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to delete sablage externe',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                'message' => 'Missing ref_Production'
+            ], Response::HTTP_BAD_REQUEST);
         }
+
+        // Check if we can delete this stage based on the stage pipeline
+        if (!canDeleteStage('sablage_externes', $sablage->ref_production)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Cannot delete: later stages already exist for this ref_Production'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $sablage->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Sablage externe deleted successfully'
+        ], Response::HTTP_OK);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Failed to delete sablage externe',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
 }

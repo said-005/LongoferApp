@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateSablage_InterneRequest;
 use App\Http\Resources\SablageIntResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+
 use Symfony\Component\HttpFoundation\Response;
 
 class SablageIntController extends Controller
@@ -135,30 +136,43 @@ class SablageIntController extends Controller
      * @param string $id
      * @return JsonResponse
      */
-    public function destroy(string $id): JsonResponse
-    {
-        try {
-            $sablage = Sablage_Interne::find($id);
+public function destroy(string $id): JsonResponse
+{ 
+    try {
+        $sablage = Sablage_Interne::find($id);
 
-            if (!$sablage) {
-                return response()->json([
-                    'message' => 'Sablage interne not found.'
-                ], Response::HTTP_NOT_FOUND);
-            }
-
-            $sablage->delete();
-
+        if (!$sablage) {
             return response()->json([
-                'message' => 'Sablage interne deleted successfully.'
-            ], Response::HTTP_OK);
-            
-        } catch (\Exception $e) {
-            Log::error('Failed to delete sablage interne: ' . $e->getMessage());
-
-            return response()->json([
-                'message' => 'An error occurred while deleting sablage interne.',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                'message' => 'Sablage interne not found.'
+            ], Response::HTTP_NOT_FOUND);
         }
+
+        if (!$sablage->ref_production) {
+            return response()->json([
+                'message' => 'Missing ref_Production for this record.'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Prevent deletion if later stages exist
+        if (!canDeleteStage('sablage_internes', $sablage->ref_production)) {
+            return response()->json([
+                'message' => 'Cannot delete: later stages already exist for this ref_Production.'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $sablage->delete();
+
+        return response()->json([
+            'message' => 'Sablage interne deleted successfully.'
+        ], Response::HTTP_OK);
+        
+    } catch (\Exception $e) {
+        Log::error('Failed to delete sablage interne: ' . $e->getMessage());
+
+        return response()->json([
+            'message' => 'An error occurred while deleting sablage interne.',
+            'error' => $e->getMessage()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
 }
