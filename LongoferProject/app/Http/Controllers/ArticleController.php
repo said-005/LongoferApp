@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Articles;
 use App\Http\Requests\StoreArticalsRequest;
 use App\Http\Requests\UpdateArticalsRequest;
+use Illuminate\Database\QueryException;
 
 use App\Http\Resources\ArticleResource;
 
@@ -76,14 +77,30 @@ public function destroy($codeArticle)
     $article = Articles::where('codeArticle', $codeArticle)->first();
 
     if (!$article) {
-        return response()->json(['message' => 'article not found.'], 404);
+        return response()->json(['message' => 'Article not found.'], 404);
     }
 
-    $article->delete(); // ✅ Use delete() on the model instance
+    try {
+        $article->delete();
 
-    return response()->json([
-        'message' => 'article deleted successfully.',
-        'artical' => $article
-    ]);
+        return response()->json([
+            'message' => 'Article deleted successfully.',
+            'article' => $article
+        ]);
+    } catch (QueryException $e) {
+        // Check if it's a foreign key constraint violation
+        if ($e->getCode() == '23000') { // SQLSTATE code for integrity constraint violation
+            return response()->json([
+                'message' => 'Cannot delete this article because it is referenced by another resource.'
+            ], 409);
+        }
+
+        // For any other query-related exception
+        return response()->json([
+            'message' => 'An error occurred while deleting the article.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
 }
+
 }

@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('ArticleMatiere');
               $table->foreign('ArticleMatiere')->references('codeArticle')->on('articles')->restrictOnDelete();
-
             $table->date('Date');
             $table->string('Num_LotOF')->nullable();
             $table->string('OF');

@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateProductionRequest;
 use App\Http\Resources\ProductionResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 
 class ProductionController extends Controller
 {
@@ -86,27 +87,40 @@ class ProductionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $production_code): JsonResponse
-    {
-        try {
-            $production = Production::where('production_code', $production_code)->first();
+public function destroy(string $production_code): JsonResponse
+{
+    try {
+        $production = Production::where('production_code', $production_code)->first();
 
-            if (!$production) {
-                return response()->json([
-                    'message' => 'Production not found'
-                ], 404);
-            }
-
-            $production->delete();
-
+        if (!$production) {
             return response()->json([
-                'message' => 'Production deleted successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to delete production',
-                'error' => $e->getMessage()
-            ], 500);
+                'message' => 'Production not found'
+            ], 404);
         }
+
+        $production->delete();
+
+        return response()->json([
+            'message' => 'Production deleted successfully'
+        ], 200);
+
+    } catch (QueryException $e) {
+        if ($e->getCode() === '23000') {
+            // SQLSTATE[23000] = Integrity constraint violation (e.g., foreign key)
+            return response()->json([
+                'message' => 'Cannot delete this production because it is referenced by another record.'
+            ], 409); // Conflict
+        }
+
+        return response()->json([
+            'message' => 'Database error while deleting production',
+            'error' => $e->getMessage()
+        ], 500);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Unexpected error occurred',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
 }

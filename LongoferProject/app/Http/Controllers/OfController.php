@@ -6,6 +6,7 @@ use App\Models\Of;
 use App\Http\Requests\StoreOfRequest;
 use App\Http\Requests\UpdateOfRequest;
 use App\Http\Resources\OfResource;
+
 class OfController extends Controller
 {
     /**
@@ -79,16 +80,35 @@ public function store(StoreOfRequest $request)
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($codeOf)
-    {
-        $of = Of::find($codeOf);
 
-        if (!$of) {
-            return response()->json(['message' => 'OF not found.'], 404);
-        }
+public function destroy($codeOf)
+{
+    $of = Of::find($codeOf);
 
+    if (!$of) {
+        return response()->json(['message' => 'OF not found.'], 404);
+    }
+
+    try {
         $of->delete();
 
-        return response()->json(['message' => 'OF deleted successfully.', 'data' => $of]);
+        return response()->json([
+            'message' => 'OF deleted successfully.',
+            'data' => $of
+        ], 200);
+
+    } catch (QueryException $e) {
+        if ($e->getCode() === '23000') {
+            return response()->json([
+                'message' => 'Cannot delete this OF because it is referenced by another record.'
+            ], 409); // 409 Conflict
+        }
+
+        return response()->json([
+            'message' => 'An unexpected error occurred while deleting the OF.',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
+
 }

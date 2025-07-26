@@ -6,7 +6,7 @@ use App\Models\Defaut;
 use App\Http\Requests\StoreDefautRequest;
 use App\Http\Requests\UpdateDefautRequest;
 use App\Http\Resources\DefautResource;
-
+use Illuminate\Database\QueryException;
 class DefautController extends Controller
 {
    public function index()
@@ -71,19 +71,34 @@ public function update(UpdateDefautRequest $request, $codeDefaut)
     /**
      * Remove the specified resource from storage.
      */
-public function destroy($codeDefaut )
+
+public function destroy($codeDefaut)
 {
-    $defaut = Defaut::where('codeDefaut', $codeDefaut )->first();
+    $defaut = Defaut::where('codeDefaut', $codeDefaut)->first();
 
     if (!$defaut) {
         return response()->json(['message' => 'Defaut not found.'], 404);
     }
 
-    $defaut->delete(); // ✅ Use delete() on the model instance
+    try {
+        $defaut->delete();
 
-    return response()->json([
-        'message' => 'Defaut deleted successfully.',
-        'Defaut' => $defaut
-    ]);
+        return response()->json([
+            'message' => 'Defaut deleted successfully.',
+            'defaut' => $defaut
+        ]);
+    } catch (QueryException $e) {
+        if ($e->getCode() === '23000') { // Foreign key constraint violation
+            return response()->json([
+                'message' => 'Cannot delete this defaut because it is referenced by another resource.'
+            ], 409);
+        }
+
+        return response()->json([
+            'message' => 'An error occurred while deleting the defaut.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
 }
+
 }

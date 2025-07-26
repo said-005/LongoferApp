@@ -7,7 +7,7 @@ use App\Http\Requests\StoreCaussesRequest;
 use App\Http\Requests\UpdateCaussesRequest;
 use App\Http\Resources\CausseResource;
 use Illuminate\Http\JsonResponse;
-
+use Illuminate\Database\QueryException;
 class CausseController extends Controller
 {
     /**
@@ -73,18 +73,30 @@ class CausseController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $code_causse): JsonResponse
-    {
-        $causse = Causses::where('code_causse', $code_causse)->first();
+public function destroy(string $code_causse): JsonResponse
+{
+    $causse = Causses::where('code_causse', $code_causse)->first();
 
-        if (!$causse) {
-            return response()->json(['message' => 'Causse not found'], 404);
-        }
-
-        if ($causse->delete()) {
-            return response()->json(['message' => 'Causse deleted successfully'], 200);
-        }
-
-        return response()->json(['message' => 'Error deleting causse'], 500);
+    if (!$causse) {
+        return response()->json(['message' => 'Causse not found'], 404);
     }
+
+    try {
+        $causse->delete();
+
+        return response()->json(['message' => 'Causse deleted successfully'], 200);
+
+    } catch (QueryException $e) {
+        if ($e->getCode() === '23000') {
+            return response()->json([
+                'message' => 'Cannot delete this causse because it is referenced by another resource.'
+            ], 409); // 409 Conflict
+        }
+
+        return response()->json([
+            'message' => 'An unexpected error occurred while deleting the causse.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 }

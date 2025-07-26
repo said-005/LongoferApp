@@ -7,6 +7,7 @@ use App\Http\Requests\StoreOperateurRequest;
 use App\Http\Requests\UpdateDefautRequest;
 use App\Http\Requests\UpdateOperateurRequest;
 use App\Http\Resources\OperateurResource;
+use Illuminate\Database\QueryException;
 
 class OperateurController extends Controller
 {
@@ -73,19 +74,39 @@ public function update(UpdateOperateurRequest $request, $operateur )
     /**
      * Remove the specified resource from storage.
      */
-public function destroy($operateur  )
+public function destroy($operateur)
 {
-    $operateur  = Operateur::where('operateur', $operateur  )->first();
+    try {
+        $operateurModel = Operateur::where('operateur', $operateur)->first();
 
-    if (!$operateur ) {
-        return response()->json(['message' => 'operateur  not found.'], 404);
+        if (!$operateurModel) {
+            return response()->json(['message' => 'Operateur not found.'], 404);
+        }
+
+        $operateurModel->delete();
+
+        return response()->json([
+            'message' => 'Operateur deleted successfully.',
+            'operateur' => $operateurModel
+        ], 200);
+
+    } catch (QueryException $e) {
+        if ($e->getCode() === '23000') {
+            return response()->json([
+                'message' => 'Cannot delete this operateur because it is referenced by another record.'
+            ], 409); // Conflict
+        }
+
+        return response()->json([
+            'message' => 'Database error while deleting operateur.',
+            'error' => $e->getMessage()
+        ], 500);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Unexpected error occurred.',
+            'error' => $e->getMessage()
+        ], 500);
     }
-
-    $operateur ->delete(); // ✅ Use delete() on the model instance
-
-    return response()->json([
-        'message' => 'operateur  deleted successfully.',
-        'operateur ' => $operateur 
-    ]);
 }
 }
