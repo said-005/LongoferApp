@@ -13,13 +13,10 @@ import { Label } from '@/components/ui/label';
 import { cn } from "../lib/utils";
 import { useDebounce } from "./useDebouncyHook";
 
-
 // Constants
 const ARIA_LIVE_DELAY = 300;
 const DEBOUNCE_DELAY = 300;
 const BLUR_TIMEOUT = 200;
-
-
 
 export default function AutocompleteInput({
   data = [],
@@ -32,10 +29,6 @@ export default function AutocompleteInput({
   disabled = false,
   loading = false,
   noOptionsMessage = 'No options available',
-  allowCustomValues = false,
-  renderOption,
-  renderInput,
-  highlightMatches = true,
 }) {
   // Refs
   const wrapperRef = useRef(null);
@@ -56,7 +49,7 @@ export default function AutocompleteInput({
   const inputId = useMemo(() => `autocomplete-input-${Math.random().toString(36).substr(2, 9)}`, []);
   const listboxId = useMemo(() => `autocomplete-listbox-${Math.random().toString(36).substr(2, 9)}`, []);
   
-  // Normalize data outside of render cycle
+  // Normalize data
   const normalizedData = useMemo(() => {
     if (Array.isArray(data)) {
       return data.map(item => ({
@@ -66,14 +59,12 @@ export default function AutocompleteInput({
     }
     
     if (data && typeof data === 'object') {
-      // Handle case where data is an object with a data property
       if (data.data && Array.isArray(data.data)) {
         return data.data.map(item => ({
           value: String(item.value ?? item),
           label: String(item.label ?? item)
         }));
       }
-      // Handle plain object case (key-value pairs)
       return Object.entries(data).map(([value, label]) => ({ 
         value, 
         label: typeof label === 'object' ? JSON.stringify(label) : String(label) 
@@ -86,27 +77,26 @@ export default function AutocompleteInput({
   // Debounced input value for filtering
   const debouncedInputValue = useDebounce(inputValue, DEBOUNCE_DELAY);
 
-  // Filter suggestions with memoization
+  // Filter suggestions
   const getFilteredSuggestions = useCallback((input, data) => {
     if (!input) return data;
-    
     return data.filter(item =>
       String(item.label).toLowerCase().includes(input.toLowerCase())
     );
   }, []);
 
-  // Update filtered suggestions when input or data changes
+  // Update filtered suggestions
   useEffect(() => {
     setInternalLoading(true);
     const timer = setTimeout(() => {
       setFilteredSuggestions(getFilteredSuggestions(debouncedInputValue, normalizedData));
+      setActiveSuggestionIndex(0); // Reset active index when suggestions change
       setInternalLoading(false);
     }, 150);
-    
     return () => clearTimeout(timer);
   }, [debouncedInputValue, normalizedData, getFilteredSuggestions]);
 
-  // Update input value when value prop changes
+  // Sync input value with external value
   useEffect(() => {
     if (value === null || value === undefined) {
       setInputValue("");
@@ -131,7 +121,7 @@ export default function AutocompleteInput({
   // Close suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target )) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
         setShowSuggestions(false);
       }
     };
@@ -139,6 +129,15 @@ export default function AutocompleteInput({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Handle suggestion selection
+  const selectSuggestion = useCallback((item) => {
+    setInputValue(item.label);
+    onChange(item.value);
+    setShowSuggestions(false);
+    setError("");
+    inputRef.current?.focus();
+  }, [onChange]);
 
   // Event handlers
   const handleInputChange = (e) => {
@@ -149,11 +148,7 @@ export default function AutocompleteInput({
   };
 
   const handleSuggestionClick = (item) => {
-    setInputValue(item.label);
-    onChange(item.value);
-    setShowSuggestions(false);
-    setError("");
-    inputRef.current?.focus();
+    selectSuggestion(item);
   };
 
   const handleBlur = () => {
@@ -175,79 +170,52 @@ export default function AutocompleteInput({
       );
       
       if (match) {
-        onChange(match.value);
-      } else if (required && !allowCustomValues) {
+        selectSuggestion(match);
+      } else if (required) {
         setError("Please select a valid option from the list");
         onChange(undefined);
-      } else if (allowCustomValues) {
-        onChange(inputValue);
       }
     }, BLUR_TIMEOUT);
-  };
-
-  const handleEnterKey = () => {
-    if (filteredSuggestions.length > 0) {
-      const selectedItem = filteredSuggestions[activeSuggestionIndex];
-      setInputValue(selectedItem.label);
-      onChange(selectedItem.value);
-      setShowSuggestions(false);
-      setError("");
-    } else if (required && inputValue && !allowCustomValues) {
-      setError("Please select a valid option from the list");
-      onChange(undefined);
-    } else if (allowCustomValues && inputValue) {
-      onChange(inputValue);
-      setShowSuggestions(false);
-    }
-  };
-
-  const handleArrowUpKey = () => {
-    if (activeSuggestionIndex > 0) {
-      setActiveSuggestionIndex(activeSuggestionIndex - 1);
-      scrollActiveIntoView();
-    }
-  };
-
-  const handleArrowDownKey = () => {
-    if (activeSuggestionIndex < filteredSuggestions.length - 1) {
-      setActiveSuggestionIndex(activeSuggestionIndex + 1);
-      scrollActiveIntoView();
-    }
-  };
-
-  const handleTabKey = () => {
-    if (filteredSuggestions.length > 0 && showSuggestions) {
-      const selectedItem = filteredSuggestions[activeSuggestionIndex];
-      setInputValue(selectedItem.label);
-      onChange(selectedItem.value);
-      setShowSuggestions(false);
-      setError("");
-    }
   };
 
   const handleKeyDown = (e) => {
     switch (e.key) {
       case "Enter":
         e.preventDefault();
-        handleEnterKey();
+        if (filteredSuggestions.length > 0) {
+          selectSuggestion(filteredSuggestions[activeSuggestionIndex]);
+        } else if (required && inputValue) {
+          setError("Please select a valid option from the list");
+          onChange(undefined);
+        }
         break;
+        
       case "ArrowUp":
         e.preventDefault();
-        handleArrowUpKey();
+        if (activeSuggestionIndex > 0) {
+          setActiveSuggestionIndex(activeSuggestionIndex - 1);
+          scrollActiveIntoView();
+        }
         break;
+        
       case "ArrowDown":
         e.preventDefault();
-        handleArrowDownKey();
+        if (activeSuggestionIndex < filteredSuggestions.length - 1) {
+          setActiveSuggestionIndex(activeSuggestionIndex + 1);
+          scrollActiveIntoView();
+        }
         break;
+        
       case "Escape":
         e.preventDefault();
         setShowSuggestions(false);
         inputRef.current?.blur();
         break;
+        
       case "Tab":
-        if (showSuggestions) {
+        if (showSuggestions && filteredSuggestions.length > 0) {
           e.preventDefault();
-          handleTabKey();
+          selectSuggestion(filteredSuggestions[activeSuggestionIndex]);
         }
         break;
     }
@@ -279,20 +247,8 @@ export default function AutocompleteInput({
     }
   };
 
-  // Highlight matching text in suggestions
-  const highlightText = (text, query) => {
-    if (!query || !highlightMatches) return text;
-    
-    const regex = new RegExp(`(${query})`, 'gi');
-    return text.split(regex).map((part, i) => 
-      part.toLowerCase() === query.toLowerCase() 
-        ? <span key={i} className="font-bold text-blue-600 dark:text-blue-400">{part}</span> 
-        : part
-    );
-  };
-
-  // Render default input if no custom renderer provided
-  const renderDefaultInput = (props) => (
+  // Render default input
+  const renderDefaultInput = () => (
     <Input
       ref={inputRef}
       id={inputId}
@@ -316,11 +272,19 @@ export default function AutocompleteInput({
           ? `suggestion-${filteredSuggestions[activeSuggestionIndex]?.value}`
           : undefined
       }
-      {...props}
+      className={cn(
+        "w-full pr-10 transition-all duration-200 rounded-lg shadow-sm",
+        {
+          "border-red-500 focus:ring-red-500 focus:border-red-500": error,
+          "border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500": !error,
+          "bg-gray-100 dark:bg-gray-800 cursor-not-allowed": disabled || loading,
+          "bg-white dark:bg-gray-900 cursor-text": !disabled && !loading
+        }
+      )}
     />
   );
 
-  // Render default option if no custom renderer provided
+  // Render default option
   const renderDefaultOption = (item, index) => (
     <li
       key={`${item.label}-${item.value}`}
@@ -328,6 +292,7 @@ export default function AutocompleteInput({
       role="option"
       aria-selected={index === activeSuggestionIndex}
       onClick={() => handleSuggestionClick(item)}
+      onMouseDown={(e) => e.preventDefault()} // Prevent input blur before click
       className={cn(
         "relative cursor-default select-none py-2 pl-3 pr-9 transition-colors",
         {
@@ -338,7 +303,7 @@ export default function AutocompleteInput({
         }
       )}
     >
-      {highlightText(item.label, inputValue)}
+      {item.label}
       {index === activeSuggestionIndex && (
         <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600 dark:text-blue-400">
           ✓
@@ -357,41 +322,10 @@ export default function AutocompleteInput({
         className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
       >
         {text}
-       
       </Label>
       
       <div className="relative">
-        {renderInput ? renderInput({
-          ref: inputRef,
-          id: inputId,
-          type,
-          value: inputValue,
-          onChange: handleInputChange,
-          onKeyDown: handleKeyDown,
-          onBlur: handleBlur,
-          onFocus: () => {
-            setIsFocused(true);
-            setShowSuggestions(true);
-          },
-          placeholder: place,
-          disabled: disabled || loading,
-          'aria-autocomplete': 'list',
-          'aria-expanded': showSuggestions,
-          'aria-haspopup': 'listbox',
-          'aria-controls': listboxId,
-          'aria-activedescendant': showSuggestions && filteredSuggestions.length > 0 
-            ? `suggestion-${filteredSuggestions[activeSuggestionIndex]?.value}`
-            : undefined,
-          className: cn(
-            "w-full pr-10 transition-all duration-200 rounded-lg shadow-sm",
-            {
-              "border-red-500 focus:ring-red-500 focus:border-red-500": error,
-              "border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500": !error,
-              "bg-gray-100 dark:bg-gray-800 cursor-not-allowed": disabled || loading,
-              "bg-white dark:bg-gray-900 cursor-text": !disabled && !loading
-            }
-          )
-        }) : renderDefaultInput({})}
+        {renderDefaultInput()}
         
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1">
           {inputValue && !disabled && !isLoading && (
@@ -432,39 +366,34 @@ export default function AutocompleteInput({
         aria-atomic="true"
         className="sr-only"
       />
-{showSuggestions && isFocused && (
-  <ul
-    ref={listboxRef}
-    id={listboxId}
-    role="listbox"
-    className="absolute z-50 w-full mt-1 max-h-60 overflow-auto rounded-lg bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-opacity duration-200"
-  >
-    {isLoading ? (
-      <li className="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-500 dark:text-gray-400 flex items-center justify-center">
-        <Loader2 className="h-5 w-5 animate-spin text-blue-500 mr-2" />
-        Loading...
-      </li>
-    ) : filteredSuggestions.length > 0 ? (
-      filteredSuggestions.map((item, index) => 
-        renderOption 
-          ? renderOption(item, inputValue, {
-              isActive: index === activeSuggestionIndex,
-              onClick: () => handleSuggestionClick(item)
-            })
-          : renderDefaultOption(item, index)
-      )
-    ) : (
-      <li className="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-500 dark:text-gray-400">
-        {noOptionsMessage}
-      </li>
-    )}
-  </ul>
-)}
 
-{error && (
-  <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
-    <span className="mr-1">⚠</span> {error}
-  </p>
-)}
-</div>
-)}
+      {showSuggestions && isFocused && (
+        <ul
+          ref={listboxRef}
+          id={listboxId}
+          role="listbox"
+          className="absolute z-50 w-full mt-1 max-h-60 overflow-auto rounded-lg bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-opacity duration-200"
+        >
+          {isLoading ? (
+            <li className="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-500 dark:text-gray-400 flex items-center justify-center">
+              <Loader2 className="h-5 w-5 animate-spin text-blue-500 mr-2" />
+              Loading...
+            </li>
+          ) : filteredSuggestions.length > 0 ? (
+            filteredSuggestions.map((item, index) => renderDefaultOption(item, index))
+          ) : (
+            <li className="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-500 dark:text-gray-400">
+              {noOptionsMessage}
+            </li>
+          )}
+        </ul>
+      )}
+
+      {error && (
+        <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+          <span className="mr-1">⚠</span> {error}
+        </p>
+      )}
+    </div>
+  );
+}
