@@ -77,11 +77,13 @@ export default function UpdateSablageEXT({ id }) {
   const { data: productions = [] } = useQuery({
     queryKey: ['productions'],
     queryFn: async () => {
-      const response = await ProductionApi.getAll();
-      return response.data.data.map(pro => ({
-        label: pro.production_code,
-        value: pro.production_code
-      }));
+  const response = await ProductionApi.getAll();
+const formatted = response.data.data.map((pro) => ({
+  label: `${pro.production_code}`,
+  value: pro.production_code
+}));
+console.log(formatted);  // ✅ This will show you the final array
+return formatted;
     },
     ...queryOptions
   });
@@ -256,7 +258,7 @@ return (
             name="ref_production"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-blue-100">Référence Production</FormLabel>
+               
                 <FormControl>
                   <AutocompleteInput
                     data={productions}
@@ -349,7 +351,7 @@ return (
             name="machine"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-blue-100">Machine</FormLabel>
+          
                 <FormControl>
                   <AutocompleteInput
                     data={machines}
@@ -372,7 +374,7 @@ return (
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-blue-100">Statut</FormLabel>
+             
                 <FormControl>
                   <AutocompleteInput
                     data={statusOptions}
@@ -395,7 +397,7 @@ return (
             name="defect"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-blue-100">Défaut (optionnel)</FormLabel>
+               
                 <FormControl>
                   <AutocompleteInput
                     data={defects}
@@ -417,7 +419,7 @@ return (
             name="cause"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-blue-100">Cause (optionnel)</FormLabel>
+                
                 <FormControl>
                   <AutocompleteInput
                     data={causes}
@@ -439,7 +441,7 @@ return (
             name="operator"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-blue-100">Opérateur</FormLabel>
+            
                 <FormControl>
                   <AutocompleteInput
                     data={operateurs.operators}
@@ -462,7 +464,7 @@ return (
             name="welder"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-blue-100">Soudeur</FormLabel>
+              
                 <FormControl>
                   <AutocompleteInput
                     data={operateurs.welders}
@@ -485,7 +487,7 @@ return (
             name="inspector"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-blue-100">Inspecteur</FormLabel>
+               
                 <FormControl>
                   <AutocompleteInput
                     data={operateurs.inspectors}

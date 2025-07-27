@@ -73,10 +73,12 @@ export default function SablageEXTForm() {
     queryKey: ['productions'],
     queryFn: async () => {
       const response = await ProductionApi.getAll();
-      return response.data.data.map((pro) => ({
-        label: `${pro.production_code}`,
-        value: pro.production_code
-      }));
+const formatted = response.data.data.map((pro) => ({
+  label: `${pro.production_code}`,
+  value: pro.production_code
+}));
+console.log(formatted); 
+return formatted;
     },
     ...queryOptions
   });
@@ -216,7 +218,7 @@ if (isLoadingData) {
     </div>
   );
 }
-
+console.log(productions)
 return (
   <div className="p-6 max-w-6xl mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-md dark:shadow-gray-800/50 mt-30">
     <h1 className="text-2xl font-bold mb-8 text-center text-gray-800 dark:text-blue-100">Formulaire de Réparation</h1>

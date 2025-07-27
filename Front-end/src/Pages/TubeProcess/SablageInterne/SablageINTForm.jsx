@@ -66,14 +66,15 @@ export default function SablageINTForm() {
     queryKey: ['productions'],
     queryFn: async () => {
       const response = await ProductionApi.getAll();
-      return response.data.data.map((pro) => ({
+      const formedData= response.data.data.map((pro) => ({
         label: pro.production_code,
         value: pro.production_code
       }));
+    return formedData
     },
     ...queryOptions
   });
-
+console.log(productions)
   const { data: machines = [], isLoading: isLoadingMachines } = useQuery({
     queryKey: ['machines'],
     queryFn: async () => {
@@ -312,7 +313,7 @@ return (
             name="machine"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-gray-300">Machine</FormLabel>
+     
                 <FormControl>
                   <AutocompleteInput
                     data={machines}
@@ -335,7 +336,7 @@ return (
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-gray-300">Statut</FormLabel>
+              
                 <FormControl>
                   <AutocompleteInput
                     data={statusOptions}
@@ -358,7 +359,7 @@ return (
             name="defect"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-gray-300">Défaut (optionnel)</FormLabel>
+          
                 <FormControl>
                   <AutocompleteInput
                     data={defects}
@@ -380,7 +381,7 @@ return (
             name="cause"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-gray-300">Cause (optionnel)</FormLabel>
+                
                 <FormControl>
                   <AutocompleteInput
                     data={causes}
@@ -402,7 +403,7 @@ return (
             name="operator"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-gray-300">Opérateur</FormLabel>
+        
                 <FormControl>
                   <AutocompleteInput
                     data={operateurs.operators}
@@ -425,7 +426,7 @@ return (
             name="welder"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-gray-300">Soudeur</FormLabel>
+  
                 <FormControl>
                   <AutocompleteInput
                     data={operateurs.welders}
@@ -448,7 +449,7 @@ return (
             name="inspector"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-gray-300">Inspecteur</FormLabel>
+                
                 <FormControl>
                   <AutocompleteInput
                     data={operateurs.inspectors}

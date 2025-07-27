@@ -76,12 +76,13 @@ export default function UpdateManchette({ id }) {
 
   const { data: productions = [] } = useQuery({
     queryKey: ['productions'],
-    queryFn: async () => {
-      const response = await ProductionApi.getAll();
-      return response.data.data.map(pro => ({
-        label: pro.production_code,
-        value: pro.production_code
-      }));
+    queryFn: async () => {const response = await ProductionApi.getAll();
+const formatted = response.data.data.map((pro) => ({
+  label: `${pro.production_code}`,
+  value: pro.production_code
+}));
+console.log(formatted);  // ✅ This will show you the final array
+return formatted;
     },
     ...queryOptions
   });
@@ -256,7 +257,7 @@ return (
             name="ref_production"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-800 dark:text-gray-300">Référence Production</FormLabel>
+               
                 <FormControl>
                   <AutocompleteInput
                     data={productions}
@@ -347,7 +348,7 @@ return (
             name="machine"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-800 dark:text-gray-300">Machine</FormLabel>
+               
                 <FormControl>
                   <AutocompleteInput
                     data={machines}
@@ -370,7 +371,7 @@ return (
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-800 dark:text-gray-300">Statut</FormLabel>
+          
                 <FormControl>
                   <AutocompleteInput
                     data={statusOptions}
@@ -393,7 +394,7 @@ return (
             name="defect"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-800 dark:text-gray-300">Défaut (optionnel)</FormLabel>
+                
                 <FormControl>
                   <AutocompleteInput
                     data={defects}
@@ -415,7 +416,7 @@ return (
             name="cause"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-800 dark:text-gray-300">Cause (optionnel)</FormLabel>
+        
                 <FormControl>
                   <AutocompleteInput
                     data={causes}
@@ -437,7 +438,7 @@ return (
             name="operator"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-800 dark:text-gray-300">Opérateur</FormLabel>
+                
                 <FormControl>
                   <AutocompleteInput
                     data={operateurs.operators}
@@ -460,7 +461,7 @@ return (
             name="welder"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-800 dark:text-gray-300">Soudeur</FormLabel>
+                
                 <FormControl>
                   <AutocompleteInput
                     data={operateurs.welders}
@@ -483,7 +484,7 @@ return (
             name="inspector"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-800 dark:text-gray-300">Inspecteur</FormLabel>
+               
                 <FormControl>
                   <AutocompleteInput
                     data={operateurs.inspectors}

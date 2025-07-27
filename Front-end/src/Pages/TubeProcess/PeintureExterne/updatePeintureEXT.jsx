@@ -77,12 +77,13 @@ export default function UpdatePeintureExt({ id }) {
     isLoading: isLoadingProductions 
   } = useQuery({
     queryKey: ['productions'],
-    queryFn: async () => {
-      const response = await ProductionApi.getAll();
-      return response.data.data.map(pro => ({
-        label: pro.production_code,
-        value: pro.production_code
-      }));
+    queryFn: async () => {const response = await ProductionApi.getAll();
+const formatted = response.data.data.map((pro) => ({
+  label: `${pro.production_code}`,
+  value: pro.production_code
+}));
+console.log(formatted);  // ✅ This will show you the final array
+return formatted;
     },
     ...queryOptions
   });
@@ -268,7 +269,7 @@ export default function UpdatePeintureExt({ id }) {
               name="ref_production"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Référence Production</FormLabel>
+        
                   <FormControl>
                     <AutocompleteInput
                       data={productions}
@@ -370,7 +371,7 @@ export default function UpdatePeintureExt({ id }) {
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Statut</FormLabel>
+             
                   <FormControl>
                     <AutocompleteInput
                       data={statusOptions}
@@ -392,7 +393,7 @@ export default function UpdatePeintureExt({ id }) {
               name="defect"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Défaut (optionnel)</FormLabel>
+                
                   <FormControl>
                     <AutocompleteInput
                       data={defects}
@@ -413,7 +414,7 @@ export default function UpdatePeintureExt({ id }) {
               name="cause"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cause (optionnel)</FormLabel>
+                 
                   <FormControl>
                     <AutocompleteInput
                       data={causes}
@@ -434,7 +435,7 @@ export default function UpdatePeintureExt({ id }) {
               name="operator"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Opérateur</FormLabel>
+                 
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.operators}
@@ -456,7 +457,7 @@ export default function UpdatePeintureExt({ id }) {
               name="welder"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Soudeur</FormLabel>
+               
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.welders}
@@ -478,7 +479,7 @@ export default function UpdatePeintureExt({ id }) {
               name="inspector"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Inspecteur</FormLabel>
+              
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.inspectors}

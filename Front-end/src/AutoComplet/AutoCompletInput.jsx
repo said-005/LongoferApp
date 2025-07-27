@@ -1,7 +1,25 @@
-import { ChevronDownIcon, XIcon } from "lucide-react";
-import { useState, KeyboardEvent, ChangeEvent, useEffect, useRef } from "react";
+import { ChevronDownIcon, XIcon, Loader2 } from "lucide-react";
+import { 
+  useState, 
+  KeyboardEvent, 
+  ChangeEvent, 
+  useEffect, 
+  useRef, 
+  useMemo, 
+  useCallback 
+} from "react";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { cn } from "../lib/utils";
+import { useDebounce } from "./useDebouncyHook";
+
+
+// Constants
+const ARIA_LIVE_DELAY = 300;
+const DEBOUNCE_DELAY = 300;
+const BLUR_TIMEOUT = 200;
+
+
 
 export default function AutocompleteInput({
   data = [],
@@ -14,25 +32,46 @@ export default function AutocompleteInput({
   disabled = false,
   loading = false,
   noOptionsMessage = 'No options available',
+  allowCustomValues = false,
+  renderOption,
+  renderInput,
+  highlightMatches = true,
 }) {
+  // Refs
+  const wrapperRef = useRef(null);
+  const inputRef = useRef(null);
+  const listboxRef = useRef(null);
+  const ariaLiveRef = useRef(null);
+  
+  // State
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
   const [error, setError] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
-  const wrapperRef = useRef(null);
-  const inputRef = useRef(null);
-
-  // Convert data to normalized array format
-  const normalizeData = (data) => {
+  const [internalLoading, setInternalLoading] = useState(false);
+  
+  // Generate unique IDs for accessibility
+  const inputId = useMemo(() => `autocomplete-input-${Math.random().toString(36).substr(2, 9)}`, []);
+  const listboxId = useMemo(() => `autocomplete-listbox-${Math.random().toString(36).substr(2, 9)}`, []);
+  
+  // Normalize data outside of render cycle
+  const normalizedData = useMemo(() => {
     if (Array.isArray(data)) {
-      return data;
+      return data.map(item => ({
+        value: String(item.value ?? item),
+        label: String(item.label ?? item)
+      }));
     }
+    
     if (data && typeof data === 'object') {
       // Handle case where data is an object with a data property
       if (data.data && Array.isArray(data.data)) {
-        return data.data;
+        return data.data.map(item => ({
+          value: String(item.value ?? item),
+          label: String(item.label ?? item)
+        }));
       }
       // Handle plain object case (key-value pairs)
       return Object.entries(data).map(([value, label]) => ({ 
@@ -40,10 +79,32 @@ export default function AutocompleteInput({
         label: typeof label === 'object' ? JSON.stringify(label) : String(label) 
       }));
     }
+    
     return [];
-  };
+  }, [data]);
 
-  const normalizedData = normalizeData(data);
+  // Debounced input value for filtering
+  const debouncedInputValue = useDebounce(inputValue, DEBOUNCE_DELAY);
+
+  // Filter suggestions with memoization
+  const getFilteredSuggestions = useCallback((input, data) => {
+    if (!input) return data;
+    
+    return data.filter(item =>
+      String(item.label).toLowerCase().includes(input.toLowerCase())
+    );
+  }, []);
+
+  // Update filtered suggestions when input or data changes
+  useEffect(() => {
+    setInternalLoading(true);
+    const timer = setTimeout(() => {
+      setFilteredSuggestions(getFilteredSuggestions(debouncedInputValue, normalizedData));
+      setInternalLoading(false);
+    }, 150);
+    
+    return () => clearTimeout(timer);
+  }, [debouncedInputValue, normalizedData, getFilteredSuggestions]);
 
   // Update input value when value prop changes
   useEffect(() => {
@@ -56,25 +117,21 @@ export default function AutocompleteInput({
     setInputValue(selectedItem?.label || String(value));
   }, [value, normalizedData]);
 
-  // Filter suggestions based on input
+  // Announce filtered results count for screen readers
   useEffect(() => {
-    if (!inputValue) {
-      setFilteredSuggestions(normalizedData);
-      return;
-    }
-
-    const filtered = normalizedData.filter(item =>
-      String(item.label).toLowerCase().includes(inputValue.toLowerCase())
-    );
-
-    setFilteredSuggestions(filtered);
-    setActiveSuggestionIndex(0);
-  }, [inputValue, normalizedData]);
+    if (!ariaLiveRef.current || !showSuggestions) return;
+    
+    const message = filteredSuggestions.length > 0 
+      ? `${filteredSuggestions.length} suggestions available`
+      : noOptionsMessage;
+      
+    ariaLiveRef.current.textContent = message;
+  }, [filteredSuggestions, noOptionsMessage, showSuggestions]);
 
   // Close suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target )) {
         setShowSuggestions(false);
       }
     };
@@ -83,6 +140,7 @@ export default function AutocompleteInput({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Event handlers
   const handleInputChange = (e) => {
     const userInput = e.target.value;
     setInputValue(userInput);
@@ -100,6 +158,7 @@ export default function AutocompleteInput({
 
   const handleBlur = () => {
     setIsFocused(false);
+    
     setTimeout(() => {
       if (!showSuggestions) return;
       
@@ -117,45 +176,79 @@ export default function AutocompleteInput({
       
       if (match) {
         onChange(match.value);
-      } else if (required) {
+      } else if (required && !allowCustomValues) {
         setError("Please select a valid option from the list");
         onChange(undefined);
+      } else if (allowCustomValues) {
+        onChange(inputValue);
       }
-    }, 200);
+    }, BLUR_TIMEOUT);
+  };
+
+  const handleEnterKey = () => {
+    if (filteredSuggestions.length > 0) {
+      const selectedItem = filteredSuggestions[activeSuggestionIndex];
+      setInputValue(selectedItem.label);
+      onChange(selectedItem.value);
+      setShowSuggestions(false);
+      setError("");
+    } else if (required && inputValue && !allowCustomValues) {
+      setError("Please select a valid option from the list");
+      onChange(undefined);
+    } else if (allowCustomValues && inputValue) {
+      onChange(inputValue);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleArrowUpKey = () => {
+    if (activeSuggestionIndex > 0) {
+      setActiveSuggestionIndex(activeSuggestionIndex - 1);
+      scrollActiveIntoView();
+    }
+  };
+
+  const handleArrowDownKey = () => {
+    if (activeSuggestionIndex < filteredSuggestions.length - 1) {
+      setActiveSuggestionIndex(activeSuggestionIndex + 1);
+      scrollActiveIntoView();
+    }
+  };
+
+  const handleTabKey = () => {
+    if (filteredSuggestions.length > 0 && showSuggestions) {
+      const selectedItem = filteredSuggestions[activeSuggestionIndex];
+      setInputValue(selectedItem.label);
+      onChange(selectedItem.value);
+      setShowSuggestions(false);
+      setError("");
+    }
   };
 
   const handleKeyDown = (e) => {
     switch (e.key) {
       case "Enter":
         e.preventDefault();
-        if (filteredSuggestions.length > 0) {
-          const selectedItem = filteredSuggestions[activeSuggestionIndex];
-          setInputValue(selectedItem.label);
-          onChange(selectedItem.value);
-          setShowSuggestions(false);
-          setError("");
-        } else if (required && inputValue) {
-          setError("Please select a valid option from the list");
-          onChange(undefined);
-        }
+        handleEnterKey();
         break;
       case "ArrowUp":
         e.preventDefault();
-        if (activeSuggestionIndex > 0) {
-          setActiveSuggestionIndex(activeSuggestionIndex - 1);
-          scrollActiveIntoView();
-        }
+        handleArrowUpKey();
         break;
       case "ArrowDown":
         e.preventDefault();
-        if (activeSuggestionIndex < filteredSuggestions.length - 1) {
-          setActiveSuggestionIndex(activeSuggestionIndex + 1);
-          scrollActiveIntoView();
-        }
+        handleArrowDownKey();
         break;
       case "Escape":
+        e.preventDefault();
         setShowSuggestions(false);
         inputRef.current?.blur();
+        break;
+      case "Tab":
+        if (showSuggestions) {
+          e.preventDefault();
+          handleTabKey();
+        }
         break;
     }
   };
@@ -186,75 +279,145 @@ export default function AutocompleteInput({
     }
   };
 
+  // Highlight matching text in suggestions
+  const highlightText = (text, query) => {
+    if (!query || !highlightMatches) return text;
+    
+    const regex = new RegExp(`(${query})`, 'gi');
+    return text.split(regex).map((part, i) => 
+      part.toLowerCase() === query.toLowerCase() 
+        ? <span key={i} className="font-bold text-blue-600 dark:text-blue-400">{part}</span> 
+        : part
+    );
+  };
+
+  // Render default input if no custom renderer provided
+  const renderDefaultInput = (props) => (
+    <Input
+      ref={inputRef}
+      id={inputId}
+      type={type}
+      value={inputValue}
+      onChange={handleInputChange}
+      onKeyDown={handleKeyDown}
+      onBlur={handleBlur}
+      onFocus={() => {
+        setIsFocused(true);
+        setShowSuggestions(true);
+      }}
+      placeholder={place}
+      disabled={disabled || loading}
+      aria-autocomplete="list"
+      aria-expanded={showSuggestions}
+      aria-haspopup="listbox"
+      aria-controls={listboxId}
+      aria-activedescendant={
+        showSuggestions && filteredSuggestions.length > 0 
+          ? `suggestion-${filteredSuggestions[activeSuggestionIndex]?.value}`
+          : undefined
+      }
+      {...props}
+    />
+  );
+
+  // Render default option if no custom renderer provided
+  const renderDefaultOption = (item, index) => (
+    <li
+      key={`${item.label}-${item.value}`}
+      id={`suggestion-${item.value}`}
+      role="option"
+      aria-selected={index === activeSuggestionIndex}
+      onClick={() => handleSuggestionClick(item)}
+      className={cn(
+        "relative cursor-default select-none py-2 pl-3 pr-9 transition-colors",
+        {
+          "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100": 
+            index === activeSuggestionIndex,
+          "text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700": 
+            index !== activeSuggestionIndex
+        }
+      )}
+    >
+      {highlightText(item.label, inputValue)}
+      {index === activeSuggestionIndex && (
+        <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600 dark:text-blue-400">
+          ✓
+        </span>
+      )}
+    </li>
+  );
+
+  // Combined loading state
+  const isLoading = loading || internalLoading;
+
   return (
     <div ref={wrapperRef} className="relative w-full">
       <Label 
-        htmlFor="autocomplete-input" 
+        htmlFor={inputId}
         className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
       >
         {text}
-        {required && <span className="text-red-500 ml-1">*</span>}
+       
       </Label>
       
       <div className="relative">
-        <Input
-          ref={inputRef}
-          id="autocomplete-input"
-          type={type}
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          onBlur={handleBlur}
-          onFocus={() => {
+        {renderInput ? renderInput({
+          ref: inputRef,
+          id: inputId,
+          type,
+          value: inputValue,
+          onChange: handleInputChange,
+          onKeyDown: handleKeyDown,
+          onBlur: handleBlur,
+          onFocus: () => {
             setIsFocused(true);
             setShowSuggestions(true);
-          }}
-          placeholder={place}
-          disabled={disabled || loading}
-          aria-autocomplete="list"
-          aria-expanded={showSuggestions}
-          aria-haspopup="listbox"
-          aria-controls="autocomplete-suggestions"
-          aria-activedescendant={
-            showSuggestions && filteredSuggestions.length > 0 
-              ? `suggestion-${filteredSuggestions[activeSuggestionIndex]?.value}`
-              : undefined
-          }
-          className={`w-full pr-10 transition-all duration-200 ${
-            error 
-              ? "border-red-500 focus:ring-red-500 focus:border-red-500" 
-              : "border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          } ${
-            disabled || loading 
-              ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed" 
-              : "bg-white dark:bg-gray-900 cursor-text"
-          } rounded-lg shadow-sm`}
-        />
+          },
+          placeholder: place,
+          disabled: disabled || loading,
+          'aria-autocomplete': 'list',
+          'aria-expanded': showSuggestions,
+          'aria-haspopup': 'listbox',
+          'aria-controls': listboxId,
+          'aria-activedescendant': showSuggestions && filteredSuggestions.length > 0 
+            ? `suggestion-${filteredSuggestions[activeSuggestionIndex]?.value}`
+            : undefined,
+          className: cn(
+            "w-full pr-10 transition-all duration-200 rounded-lg shadow-sm",
+            {
+              "border-red-500 focus:ring-red-500 focus:border-red-500": error,
+              "border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500": !error,
+              "bg-gray-100 dark:bg-gray-800 cursor-not-allowed": disabled || loading,
+              "bg-white dark:bg-gray-900 cursor-text": !disabled && !loading
+            }
+          )
+        }) : renderDefaultInput({})}
         
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1">
-          {inputValue && !disabled && !loading && (
+          {inputValue && !disabled && !isLoading && (
             <button
               type="button"
               onClick={handleClear}
               className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
               aria-label="Clear input"
-              disabled={disabled || loading}
+              disabled={disabled || isLoading}
             >
               <XIcon className="h-4 w-4" />
             </button>
           )}
-          {loading ? (
-            <div className="animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+          {isLoading ? (
+            <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
           ) : (
             <button
               type="button"
               onClick={toggleSuggestions}
-              className={`text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-transform ${
-                showSuggestions ? "rotate-180" : ""
-              }`}
+              className={cn(
+                "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-transform",
+                { "rotate-180": showSuggestions }
+              )}
               aria-label={showSuggestions ? "Hide suggestions" : "Show suggestions"}
               aria-haspopup="listbox"
-              disabled={disabled || loading}
+              disabled={disabled || isLoading}
             >
               <ChevronDownIcon className="h-5 w-5" />
             </button>
@@ -262,47 +425,46 @@ export default function AutocompleteInput({
         </div>
       </div>
 
-      {showSuggestions && isFocused && (
-        <ul
-          id="autocomplete-suggestions"
-          role="listbox"
-          className="absolute z-50 w-full mt-1 max-h-60 overflow-auto rounded-lg bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-opacity duration-200"
-        >
-          {filteredSuggestions.length > 0 ? (
-            filteredSuggestions.map((item, index) => (
-              <li
-                key={`${item.label}-${item.value}`}
-                id={`suggestion-${item.value}`}
-                role="option"
-                aria-selected={index === activeSuggestionIndex}
-                onMouseDown={() => handleSuggestionClick(item)}
-                className={`relative cursor-default select-none py-2 pl-3 pr-9 transition-colors ${
-                  index === activeSuggestionIndex 
-                    ? "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100" 
-                    : "text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
-                }`}
-              >
-                {item.label}
-                {index === activeSuggestionIndex && (
-                  <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600 dark:text-blue-400">
-                    ✓
-                  </span>
-                )}
-              </li>
-            ))
-          ) : (
-            <li className="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-500 dark:text-gray-400">
-              {noOptionsMessage}
-            </li>
-          )}
-        </ul>
-      )}
+      {/* ARIA live region for accessibility announcements */}
+      <div
+        ref={ariaLiveRef}
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      />
+{showSuggestions && isFocused && (
+  <ul
+    ref={listboxRef}
+    id={listboxId}
+    role="listbox"
+    className="absolute z-50 w-full mt-1 max-h-60 overflow-auto rounded-lg bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-opacity duration-200"
+  >
+    {isLoading ? (
+      <li className="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-500 dark:text-gray-400 flex items-center justify-center">
+        <Loader2 className="h-5 w-5 animate-spin text-blue-500 mr-2" />
+        Loading...
+      </li>
+    ) : filteredSuggestions.length > 0 ? (
+      filteredSuggestions.map((item, index) => 
+        renderOption 
+          ? renderOption(item, inputValue, {
+              isActive: index === activeSuggestionIndex,
+              onClick: () => handleSuggestionClick(item)
+            })
+          : renderDefaultOption(item, index)
+      )
+    ) : (
+      <li className="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-500 dark:text-gray-400">
+        {noOptionsMessage}
+      </li>
+    )}
+  </ul>
+)}
 
-      {error && (
-        <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
-          <span className="mr-1">⚠</span> {error}
-        </p>
-      )}
-    </div>
-  );
-}
+{error && (
+  <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center">
+    <span className="mr-1">⚠</span> {error}
+  </p>
+)}
+</div>
+)}

@@ -74,12 +74,13 @@ export default function UpdateSablageInt({ id }) {
 
     const { data: productions = [], isLoading: isLoadingProductions } = useQuery({
       queryKey: ['productions'],
-      queryFn: async () => {
-        const response = await ProductionApi.getAll();
-        return response.data.data.map(pro => ({
-          label: pro.production_code,
-          value: pro.production_code
-        }));
+      queryFn: async () => {const response = await ProductionApi.getAll();
+const formatted = response.data.data.map((pro) => ({
+  label: `${pro.production_code}`,
+  value: pro.production_code
+}));
+console.log(formatted);  // ✅ This will show you the final array
+return formatted;
       },
       ...queryOptions
     });
@@ -283,7 +284,7 @@ export default function UpdateSablageInt({ id }) {
               name="ref_production"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="dark:text-gray-300">Référence Production</FormLabel>
+                 
                   <FormControl>
                     <AutocompleteInput
                       data={productions}
@@ -376,7 +377,7 @@ export default function UpdateSablageInt({ id }) {
               name="machine"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="dark:text-gray-300">Machine</FormLabel>
+             
                   <FormControl>
                     <AutocompleteInput
                       data={machines}
@@ -399,7 +400,7 @@ export default function UpdateSablageInt({ id }) {
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="dark:text-gray-300">Statut</FormLabel>
+           
                   <FormControl>
                     <AutocompleteInput
                       data={statusOptions}
@@ -422,7 +423,7 @@ export default function UpdateSablageInt({ id }) {
               name="defect"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="dark:text-gray-300">Défaut (optionnel)</FormLabel>
+                  
                   <FormControl>
                     <AutocompleteInput
                       data={defects}
@@ -444,7 +445,6 @@ export default function UpdateSablageInt({ id }) {
               name="cause"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="dark:text-gray-300">Cause (optionnel)</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={causes}
@@ -466,7 +466,7 @@ export default function UpdateSablageInt({ id }) {
               name="operator"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="dark:text-gray-300">Opérateur</FormLabel>
+                
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.operators}
@@ -489,7 +489,7 @@ export default function UpdateSablageInt({ id }) {
               name="welder"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="dark:text-gray-300">Soudeur</FormLabel>
+               
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.welders}
@@ -512,7 +512,7 @@ export default function UpdateSablageInt({ id }) {
               name="inspector"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="dark:text-gray-300">Inspecteur</FormLabel>
+          
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.inspectors}

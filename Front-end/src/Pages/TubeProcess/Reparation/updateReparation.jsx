@@ -76,12 +76,13 @@ export default function UpdateReparation({ id }) {
     isLoading: isLoadingProductions 
   } = useQuery({
     queryKey: ['productions'],
-    queryFn: async () => {
-      const response = await ProductionApi.getAll();
-      return response.data.data.map(pro => ({
-        label: pro.production_code,
-        value: pro.production_code
-      }));
+    queryFn: async () => {const response = await ProductionApi.getAll();
+const formatted = response.data.data.map((pro) => ({
+  label: `${pro.production_code}`,
+  value: pro.production_code
+}));
+console.log(formatted);  // ✅ This will show you the final array
+return formatted;
     },
     ...queryOptions
   });

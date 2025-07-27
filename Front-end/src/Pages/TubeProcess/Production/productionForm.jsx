@@ -265,7 +265,7 @@ export default function ProductionForm() {
               name="refOF"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Référence OF*</FormLabel>
+
                   <FormControl>
                     <AutocompleteInput
                       data={refOFs}
@@ -288,7 +288,7 @@ export default function ProductionForm() {
               name="refArticle"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Référence Article*</FormLabel>
+       
                   <FormControl>
                     <AutocompleteInput
                       data={articles}
@@ -311,7 +311,7 @@ export default function ProductionForm() {
               name="articleCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Code Article*</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Code Article</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Entrer un code article"
@@ -331,7 +331,7 @@ export default function ProductionForm() {
               name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Date*</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -373,7 +373,7 @@ export default function ProductionForm() {
               name="machine"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Machine*</FormLabel>
+               
                   <FormControl>
                     <AutocompleteInput
                       data={machines}
@@ -396,7 +396,7 @@ export default function ProductionForm() {
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Statut*</FormLabel>
+                 
                   <FormControl>
                     <AutocompleteInput
                       data={statusOptions}
@@ -419,7 +419,7 @@ export default function ProductionForm() {
               name="defect"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Défaut</FormLabel>
+
                   <FormControl>
                     <AutocompleteInput
                       data={defects}
@@ -441,7 +441,7 @@ export default function ProductionForm() {
               name="cause"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Cause</FormLabel>
+           
                   <FormControl>
                     <AutocompleteInput
                       data={causes}
@@ -463,7 +463,7 @@ export default function ProductionForm() {
               name="operator"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Opérateur*</FormLabel>
+               
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.operators}
@@ -486,7 +486,7 @@ export default function ProductionForm() {
               name="welder"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Soudeur*</FormLabel>
+                 
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.welders}
@@ -509,7 +509,6 @@ export default function ProductionForm() {
               name="inspector"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Inspecteur*</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.inspectors}
