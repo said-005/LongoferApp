@@ -246,15 +246,15 @@ export default function UpdateReparation({ id }) {
   if (isLoadingData) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Chargement des données...</span>
+        <Loader2 className="h-8 w-8 animate-spin text-gray-800 dark:text-gray-200" />
+        <span className="ml-2 text-gray-800 dark:text-gray-200">Chargement des données...</span>
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-8 md:mt-12">
-      <h1 className="text-xl md:text-2xl font-bold mb-6 text-center text-gray-800">
+    <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-md dark:shadow-gray-800 mt-8 md:mt-12">
+      <h1 className="text-xl md:text-2xl font-bold mb-6 text-center text-gray-800 dark:text-gray-200">
         Modifier la Réparation
       </h1>
       
@@ -267,7 +267,7 @@ export default function UpdateReparation({ id }) {
               name="ref_production"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Référence Production</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Référence Production</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={productions}
@@ -276,9 +276,10 @@ export default function UpdateReparation({ id }) {
                       value={field.value}
                       onChange={field.onChange}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -289,14 +290,15 @@ export default function UpdateReparation({ id }) {
               name="code_reparation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Code Réparation</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Code Réparation</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Entrez le code réparation"
                       {...field}
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -307,15 +309,15 @@ export default function UpdateReparation({ id }) {
               name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Date</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
+                            "w-full pl-3 text-left font-normal dark:bg-gray-800 dark:text-white dark:border-gray-700",
+                            !field.value && "text-muted-foreground dark:text-gray-400"
                           )}
                         >
                           {field.value ? (
@@ -323,20 +325,29 @@ export default function UpdateReparation({ id }) {
                           ) : (
                             <span>Sélectionner une date</span>
                           )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50 dark:text-gray-300" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className="w-auto p-0 dark:bg-gray-800 dark:border-gray-700" align="start">
                       <Calendar
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
+                        className="dark:bg-gray-800"
+                        classNames={{
+                          day: "dark:text-white hover:dark:bg-gray-700",
+                          day_selected: "dark:bg-blue-600 dark:text-white",
+                          day_today: "dark:bg-gray-700 dark:text-white",
+                          head_cell: "dark:text-gray-400",
+                          caption: "dark:text-white",
+                          nav_button: "dark:text-white dark:border-gray-600",
+                        }}
                       />
                     </PopoverContent>
                   </Popover>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -347,7 +358,7 @@ export default function UpdateReparation({ id }) {
               name="machine"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Machine</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Machine</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={machines}
@@ -356,9 +367,10 @@ export default function UpdateReparation({ id }) {
                       value={field.value}
                       onChange={field.onChange}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -369,7 +381,7 @@ export default function UpdateReparation({ id }) {
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Statut</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Statut</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={statusOptions}
@@ -378,9 +390,10 @@ export default function UpdateReparation({ id }) {
                       value={field.value}
                       onChange={field.onChange}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -391,7 +404,7 @@ export default function UpdateReparation({ id }) {
               name="defect"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Défaut (optionnel)</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Défaut (optionnel)</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={defects}
@@ -399,9 +412,10 @@ export default function UpdateReparation({ id }) {
                       place="Choisissez parmi les suggestions"
                       value={field.value}
                       onChange={field.onChange}
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -412,7 +426,7 @@ export default function UpdateReparation({ id }) {
               name="cause"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cause (optionnel)</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Cause (optionnel)</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={causes}
@@ -420,9 +434,10 @@ export default function UpdateReparation({ id }) {
                       place="Choisissez parmi les suggestions"
                       value={field.value}
                       onChange={field.onChange}
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -433,7 +448,7 @@ export default function UpdateReparation({ id }) {
               name="operator"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Opérateur</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Opérateur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.operators}
@@ -442,9 +457,10 @@ export default function UpdateReparation({ id }) {
                       value={field.value}
                       onChange={field.onChange}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -455,7 +471,7 @@ export default function UpdateReparation({ id }) {
               name="welder"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Soudeur</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Soudeur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.welders}
@@ -464,9 +480,10 @@ export default function UpdateReparation({ id }) {
                       value={field.value}
                       onChange={field.onChange}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -477,7 +494,7 @@ export default function UpdateReparation({ id }) {
               name="inspector"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Inspecteur</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Inspecteur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.inspectors}
@@ -486,21 +503,22 @@ export default function UpdateReparation({ id }) {
                       value={field.value}
                       onChange={field.onChange}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
           </div>
 
-          <div className="flex justify-center items-center gap-4 mt-8 pt-4 border-t">
-           <div className="w-1/3">
-            <SheetCloseComponent/>
-           </div>
+          <div className="flex justify-center items-center gap-4 mt-8 pt-4 border-t dark:border-gray-700">
+            <div className="w-1/3">
+              <SheetCloseComponent className="dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:border-gray-700" />
+            </div>
             <Button 
               type="submit"
-              className="min-w-[120px] bg-blue-600 hover:bg-blue-700" 
+              className="min-w-[120px] bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800" 
               disabled={isSubmitting}
             >
               {isSubmitting ? (

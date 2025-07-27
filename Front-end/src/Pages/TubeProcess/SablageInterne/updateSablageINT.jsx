@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import {
   Form,
@@ -27,16 +27,7 @@ import { Input } from "@/components/ui/input";
 import AutocompleteInput from "../../../AutoComplet/AutoCompletInput";
 import { cn } from '../../../lib/utils';
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import SheetCloseComponent from "../../SheetClose";
 
 // API imports
 import { ProductionApi } from "../../../Api/ProductionApi";
@@ -46,9 +37,7 @@ import { DefautApi } from "../../../Api/defautApi";
 import { OperateurApi } from "../../../Api/operateurApi";
 import { StatutApi } from "../../../Api/StatutApi";
 import { SablageIntApi } from './../../../Api/SablageIntApi';
-import SheetCloseComponent from "../../SheetClose";
 
-// Schema moved to separate file for better organization
 const formSchema = z.object({
   ref_production: z.string().min(1, "La référence production est requise"),
   code_Sablage_Interne: z.string()
@@ -70,9 +59,6 @@ const formSchema = z.object({
 export default function UpdateSablageInt({ id }) {
   const queryClient = useQueryClient();
   
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [formData, setFormData] = useState(null);
-
   const queryOptions = {
     staleTime: 1000 * 60 * 5, // 5 minutes
     onError: (error) => toast.error(`Erreur de chargement: ${error.message}`),
@@ -245,57 +231,51 @@ export default function UpdateSablageInt({ id }) {
     }
   });
 
-  const handleSubmit = (values) => {
-    setFormData(values);
-    setShowConfirmation(true);
-  };
-
-  const confirmUpdate = () => {
+  const onSubmit = (values) => {
     const payload = {
-      code_Sablage_Interne: formData.code_Sablage_Interne,
-      ref_production: formData.ref_production,
-      date_Sablage_Interne: format(formData.date, "yyyy-MM-dd HH:mm:ss"),
-      machine: formData.machine,
-      statut: formData.status,
-      defaut: formData.defect || null,
-      causse: formData.cause || null,
-      operateur: formData.operator,
-      soudeur: formData.welder,
-      controleur: formData.inspector,
+      code_Sablage_Interne: values.code_Sablage_Interne,
+      ref_production: values.ref_production,
+      date_Sablage_Interne: format(values.date, "yyyy-MM-dd HH:mm:ss"),
+      machine: values.machine,
+      statut: values.status,
+      defaut: values.defect || null,
+      causse: values.cause || null,
+      operateur: values.operator,
+      soudeur: values.welder,
+      controleur: values.inspector,
     };
     
     updateSablageInt(payload);
-    setShowConfirmation(false);
   };
 
   if (isLoading) {
     return (
-      <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-8 md:mt-12 space-y-4">
-        <Skeleton className="h-8 w-1/3 mx-auto" />
+      <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-md dark:shadow-gray-800 mt-8 md:mt-12 space-y-4">
+        <Skeleton className="h-8 w-1/3 mx-auto dark:bg-gray-800" />
         <div className="space-y-4">
           {[...Array(9)].map((_, i) => (
             <div key={i} className="space-y-2">
-              <Skeleton className="h-4 w-1/4" />
-              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-4 w-1/4 dark:bg-gray-800" />
+              <Skeleton className="h-10 w-full dark:bg-gray-800" />
             </div>
           ))}
         </div>
         <div className="flex justify-center gap-4 pt-4">
-          <Skeleton className="h-10 w-32" />
-          <Skeleton className="h-10 w-32" />
+          <Skeleton className="h-10 w-32 dark:bg-gray-800" />
+          <Skeleton className="h-10 w-32 dark:bg-gray-800" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-8 md:mt-12">
-      <h1 className="text-xl md:text-2xl font-bold mb-6 text-center text-gray-800">
+    <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-md dark:shadow-gray-800 mt-8 md:mt-12">
+      <h1 className="text-xl md:text-2xl font-bold mb-6 text-center text-gray-800 dark:text-gray-200">
         Modifier le Sablage Interne
       </h1>
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 md:space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
           <div className="flex flex-col gap-3">
             {/* Production Reference */}
             <FormField
@@ -303,7 +283,7 @@ export default function UpdateSablageInt({ id }) {
               name="ref_production"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Référence Production</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Référence Production</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={productions}
@@ -312,9 +292,10 @@ export default function UpdateSablageInt({ id }) {
                       value={field.value}
                       onChange={field.onChange}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -325,14 +306,15 @@ export default function UpdateSablageInt({ id }) {
               name="code_Sablage_Interne"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Code Sablage Interne</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Code Sablage Interne</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Entrez le code sablage"
                       {...field}
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -343,15 +325,15 @@ export default function UpdateSablageInt({ id }) {
               name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Date</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
+                            "w-full pl-3 text-left font-normal dark:bg-gray-800 dark:text-white dark:border-gray-700",
+                            !field.value && "text-muted-foreground dark:text-gray-400"
                           )}
                         >
                           {field.value ? (
@@ -359,21 +341,31 @@ export default function UpdateSablageInt({ id }) {
                           ) : (
                             <span>Sélectionner une date</span>
                           )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50 dark:text-gray-300" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className="w-auto p-0 dark:bg-gray-800 dark:border-gray-700" align="start">
                       <Calendar
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
                         disabled={(date) => date > new Date()}
+                        className="dark:bg-gray-800"
+                        classNames={{
+                          day: "dark:text-white hover:dark:bg-gray-700",
+                          day_selected: "dark:bg-blue-600 dark:text-white",
+                          day_today: "dark:bg-gray-700 dark:text-white",
+                          head_cell: "dark:text-gray-400",
+                          caption: "dark:text-white",
+                          nav_button: "dark:text-white dark:border-gray-600",
+                          day_disabled: "dark:text-gray-600 dark:hover:bg-transparent"
+                        }}
                       />
                     </PopoverContent>
                   </Popover>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -384,7 +376,7 @@ export default function UpdateSablageInt({ id }) {
               name="machine"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Machine</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Machine</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={machines}
@@ -393,9 +385,10 @@ export default function UpdateSablageInt({ id }) {
                       value={field.value}
                       onChange={field.onChange}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -406,7 +399,7 @@ export default function UpdateSablageInt({ id }) {
               name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Statut</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Statut</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={statusOptions}
@@ -415,9 +408,10 @@ export default function UpdateSablageInt({ id }) {
                       value={field.value}
                       onChange={field.onChange}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -428,7 +422,7 @@ export default function UpdateSablageInt({ id }) {
               name="defect"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Défaut (optionnel)</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Défaut (optionnel)</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={defects}
@@ -436,9 +430,10 @@ export default function UpdateSablageInt({ id }) {
                       place="Choisissez parmi les suggestions"
                       value={field.value}
                       onChange={field.onChange}
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -449,7 +444,7 @@ export default function UpdateSablageInt({ id }) {
               name="cause"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cause (optionnel)</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Cause (optionnel)</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={causes}
@@ -457,9 +452,10 @@ export default function UpdateSablageInt({ id }) {
                       place="Choisissez parmi les suggestions"
                       value={field.value}
                       onChange={field.onChange}
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -470,7 +466,7 @@ export default function UpdateSablageInt({ id }) {
               name="operator"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Opérateur</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Opérateur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.operators}
@@ -479,9 +475,10 @@ export default function UpdateSablageInt({ id }) {
                       value={field.value}
                       onChange={field.onChange}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -492,7 +489,7 @@ export default function UpdateSablageInt({ id }) {
               name="welder"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Soudeur</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Soudeur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.welders}
@@ -501,9 +498,10 @@ export default function UpdateSablageInt({ id }) {
                       value={field.value}
                       onChange={field.onChange}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -514,7 +512,7 @@ export default function UpdateSablageInt({ id }) {
               name="inspector"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Inspecteur</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Inspecteur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.inspectors}
@@ -523,21 +521,22 @@ export default function UpdateSablageInt({ id }) {
                       value={field.value}
                       onChange={field.onChange}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
           </div>
 
-          <div className="flex justify-center items-center gap-4 mt-8 pt-4 border-t">
+          <div className="flex justify-center items-center gap-4 mt-8 pt-4 border-t dark:border-gray-700">
             <div className="w-1/3">
-              <SheetCloseComponent/>
+              <SheetCloseComponent className="dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:border-gray-700" />
             </div>
             <Button 
               type="submit"
-              className="min-w-[120px] bg-blue-600 hover:bg-blue-700" 
+              className="min-w-[120px] bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800" 
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -550,22 +549,6 @@ export default function UpdateSablageInt({ id }) {
           </div>
         </form>
       </Form>
-
-      {/* Confirmation Dialog */}
-      <AlertDialog open={showConfirmation} onOpenChange={setShowConfirmation}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmer la modification</AlertDialogTitle>
-            <AlertDialogDescription>
-              Êtes-vous sûr de vouloir modifier cet enregistrement de sablage interne ?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmUpdate}>Confirmer</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

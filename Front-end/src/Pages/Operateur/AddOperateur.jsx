@@ -20,8 +20,8 @@ import { Loader2 } from 'lucide-react';
 import { OperateurApi } from "../../Api/operateurApi";
 import AutocompleteInput from "../../AutoComplet/AutoCompletInput";
 import { MachineApi } from "../../Api/machineApi";
+import { cn } from "@/lib/utils";
 
-// Schema validation with TypeScript types
 const formSchema = z.object({
   fullName: z.string()
     .min(1, "Le nom complet est requis")
@@ -56,14 +56,15 @@ export function OperateurForm() {
     onError: (error) => {
       toast.error("Échec du chargement des machines", {
         description: error.message,
+        className: "bg-red-100 dark:bg-red-900/50 dark:text-red-200 border-red-200 dark:border-red-800",
       });
     },
   });
 
   // Prepare machines data for AutocompleteInput
   const machinesOptions = machinesData?.data?.data?.map((machine) => ({
-    label: machine.MachineName, // Adjust according to your machine object structure
-    value: machine.codeMachine,   // Adjust according to your machine object structure
+    label: machine.MachineName,
+    value: machine.codeMachine,
   })) || [];
 
   // Mutation for creating a new operator
@@ -72,21 +73,21 @@ export function OperateurForm() {
       await OperateurApi.createOperateur(values);
     },
     onSuccess: () => {
-      toast.success('Opérateur créé avec succès');
+      toast.success('Opérateur créé avec succès', {
+        className: "bg-green-100 dark:bg-green-900/50 dark:text-green-200 border-green-200 dark:border-green-800",
+      });
       queryClient.invalidateQueries({ queryKey: ['operateurs'] });
-     
+      navigate('/operateur');
     },
     onError: (error) => {
       toast.error('Erreur lors de la création', {
         description: error.response?.data?.message || 'Une erreur est survenue',
+        className: "bg-red-100 dark:bg-red-900/50 dark:text-red-200 border-red-200 dark:border-red-800",
       });
     }
   });
 
-
   const onSubmit = (values) => {
-    console.log(values)
-    
     const data = {
       operateur: values.code_operateur,
       Fonction: values.position,
@@ -97,16 +98,28 @@ export function OperateurForm() {
   };
 
   const handleAnnuller = () => {
-
     navigate('/operateur');
   };
 
   return (      
-    <div className="flex justify-center p-4 mt-20">
+    <div className={cn(
+      "flex justify-center p-4 mt-10",
+      "min-h-[calc(100vh-160px)]"
+    )}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full max-w-md">
+        <form onSubmit={form.handleSubmit(onSubmit)} className={cn(
+          "space-y-4 w-full max-w-md p-6 rounded-lg",
+          "bg-white dark:bg-gray-900",
+          "border border-gray-200 dark:border-gray-800",
+          "shadow-md dark:shadow-gray-950/50"
+        )}>
           
-          <h1 className="text-2xl font-bold">Ajouter un opérateur</h1>
+          <h1 className={cn(
+            "text-2xl font-bold text-center",
+            "text-gray-800 dark:text-gray-100"
+          )}>
+            Ajouter un opérateur
+          </h1>
           
           {/* Code Opérateur */}
           <FormField
@@ -114,16 +127,26 @@ export function OperateurForm() {
             name="code_operateur"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-medium">Code Opérateur*</FormLabel>
+                <FormLabel className={cn(
+                  "font-medium",
+                  "text-gray-700 dark:text-gray-300"
+                )}>
+                  Code Opérateur*
+                </FormLabel>
                 <FormControl>
                   <Input 
                     placeholder="op-0001" 
                     {...field} 
                     autoComplete="off"
                     disabled={isPending}
+                    className={cn(
+                      "dark:bg-gray-800 dark:border-gray-700",
+                      "dark:text-white dark:placeholder-gray-400",
+                      "focus-visible:ring-2 focus-visible:ring-blue-500"
+                    )}
                   />
                 </FormControl>
-                <FormMessage className="text-xs text-red-500" />
+                <FormMessage className="text-xs text-red-500 dark:text-red-400" />
               </FormItem>
             )}
           />
@@ -134,16 +157,26 @@ export function OperateurForm() {
             name="fullName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-medium">Nom Complet*</FormLabel>
+                <FormLabel className={cn(
+                  "font-medium",
+                  "text-gray-700 dark:text-gray-300"
+                )}>
+                  Nom Complet*
+                </FormLabel>
                 <FormControl>
                   <Input 
                     placeholder="Jean Dupont" 
                     {...field} 
                     autoComplete="name"
                     disabled={isPending}
+                    className={cn(
+                      "dark:bg-gray-800 dark:border-gray-700",
+                      "dark:text-white dark:placeholder-gray-400",
+                      "focus-visible:ring-2 focus-visible:ring-blue-500"
+                    )}
                   />
                 </FormControl>
-                <FormMessage className="text-xs text-red-500" />
+                <FormMessage className="text-xs text-red-500 dark:text-red-400" />
               </FormItem>
             )}
           />
@@ -154,16 +187,26 @@ export function OperateurForm() {
             name="position"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-medium">Fonction*</FormLabel>
+                <FormLabel className={cn(
+                  "font-medium",
+                  "text-gray-700 dark:text-gray-300"
+                )}>
+                  Fonction*
+                </FormLabel>
                 <FormControl>
                   <Input 
                     placeholder="Opérateur CNC" 
                     {...field} 
                     autoComplete="organization-title"
                     disabled={isPending}
+                    className={cn(
+                      "dark:bg-gray-800 dark:border-gray-700",
+                      "dark:text-white dark:placeholder-gray-400",
+                      "focus-visible:ring-2 focus-visible:ring-blue-500"
+                    )}
                   />
                 </FormControl>
-                <FormMessage className="text-xs text-red-500" />
+                <FormMessage className="text-xs text-red-500 dark:text-red-400" />
               </FormItem>
             )}
           />
@@ -174,21 +217,24 @@ export function OperateurForm() {
             name="machine"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-medium">Machine*</FormLabel>
+             
                 <FormControl>
                   <AutocompleteInput
                     data={machinesOptions}
                     text="Sélectionnez une machine"
                     place="Choisissez parmi les suggestions"
                     value={field.value}
-                    onChange={(value) => {
-                      field.onChange(value); // This will update the form value with the machine ID
-                    }}
+                    onChange={field.onChange}
                     required={true}
                     disabled={isPending || isMachinesLoading}
+                    className={cn(
+                      "dark:bg-gray-800 dark:border-gray-700",
+                      "dark:text-white dark:placeholder-gray-400",
+                      "focus-visible:ring-2 focus-visible:ring-blue-500"
+                    )}
                   />
                 </FormControl>
-                <FormMessage className="text-xs text-red-500" />
+                <FormMessage className="text-xs text-red-500 dark:text-red-400" />
               </FormItem>
             )}
           />
@@ -196,7 +242,12 @@ export function OperateurForm() {
           <div className="flex flex-col space-y-2 pt-4">
             <Button 
               type="submit" 
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className={cn(
+                "w-full",
+                "bg-blue-600 hover:bg-blue-700",
+                "dark:bg-blue-700 dark:hover:bg-blue-800",
+                "text-white dark:text-gray-100"
+              )}
               disabled={isPending}
             >
               {isPending ? (
@@ -209,7 +260,12 @@ export function OperateurForm() {
             
             <Button  
               type="button"
-              className="w-full"
+              className={cn(
+                "w-full",
+                "border-gray-300 hover:bg-gray-100",
+                "dark:border-gray-700 dark:hover:bg-gray-800",
+                "text-gray-800 dark:text-gray-200"
+              )}
               variant="outline"
               onClick={handleAnnuller}
               disabled={isPending}

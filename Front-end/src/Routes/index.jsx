@@ -47,11 +47,6 @@ import MachineList from "../Pages/machine/machineList";
 // Causse routes
 import CausseList from '../Pages/causse/causseList';
 import { CausseForm } from "../Pages/causse/AddCausse";
-
-// Matiere routes
-import { MatiereForm } from "../Pages/Matiere/AddMatiere";
-import MatiereList from "../Pages/Matiere/MatiereList";
-
 // Tube Process routes
 import ProductionList from "../Pages/TubeProcess/Production/productionList";
 import ProductionForm from "../Pages/TubeProcess/Production/productionForm";
@@ -254,16 +249,6 @@ export const Routers = createBrowserRouter([
       {
         path: '/causse/AddCausse',
         element: <CausseForm />
-      },
-
-      // Matiere Routes
-      {
-        path: '/matiere',
-        element: <MatiereList />
-      },
-      {
-        path: '/matiere/AddMatiere',
-        element: <MatiereForm />
       },
 
       // Catch-all route

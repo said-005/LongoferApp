@@ -6,11 +6,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
-
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,6 +23,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+
 import { OfApi } from "../../../Api/ofApi";
 import { ArticleApi } from "../../../Api/ArticleApi";
 import { MachineApi } from "../../../Api/machineApi";
@@ -36,6 +35,7 @@ import AutocompleteInput from "../../../AutoComplet/AutoCompletInput";
 import { useNavigate } from "react-router-dom";
 import { cn } from './../../../lib/utils';
 import { ProductionApi } from "../../../Api/ProductionApi";
+
 
 
 const MAX_DESCRIPTION_LENGTH = 500;
@@ -60,7 +60,7 @@ const formSchema = z.object({
   description: z.string()
     .max(MAX_DESCRIPTION_LENGTH, `La description ne doit pas dépasser ${MAX_DESCRIPTION_LENGTH} caractères`)
     .optional(),
-     qte_produite: z.number()
+  qte_produite: z.number()
     .min(1, "La quantité doit être au moins 1")
     .max(10000, "La quantité ne peut pas dépasser 10000"),
 });
@@ -70,7 +70,9 @@ export default function ProductionForm() {
   
   const queryOptions = {
     staleTime: 1000 * 60 * 5,
-    onError: (error) => toast.error(`Erreur de chargement: ${error.message}`),
+    onError: (error) => toast.error(`Erreur de chargement: ${error.message}`, {
+      className: "bg-red-100 dark:bg-red-900/50 dark:text-red-200 border-red-200 dark:border-red-800",
+    }),
   };
 
   // Fetch data queries
@@ -81,12 +83,11 @@ export default function ProductionForm() {
       return response.data.data.map((of) => ({
         label: of.codeOf,
         value: of.codeOf
-      }))
-  
+      }));
     },
     ...queryOptions
   });
-console.log(refOFs)
+
   const { data: articles = [], isLoading: isLoadingArticles } = useQuery({
     queryKey: ['articles'],
     queryFn: async () => {
@@ -99,7 +100,6 @@ console.log(refOFs)
     ...queryOptions
   });
 
-
   const { data: machines = [], isLoading: isLoadingMachines } = useQuery({
     queryKey: ['machines'],
     queryFn: async () => {
@@ -111,7 +111,7 @@ console.log(refOFs)
     },
     ...queryOptions
   });
-console.log('the articles data',articles,'the machine data',machines,'the refOf data',refOFs)
+
   const { data: statusOptions = [], isLoading: isLoadingStatus } = useQuery({
     queryKey: ['statusOptions'],
     queryFn: async () => {
@@ -178,7 +178,7 @@ console.log('the articles data',articles,'the machine data',machines,'the refOf 
       articleCode: '',
       refArticle: '',
       date: undefined,
-       qte_produite: 1,
+      qte_produite: 1,
       machine: '',
       status: '',
       defect: '',
@@ -194,57 +194,67 @@ console.log('the articles data',articles,'the machine data',machines,'the refOf 
   const isLoadingData = isLoadingOFs || isLoadingArticles || isLoadingMachines || 
                       isLoadingStatus || isLoadingDefects || isLoadingCauses || 
                       isLoadingOperateurs;
- // send data by mutation
- 
- const { mutate: submitProduction } = useMutation({
-  mutationFn: (productionData) => ProductionApi.createProduction(productionData),
-  onSuccess: () => {
-    toast.success("Production créée avec succès");
-    form.reset(); // Reset form after successful submission
-    navigate('/production'); // Redirect after success
-  },
-  onError: (error) => {
-    toast.error("Erreur lors de la création", {
-      description: error.response.data.message,
-    });
-  }
-});
-const onSubmit = (values) => {
-   const dateObj = new Date(values.date);
 
-  const pad = (num) => String(num).padStart(2, '0');
-
-  const formattedDate = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
-  submitProduction({
-    production_code:values.articleCode,          // Map refOF to production_code
-    Num_OF: values.refOF,                  // Same as production_code if needed
-    ref_article: values.refArticle,        // Map refArticle to ref_article
-    date_production: formattedDate,          // Map date to date_production
-    qte_produite: values.qte_produite,                      // Add quantity produced (default 0)
-    machine: values.machine,               // Same field name
-    statut: values.status,                 // Map status to statut
-    defaut: values.defect,                 // Map defect to defaut
-    causse: values.cause,                  // Map cause to causse
-    operateur: values.operator,            // Map operator to operateur
-    soudeur: values.welder,                // Map welder to soudeur
-    controleur: values.inspector,          // Map inspector to controleur
-    description: values.description,       // Same field name
-        // Keep if still needed
+  const { mutate: submitProduction, isPending: isSubmitting } = useMutation({
+    mutationFn: (productionData) => ProductionApi.createProduction(productionData),
+    onSuccess: () => {
+      toast.success("Production créée avec succès", {
+        className: "bg-green-100 dark:bg-green-900/50 dark:text-green-200 border-green-200 dark:border-green-800",
+      });
+      form.reset();
+      navigate('/production');
+    },
+    onError: (error) => {
+      toast.error("Erreur lors de la création", {
+        description: error.response?.data?.message || error.message,
+        className: "bg-red-100 dark:bg-red-900/50 dark:text-red-200 border-red-200 dark:border-red-800",
+      });
+    }
   });
-};
+
+  const onSubmit = (values) => {
+    const dateObj = new Date(values.date);
+    const pad = (num) => String(num).padStart(2, '0');
+    const formattedDate = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
+    
+    submitProduction({
+      production_code: values.articleCode,
+      Num_OF: values.refOF,
+      ref_article: values.refArticle,
+      date_production: formattedDate,
+      qte_produite: values.qte_produite,
+      machine: values.machine,
+      statut: values.status,
+      defaut: values.defect,
+      causse: values.cause,
+      operateur: values.operator,
+      soudeur: values.welder,
+      controleur: values.inspector,
+      description: values.description,
+    });
+  };
 
   if (isLoadingData) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Chargement des données...</span>
+        <Loader2 className="h-8 w-8 animate-spin text-gray-600 dark:text-gray-400" />
+        <span className="ml-2 text-gray-600 dark:text-gray-400">Chargement des données...</span>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-30">
-      <h1 className="text-2xl font-bold mb-8 text-center text-gray-800">Formulaire de Production</h1>
+    <div className={cn(
+      "p-6 max-w-6xl mx-auto rounded-lg shadow-md mt-8",
+      "bg-white dark:bg-gray-900",
+      "border border-gray-200 dark:border-gray-800"
+    )}>
+      <h1 className={cn(
+        "text-2xl font-bold mb-8 text-center",
+        "text-gray-800 dark:text-gray-100"
+      )}>
+        Formulaire de Production
+      </h1>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -255,6 +265,7 @@ const onSubmit = (values) => {
               name="refOF"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Référence OF*</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={refOFs}
@@ -263,9 +274,10 @@ const onSubmit = (values) => {
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
                       required
+                      className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -276,6 +288,7 @@ const onSubmit = (values) => {
               name="refArticle"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Référence Article*</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={articles}
@@ -284,9 +297,10 @@ const onSubmit = (values) => {
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
                       required
+                      className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -297,15 +311,16 @@ const onSubmit = (values) => {
               name="articleCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Code Article</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Code Article*</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Entrer un code article"
                       {...field}
                       value={field.value || ''}
+                      className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -316,16 +331,16 @@ const onSubmit = (values) => {
               name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Date</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Date*</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
                           variant="outline"
-                          
                           className={cn(
                             "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
+                            !field.value && "text-muted-foreground",
+                            "dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                           )}
                         >
                           {field.value ? (
@@ -343,10 +358,11 @@ const onSubmit = (values) => {
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
+                        className="dark:bg-gray-800 dark:text-white"
                       />
                     </PopoverContent>
                   </Popover>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -357,6 +373,7 @@ const onSubmit = (values) => {
               name="machine"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Machine*</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={machines}
@@ -365,9 +382,10 @@ const onSubmit = (values) => {
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
                       required
+                      className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -378,6 +396,7 @@ const onSubmit = (values) => {
               name="status"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Statut*</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={statusOptions}
@@ -386,9 +405,10 @@ const onSubmit = (values) => {
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
                       required
+                      className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -399,6 +419,7 @@ const onSubmit = (values) => {
               name="defect"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Défaut</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={defects}
@@ -406,9 +427,10 @@ const onSubmit = (values) => {
                       place="Choisissez parmi les suggestions"
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
+                      className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -419,6 +441,7 @@ const onSubmit = (values) => {
               name="cause"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Cause</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={causes}
@@ -426,9 +449,10 @@ const onSubmit = (values) => {
                       place="Choisissez parmi les suggestions"
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
+                      className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -439,6 +463,7 @@ const onSubmit = (values) => {
               name="operator"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Opérateur*</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.operators}
@@ -447,9 +472,10 @@ const onSubmit = (values) => {
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
                       required
+                      className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -460,6 +486,7 @@ const onSubmit = (values) => {
               name="welder"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Soudeur*</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.welders}
@@ -468,9 +495,10 @@ const onSubmit = (values) => {
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
                       required
+                      className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -481,6 +509,7 @@ const onSubmit = (values) => {
               name="inspector"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Inspecteur*</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.inspectors}
@@ -489,35 +518,37 @@ const onSubmit = (values) => {
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
                       required
+                      className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
               )}
             />
-            {/* qunt produit */}
-             <FormField
-    control={form.control}
-    name="qte_produite"
-    render={({ field }) => (
-      <FormItem>
-        <FormLabel>Quantité Produite</FormLabel>
-        <FormControl>
-          <Input
-            type="number"
-            min="1"
-            max="10000"
-            placeholder="Entrez la quantité produite"
-            {...field}
-            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-          />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    )}
-  />
+
+            {/* Quantity Produced */}
+            <FormField
+              control={form.control}
+              name="qte_produite"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Quantité Produite*</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="10000"
+                      placeholder="Entrez la quantité produite"
+                      {...field}
+                      onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-red-500 dark:text-red-400" />
+                </FormItem>
+              )}
+            />
           </div>
-   
   
           {/* Description */}
           <FormField
@@ -525,42 +556,59 @@ const onSubmit = (values) => {
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description du tube</FormLabel>
+                <FormLabel className="text-gray-700 dark:text-gray-300">Description du tube</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Textarea
                       placeholder="Décrivez en détail le tube"
-                      className="min-h-[120px]"
+                      className={cn(
+                        "min-h-[120px]",
+                        "dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                      )}
                       {...field}
                       value={field.value || ''}
                     />
-                    <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+                    <div className={cn(
+                      "absolute bottom-2 right-2 text-xs",
+                      "text-muted-foreground dark:text-gray-400"
+                    )}>
                       {field.value?.length || 0}/{MAX_DESCRIPTION_LENGTH}
                     </div>
                   </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500 dark:text-red-400" />
               </FormItem>
             )}
           />
 
-
-
-          <div className="flex justify-center gap-4 mt-8 pt-4 border-t">
+          <div className={cn(
+            "flex justify-center gap-4 mt-8 pt-4 border-t",
+            "border-gray-200 dark:border-gray-800"
+          )}>
             <Button 
               type="button" 
               variant="outline" 
               onClick={() => navigate('/production')}
-              className="min-w-[120px]"
+              className={cn(
+                "min-w-[120px]",
+                "border-gray-300 hover:bg-gray-100",
+                "dark:border-gray-700 dark:hover:bg-gray-800",
+                "text-gray-800 dark:text-gray-200"
+              )}
             >
               Annuler
             </Button>
             <Button 
               type="submit"
-              className="min-w-[120px] bg-blue-600 hover:bg-blue-700" 
-              disabled={form.formState.isSubmitting}
+              className={cn(
+                "min-w-[120px]",
+                "bg-blue-600 hover:bg-blue-700",
+                "dark:bg-blue-700 dark:hover:bg-blue-800",
+                "text-white dark:text-gray-100"
+              )} 
+              disabled={isSubmitting}
             >
-              {form.formState.isSubmitting ? (
+              {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Enregistrement...

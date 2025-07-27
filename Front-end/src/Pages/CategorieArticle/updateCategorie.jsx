@@ -17,8 +17,6 @@ import { toast } from "sonner";
 import { CategorieApi } from "../../Api/CategorieApi";
 import { useEffect } from "react";
 
-
-
 // Schema with French validation messages
 const formSchema = z.object({
   CategorieArticle: z.string({
@@ -31,8 +29,6 @@ const formSchema = z.object({
     message: "Le nom ne doit pas dépasser 50 caractères",
   }),
 });
-
-
 
 export function UpdateCategorie({ id }) {
   const queryClient = useQueryClient();
@@ -82,23 +78,27 @@ export function UpdateCategorie({ id }) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4">
-        <h2 className="text-xl font-semibold">Modifier la Catégorie</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          Modifier la Catégorie
+        </h2>
         
         <FormField
           control={form.control}
-          name="CategorieArticle" // Fixed: Removed trailing space
+          name="CategorieArticle"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-medium">Nom de la catégorie*</FormLabel>
+              <FormLabel className="font-medium text-gray-900 dark:text-gray-300">
+                Nom de la catégorie*
+              </FormLabel>
               <FormControl>
                 <Input
                   {...field}
-                  className="w-full"
+                  className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
                   placeholder="Entrez le nom de la catégorie"
                   disabled={isPending}
                 />
               </FormControl>
-              <FormMessage className="text-red-500 text-sm" />
+              <FormMessage className="text-red-500 dark:text-red-400 text-sm" />
             </FormItem>
           )}
         />
@@ -109,6 +109,7 @@ export function UpdateCategorie({ id }) {
               type="button" 
               variant="outline"
               disabled={isPending}
+              className="text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               Fermer
             </Button>
@@ -116,7 +117,7 @@ export function UpdateCategorie({ id }) {
           <Button 
             type="submit" 
             disabled={isPending}
-            className="min-w-[120px] bg-blue-600 hover:bg-blue-700 text-white"
+            className="min-w-[120px] bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white"
           >
             {isPending ? (
               <span className="flex items-center gap-2">

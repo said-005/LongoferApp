@@ -6,89 +6,177 @@ use App\Models\CategorieArticle;
 use App\Http\Requests\StoreCategorieArticalRequest;
 use App\Http\Requests\UpdateCategorieArticalRequest;
 use App\Http\Resources\CategorieResource;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Log;
 
 class CategorieController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(): JsonResponse|AnonymousResourceCollection
     {
-        $cat = CategorieArticle::all();
-        return CategorieResource::collection($cat);
+        try {
+            $categories = CategorieArticle::all();
+            return CategorieResource::collection($categories);
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch categories: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to retrieve categories',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCategorieArticalRequest $request)
+    public function store(StoreCategorieArticalRequest $request): JsonResponse
     {
-        $formData = $request->validated();
-        $cat = CategorieArticle::create($formData);
-        return new CategorieResource($cat);
+        try {
+            $formData = $request->validated();
+            $category = CategorieArticle::create($formData);
+            
+            return response()->json([
+                'message' => 'Category created successfully',
+                'data' => new CategorieResource($category)
+            ], 201);
+        } catch (QueryException $e) {
+            Log::error('Category creation failed: ' . $e->getMessage());
+            
+            if ($e->getCode() === '23000') {
+                return response()->json([
+                    'message' => 'Database integrity constraint violation',
+                    'error' => config('app.debug') ? $e->getMessage() : null
+                ], 422);
+            }
+            
+            return response()->json([
+                'message' => 'Failed to create category',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        } catch (\Exception $e) {
+            Log::error('Unexpected error creating category: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'An unexpected error occurred while creating category',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($id): JsonResponse
     {
-        $cat = CategorieArticle::find($id); // Uses custom primary key
+        try {
+            $category = CategorieArticle::find($id);
 
-        if (!$cat) {
-            return response()->json(['message' => 'Categorie not found.'], 404);
+            if (!$category) {
+                return response()->json([
+                    'message' => 'Category not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'message' => 'Category retrieved successfully',
+                'data' => new CategorieResource($category)
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch category: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to retrieve category',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
         }
-
-        return new CategorieResource($cat);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCategorieArticalRequest $request, $id)
+    public function update(UpdateCategorieArticalRequest $request, $id): JsonResponse
     {
-        $validatedData = $request->validated();
-        $cat = CategorieArticle::find($id);
+        try {
+            $category = CategorieArticle::find($id);
 
-        if (!$cat) {
-            return response()->json(['message' => 'Categorie not found.'], 404);
+            if (!$category) {
+                return response()->json([
+                    'message' => 'Category not found'
+                ], 404);
+            }
+
+            $validatedData = $request->validated();
+            $category->update($validatedData);
+
+            return response()->json([
+                'message' => 'Category updated successfully',
+                'data' => new CategorieResource($category)
+            ]);
+        } catch (QueryException $e) {
+            Log::error('Category update failed: ' . $e->getMessage());
+            
+            if ($e->getCode() === '23000') {
+                return response()->json([
+                    'message' => 'Database integrity constraint violation',
+                    'error' => config('app.debug') ? $e->getMessage() : null
+                ], 422);
+            }
+            
+            return response()->json([
+                'message' => 'Failed to update category',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        } catch (\Exception $e) {
+            Log::error('Unexpected error updating category: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'An unexpected error occurred while updating category',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
         }
-
-        $cat->update($validatedData);
-
-        return response()->json(['message' => 'Categorie updated successfully.', 'Categorie' => $cat]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-public function destroy($id)
-{
-    try {
-        $cat = CategorieArticle::find($id);
+    public function destroy($id): JsonResponse
+    {
+        try {
+            $category = CategorieArticle::find($id);
 
-        if (!$cat) {
-            return response()->json(['message' => 'Categorie not found.'], 404);
-        }
+            if (!$category) {
+                return response()->json([
+                    'message' => 'Category not found'
+                ], 404);
+            }
 
-        $cat->delete();
+            $category->delete();
 
-        return response()->json([
-            'message' => 'Categorie deleted successfully.',
-            'Categorie' => $cat
-        ]);
-    } catch (\Exception $e) {
-        // Optionally log the error for debugging:
-        // \Log::error($e);
-
-        if ($e->getCode() == 23000) {
             return response()->json([
-                'message' => 'Impossible de supprimer ce Categorie. Il est utilisé dans un autre endroit.'
-            ], 409); // Conflict
+                'message' => 'Category deleted successfully',
+                'data' => new CategorieResource($category)
+            ]);
+        } catch (QueryException $e) {
+            Log::error('Category deletion failed: ' . $e->getMessage());
+            
+            if ($e->getCode() === '23000') {
+                return response()->json([
+                    'message' => 'Cannot delete category as it is referenced by other resources',
+                    'error' => config('app.debug') ? $e->getMessage() : null
+                ], 409);
+            }
+            
+            return response()->json([
+                'message' => 'Failed to delete category',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        } catch (\Exception $e) {
+            Log::error('Unexpected error deleting category: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'An unexpected error occurred while deleting category',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
         }
-
-        return response()->json([
-            'message' => 'Une erreur est survenue lors de la suppression du Categorie.',
-         
-        ], 500);
     }
-}
-
 }

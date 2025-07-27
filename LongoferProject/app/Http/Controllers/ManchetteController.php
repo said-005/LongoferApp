@@ -21,9 +21,7 @@ class ManchetteController extends Controller
     public function index()
     {
         try {
-            $manchettes = Manchette_ISO::query()
-                ->latest()
-                ->get();
+            $manchettes = Manchette_ISO::all();
 
             return ManchetteResource::collection($manchettes);
             

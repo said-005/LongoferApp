@@ -12,7 +12,15 @@ import { MoreHorizontal, Trash2, Edit, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDeleteOperateur } from "./delteOperateurHook";
 import { toast } from "sonner";
-
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export const OperateurColumns = [
   {
@@ -102,21 +110,39 @@ export const OperateurColumns = [
               Component={UpdateOperateur} 
               id={operateur.operateur}
               text={"mis a jour l'operateur"}
-            >
-            </UpdateSheet>
+            />
             
             <DropdownMenuSeparator />
             
-            <DropdownMenuItem 
-              className="text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                handleDelete();
-              }}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              <span>Supprimer</span>
-            </DropdownMenuItem>
+            <Dialog>
+              <DialogTrigger asChild>
+                <DropdownMenuItem 
+                  className="text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  <span>Supprimer</span>
+                </DropdownMenuItem>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Êtes-vous sûr ?</DialogTitle>
+                  <DialogDescription>
+                    Cette action ne peut pas être annulée. Cela supprimera définitivement l'opérateur "{operateur.nom_complete}".
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button variant="outline">Annuler</Button>
+                  <Button 
+                    variant="destructive" 
+                    onClick={handleDelete}
+                    disabled={isPending}
+                  >
+                    {isPending ? "Suppression..." : "Supprimer"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </DropdownMenuContent>
         </DropdownMenu>
       );

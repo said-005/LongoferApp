@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { DefautApi } from "../../Api/defautApi";
 import SheetCloseComponent from "../SheetClose";
 import { useEffect } from "react";
-
+import { Card } from "@/components/ui/card";
 
 const formSchema = z.object({
   codeDefaut: z.string()
@@ -27,8 +27,6 @@ const formSchema = z.object({
     .min(10, { message: "La description doit contenir au moins 10 caractères" })
     .max(500, { message: "La description ne doit pas dépasser 500 caractères" })
 });
-
-
 
 export function UpdateDefaut({ id }) {
   const queryClient = useQueryClient();
@@ -60,8 +58,7 @@ export function UpdateDefaut({ id }) {
 
   // Mutation for updating/creating defaut
   const { mutate: updateDefaut, isPending } = useMutation({
-    mutationFn: (values) => 
-      id ? DefautApi.updateDefaut(id, values) : Promise.reject(new Error("Create not implemented")),
+    mutationFn: (values) =>  DefautApi.updateDefaut(id, values),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['defauts'] });
       queryClient.invalidateQueries({ queryKey: ['defaut', id] });
@@ -78,83 +75,93 @@ export function UpdateDefaut({ id }) {
 
   if (isLoadingDefaut && id) {
     return (
-      <div className="space-y-6 w-full max-w-2xl shadow-2xl rounded-2xl mx-auto p-3">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/2 mx-auto"></div>
-          <div className="space-y-2">
-            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-10 bg-gray-200 rounded"></div>
+      <div className="flex justify-center p-4">
+        <Card className="w-full max-w-2xl p-6 space-y-4">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mx-auto"></div>
+            <div className="space-y-2">
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+              <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </div>
           </div>
-          <div className="space-y-2">
-            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-24 bg-gray-200 rounded"></div>
-          </div>
-        </div>
+        </Card>
       </div>
     );
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full max-w-2xl shadow-2xl rounded-2xl mx-auto p-3">
-        <h1 className="text-2xl text-center font-bold">
-          {id ? "Modifier Défaut" : "Ajouter Défaut"}
-        </h1>
-          <FormField
-          control={form.control}
-          name="codeDefaut"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-semibold">Code du Défaut</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Décrivez le défaut en détail..."
-                  {...field}
-                  className="min-h-[120px] border-gray-300 focus:border-blue-500"
-                />
-              </FormControl>
-              <FormMessage className="text-red-500" />
-            </FormItem>
-          )}
-        />
+    <div className="flex justify-center p-4 w-full min-h-full">
+      <Card className="w-full max-w-2xl p-6 shadow-lg dark:shadow-gray-800">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 h-full">
+            <h1 className="text-2xl text-center font-bold text-foreground dark:text-foreground/90">
+              {id ? "Modifier Défaut" : "Ajouter Défaut"}
+            </h1>
 
+            <FormField
+              control={form.control}
+              name="codeDefaut"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-semibold text-foreground/80 dark:text-foreground/70">
+                    Code du Défaut*
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Entrez le code défaut"
+                      {...field}
+                      className="bg-background dark:bg-background/95 border-input focus:ring-2 focus:ring-primary/50"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-destructive dark:text-destructive-foreground" />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="defautDescription"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-semibold">Description du Défaut*</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Décrivez le défaut en détail..."
-                  {...field}
-                  className="min-h-[120px] border-gray-300 focus:border-blue-500"
-                />
-              </FormControl>
-              <FormMessage className="text-red-500" />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="defautDescription"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-semibold text-foreground/80 dark:text-foreground/70">
+                    Description du Défaut*
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Décrivez le défaut en détail..."
+                      {...field}
+                      className="min-h-[120px] bg-background dark:bg-background/95 border-input focus:ring-2 focus:ring-primary/50"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-destructive dark:text-destructive-foreground" />
+                </FormItem>
+              )}
+            />
 
-        <div className="flex justify-end gap-2 items-center">
-          <div className="w-1/4 -mt-1.5">
-            <SheetCloseComponent />
-          </div>
-          <Button 
-            type="submit" 
-            disabled={isPending}
-            className="min-w-[120px]"
-          >
-            {isPending ? (
-              <span className="flex items-center gap-2">
-                <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-                {"Mise à jour..."}
-              </span>
-            ) : "Mettre à jour"}
-          </Button>
-        </div>
-      </form>
-    </Form>
+            <div className="flex justify-end gap-2 items-center">
+              <div className="w-1/4 -mt-1">
+                <SheetCloseComponent className="border-input hover:bg-accent dark:hover:bg-accent/50" />
+              </div>
+              <Button 
+                type="submit" 
+                disabled={isPending}
+                className="min-w-[120px] bg-primary hover:bg-primary/90 dark:bg-primary/80 dark:hover:bg-primary"
+              >
+                {isPending ? (
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+                    {"Mise à jour..."}
+                  </span>
+                ) : "Mettre à jour"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </Card>
+    </div>
   );
 }

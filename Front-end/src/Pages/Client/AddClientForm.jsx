@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { toast } from "sonner"
 import { useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ClientApi } from "../../Api/ClientApi";
 import { Loader2 } from "lucide-react";
 
@@ -29,6 +29,7 @@ const formSchema = z.object({
 
 export function ClientForm() {
   const navigate = useNavigate();
+  const queryClient=useQueryClient()
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -44,7 +45,9 @@ export function ClientForm() {
     mutationFn: (data) => ClientApi.createClient(data),
     onSuccess: () => {
       toast.success("Client created successfully");
+      queryClient.invalidateQueries('clients')
       navigate(-1); // Go back after successful creation
+
     },
     onError: (error) => {
       console.log(error)

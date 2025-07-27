@@ -5,9 +5,10 @@ import { DefautApi } from "../../Api/defautApi";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Defautcolumns } from "./defautColumns";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 export default function DefautList() {
-  // Fetch defauts data with React Query
   const { data: defauts, isLoading, isError, error } = useQuery({
     queryKey: ['defauts'],
     queryFn: DefautApi.getAll,
@@ -20,41 +21,56 @@ export default function DefautList() {
     });
   }
 
+  const defautsData = defauts?.data?.data || [];
+
   return (
-    <div className="container mx-auto mt-20 px-4 py-6">
+    <div className="container mx-auto px-4 py-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Gestion des Défauts</h1>
-          <p className="text-sm text-gray-500 mt-1">Liste des défauts qualité enregistrés</p>
+          <h1 className="text-2xl font-bold">Gestion des Défauts</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {defautsData.length} {defautsData.length === 1 ? 'défaut' : 'défauts'} enregistrés
+          </p>
         </div>
-        <Link 
-          to={'/defaut/AddDefaut'} 
-          className="bg-black hover:bg-gray-800 transition-colors duration-200 rounded-lg px-4 py-2 text-white font-semibold text-center inline-flex items-center justify-center gap-2"
-        >
-          <span>+ Ajouter Défaut</span>
-        </Link>  
+        <Button asChild>
+          <Link 
+            to={'/defaut/AddDefaut'}
+            className="inline-flex items-center gap-2"
+          >
+            <span>+ Ajouter Défaut</span>
+          </Link>
+        </Button>
       </div>
       
-      <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-        {isLoading ? (
-          <div className="space-y-4 p-6">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-16 w-full" />
-            <Skeleton className="h-16 w-full" />
-            <Skeleton className="h-16 w-full" />
-          </div>
-        ) : isError ? (
-          <div className="p-6 text-center text-red-500">
-            Erreur lors du chargement des données. Veuillez réessayer.
-          </div>
-        ) : (
+      {isLoading ? (
+        <div className="space-y-4 p-6">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-16 w-full" />
+        </div>
+      ) : isError ? (
+        <div className="p-6 text-center text-destructive">
+          Erreur lors du chargement des données. Veuillez réessayer.
+        </div>
+      ) : (
+        <div className="rounded-lg border shadow-sm overflow-hidden">
           <DataTable 
             columns={Defautcolumns} 
-            data={defauts.data.data || []} 
-            className="w-full"
+            data={defautsData} 
+            emptyState={
+              <div className="p-8 text-center space-y-2">
+                <p className="text-muted-foreground font-medium">Aucun défaut enregistré</p>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/defaut/AddDefaut" className="gap-2">
+                    Ajouter votre premier défaut
+                  </Link>
+                </Button>
+              </div>
+            }
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

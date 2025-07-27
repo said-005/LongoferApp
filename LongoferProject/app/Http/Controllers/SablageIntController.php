@@ -21,9 +21,7 @@ class SablageIntController extends Controller
     public function index()
     {
         try {
-            $sablages = Sablage_Interne::query()
-                ->latest()
-                ->get();
+            $sablages = Sablage_Interne::all();
 
             return SablageIntResource::collection($sablages);
             

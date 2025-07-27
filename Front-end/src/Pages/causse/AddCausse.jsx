@@ -1,3 +1,5 @@
+"use client";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -5,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -17,21 +18,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CausseApi } from "@/api/causseApi";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
-// Define the form schema using Zod
 const formSchema = z.object({
   code_causse: z.string().min(2, {
-    message: "Cause code must be at least 2 characters.",
+    message: "Le code cause doit contenir au moins 2 caractères",
   }),
   causse: z.string().min(2, {
-    message: "Cause description must be at least 2 characters.",
+    message: "La description doit contenir au moins 2 caractères",
   }),
 });
 
-
-
 export function CausseForm({ initialData, onSuccess }) {
-    const navigate=useNavigate()
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const form = useForm({
@@ -50,17 +49,19 @@ export function CausseForm({ initialData, onSuccess }) {
     },
     onSuccess: (data) => {
       toast.success(
-        initialData ? "Cause updated successfully" : "Cause created successfully",
+        initialData ? "Cause mise à jour" : "Cause créée avec succès",
         {
           description: `Code: ${data.code_causse}`,
+          className: "bg-green-100 dark:bg-green-900/50 dark:text-green-200 border-green-200 dark:border-green-800",
         }
       );
       queryClient.invalidateQueries({ queryKey: ["causses"] });
       onSuccess?.();
     },
     onError: (error) => {
-      toast.error("Error submitting cause", {
+      toast.error("Erreur lors de l'envoi", {
         description: error.message,
+        className: "bg-red-100 dark:bg-red-900/50 dark:text-red-200 border-red-200 dark:border-red-800",
       });
     },
   });
@@ -68,67 +69,115 @@ export function CausseForm({ initialData, onSuccess }) {
   const onSubmit = (values) => {
     submitCausse(values);
   };
-  const handleCancel=()=>{
-navigate('/causse')
-  }
+
+  const handleCancel = () => {
+    navigate('/causse');
+  };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-20 w-1/2 shadow-2xl p-3 rounded mx-auto ">
-      <h1 className="text-center text-2xl font-bold">Causse Form </h1>
-        <FormField
-          control={form.control}
-          name="code_causse"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Cause Code</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter cause code"
-                  {...field}
-                  disabled={isPending}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <div className="flex justify-center items-start pt-10">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className={cn(
+          "space-y-6 w-full max-w-md p-6 rounded-lg",
+          "bg-white dark:bg-gray-900",
+          "border border-gray-200 dark:border-gray-800",
+          "shadow-lg dark:shadow-gray-950/50"
+        )}>
+          <h1 className={cn(
+            "text-2xl font-bold text-center",
+            "text-gray-800 dark:text-gray-100"
+          )}>
+            {initialData ? "Modifier la Cause" : "Ajouter une Cause"}
+          </h1>
 
-        <FormField
-          control={form.control}
-          name="causse"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Cause Description</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter cause description"
-                  {...field}
-                  disabled={isPending}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex justify-end gap-4 pt-2">
-            <Button variant={'outline'} type='button' onClick={handleCancel}>
-            Annuler
-          </Button>
-          <Button type="submit" disabled={isPending}>
-            {isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {initialData ? "Updating..." : "Creating..."}
-              </>
-            ) : (
-              <>{initialData ? "Update Cause" : "Create Cause"}</>
+          <FormField
+            control={form.control}
+            name="code_causse"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className={cn(
+                  "text-gray-700 dark:text-gray-300"
+                )}>
+                  Code Cause*
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Entrez le code cause"
+                    {...field}
+                    disabled={isPending}
+                    className={cn(
+                      "dark:bg-gray-800 dark:border-gray-700",
+                      "dark:text-white dark:placeholder-gray-400",
+                      "focus-visible:ring-2 focus-visible:ring-blue-500"
+                    )}
+                  />
+                </FormControl>
+                <FormMessage className="text-red-500 dark:text-red-400 text-sm" />
+              </FormItem>
             )}
-          </Button>
+          />
+
+          <FormField
+            control={form.control}
+            name="causse"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className={cn(
+                  "text-gray-700 dark:text-gray-300"
+                )}>
+                  Description*
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Entrez la description"
+                    {...field}
+                    disabled={isPending}
+                    className={cn(
+                      "dark:bg-gray-800 dark:border-gray-700",
+                      "dark:text-white dark:placeholder-gray-400",
+                      "focus-visible:ring-2 focus-visible:ring-blue-500"
+                    )}
+                  />
+                </FormControl>
+                <FormMessage className="text-red-500 dark:text-red-400 text-sm" />
+              </FormItem>
+            )}/>
           
-        </div>
-      </form>
-    </Form>
+
+          <div className="flex justify-end gap-4 pt-2">
+            <Button 
+              variant="outline" 
+              type="button" 
+              onClick={handleCancel}
+              className={cn(
+                "border-gray-300 hover:bg-gray-100",
+                "dark:border-gray-700 dark:hover:bg-gray-800",
+                "text-gray-800 dark:text-gray-200"
+              )}
+            >
+              Annuler
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={isPending}
+              className={cn(
+                "bg-blue-600 hover:bg-blue-700",
+                "dark:bg-blue-700 dark:hover:bg-blue-800",
+                "text-white dark:text-gray-100"
+              )}
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {initialData ? "Mise à jour..." : "Création..."}
+                </>
+              ) : (
+                <>{initialData ? "Mettre à jour" : "Créer"}</>
+              )}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 }

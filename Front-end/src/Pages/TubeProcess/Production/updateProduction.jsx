@@ -271,8 +271,10 @@ const onSubmit = (values) => {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-30">
-      <h1 className="text-2xl font-bold mb-8 text-center text-gray-800">Formulaire de Production</h1>
+    <div className="p-6 max-w-6xl mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-md dark:shadow-gray-800 mt-30">
+      <h1 className="text-2xl font-bold mb-8 text-center text-gray-800 dark:text-gray-200">
+        Formulaire de Production
+      </h1>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -291,9 +293,10 @@ const onSubmit = (values) => {
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -312,9 +315,10 @@ const onSubmit = (values) => {
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -325,15 +329,16 @@ const onSubmit = (values) => {
               name="articleCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Code Article</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Code Article</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Entrer un code article"
                       {...field}
                       value={field.value || ''}
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -344,15 +349,15 @@ const onSubmit = (values) => {
               name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Date</FormLabel>
+                  <FormLabel className="dark:text-gray-300">Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
+                            "w-full pl-3 text-left font-normal dark:bg-gray-800 dark:text-white dark:border-gray-700",
+                            !field.value && "text-muted-foreground dark:text-gray-400"
                           )}
                         >
                           {field.value ? (
@@ -360,20 +365,29 @@ const onSubmit = (values) => {
                           ) : (
                             <span>Sélectionner une date</span>
                           )}
-                          <Calendar1Icon className="ml-auto h-4 w-4 opacity-50" />
+                          <Calendar1Icon className="ml-auto h-4 w-4 opacity-50 dark:text-gray-300" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className="w-auto p-0 dark:bg-gray-800 dark:border-gray-700" align="start">
                       <Calendar
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
+                        className="dark:bg-gray-800"
+                        classNames={{
+                          day: "dark:text-white hover:dark:bg-gray-700",
+                          day_selected: "dark:bg-blue-600 dark:text-white",
+                          day_today: "dark:bg-gray-700 dark:text-white",
+                          head_cell: "dark:text-gray-400",
+                          caption: "dark:text-white",
+                          nav_button: "dark:text-white dark:border-gray-600",
+                        }}
                       />
                     </PopoverContent>
                   </Popover>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -392,9 +406,10 @@ const onSubmit = (values) => {
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -413,9 +428,10 @@ const onSubmit = (values) => {
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -433,9 +449,10 @@ const onSubmit = (values) => {
                       place="Choisissez parmi les suggestions"
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -453,9 +470,10 @@ const onSubmit = (values) => {
                       place="Choisissez parmi les suggestions"
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -474,9 +492,10 @@ const onSubmit = (values) => {
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -495,9 +514,10 @@ const onSubmit = (values) => {
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
@@ -516,35 +536,37 @@ const onSubmit = (values) => {
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
                       required
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="dark:text-red-400" />
                 </FormItem>
               )}
             />
-             {/* qunt produit */}
-             <FormField
-    control={form.control}
-    name="qte_produite"
-    render={({ field }) => (
-      <FormItem>
-        <FormLabel>Quantité Produite</FormLabel>
-        <FormControl>
-          <Input
-            type="number"
-            min="1"
-            max="10000"
-            placeholder="Entrez la quantité produite"
-            {...field}
-            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-          />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-          </div>
 
+            {/* Quantity Produced */}
+            <FormField
+              control={form.control}
+              name="qte_produite"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="dark:text-gray-300">Quantité Produite</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="10000"
+                      placeholder="Entrez la quantité produite"
+                      {...field}
+                      onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                      className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
+                    />
+                  </FormControl>
+                  <FormMessage className="dark:text-red-400" />
+                </FormItem>
+              )}
+            />
+          </div>
 
           {/* Description */}
           <FormField
@@ -552,32 +574,32 @@ const onSubmit = (values) => {
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description du tube</FormLabel>
+                <FormLabel className="dark:text-gray-300">Description du tube</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Textarea
                       placeholder="Décrivez en détail le tube"
-                      className="min-h-[120px]"
+                      className="min-h-[120px] dark:bg-gray-800 dark:text-white dark:border-gray-700"
                       {...field}
                       value={field.value || ''}
                     />
-                    <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+                    <div className="absolute bottom-2 right-2 text-xs text-muted-foreground dark:text-gray-400">
                       {field.value?.length || 0}/{MAX_DESCRIPTION_LENGTH}
                     </div>
                   </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="dark:text-red-400" />
               </FormItem>
             )}
           />
 
-          <div className="flex justify-center items-center gap-4 mt-8 pt-4 border-t">
-         <div className="w-1/3">
-          <SheetCloseComponent/>
-         </div>
+          <div className="flex justify-center items-center gap-4 mt-8 pt-4 border-t dark:border-gray-700">
+            <div className="w-1/3">
+              <SheetCloseComponent className="dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700" />
+            </div>
             <Button 
               type="submit"
-              className="min-w-[120px] bg-blue-600 hover:bg-blue-700" 
+              className="min-w-[120px] bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800" 
               disabled={form.formState.isSubmitting}
             >
               {form.formState.isSubmitting ? (

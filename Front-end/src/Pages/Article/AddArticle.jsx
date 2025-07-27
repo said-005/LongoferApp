@@ -23,7 +23,6 @@ import AutocompleteInput from "../../AutoComplet/AutoCompletInput";
 import { CategorieApi } from "../../Api/CategorieApi";
 import { ArticleApi } from "../../Api/ArticleApi";
 
-// Constants
 const UNITS = [
   { value: "kg", label: "Kilogramme (kg)" },
   { value: "g", label: "Gramme (g)" },
@@ -31,7 +30,7 @@ const UNITS = [
   { value: "cm", label: "Centimètre (cm)" },
   { value: "mm", label: "Millimètre (mm)" },
   { value: "pcs", label: "Pièce (pcs)" },
-] ;
+];
 
 const FORM_SCHEMA = z.object({
   articleCode: z.string()
@@ -52,7 +51,6 @@ const FORM_SCHEMA = z.object({
     .min(0.01, { message: "Doit être positif" })
     .max(9999, { message: "Valeur trop élevée" }),
 });
-
 
 const ERROR_MESSAGES = {
   CATEGORY_LOAD: "Échec du chargement des catégories",
@@ -76,7 +74,6 @@ export function ArticleForm() {
     },
   });
 
-  // Fetch categories
   const { 
     data: categoriesData, 
     isLoading: isCategoriesLoading,
@@ -91,7 +88,6 @@ export function ArticleForm() {
     select: (data) => data?.data?.data || [],
   });
 
-  // Mutation to create article
   const { mutate: createArticle, isPending: isCreating } = useMutation({
     mutationFn: ArticleApi.createArticel,
     onSuccess: () => {
@@ -134,12 +130,14 @@ export function ArticleForm() {
   })) || [];
 
   return (
-    <div className="w-full h-full flex justify-center items-center p-4">
+    <div className="w-full h-full flex justify-center items-center p-4 ">
       <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <h1 className="text-2xl font-bold text-center">Créer un nouvel article</h1>
+        <CardHeader className="bg-secondary/50 -mt-6">
+          <h1 className="text-2xl font-bold text-center">
+            Créer un nouvel article
+          </h1>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -154,7 +152,6 @@ export function ArticleForm() {
                           placeholder="Entrez le code article" 
                           {...field} 
                           disabled={isCreating}
-                          aria-label="Code article"
                         />
                       </FormControl>
                       <FormMessage />
@@ -167,9 +164,9 @@ export function ArticleForm() {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                     
+           
                       <FormControl>
-                        <div className="-mt-2">
+                        <div className="-mt-1">
                           <AutocompleteInput
                             data={CategorieOptions}
                             text="Sélectionnez une catégorie"
@@ -177,7 +174,7 @@ export function ArticleForm() {
                             value={field.value}
                             onChange={field.onChange}
                             name="category"
-                          
+                            disabled={isCategoriesLoading}
                           />
                         </div>
                       </FormControl>
@@ -197,7 +194,6 @@ export function ArticleForm() {
                           placeholder="Entrez la description de l'article" 
                           {...field} 
                           disabled={isCreating}
-                          aria-label="Désignation"
                         />
                       </FormControl>
                       <FormMessage />
@@ -220,7 +216,6 @@ export function ArticleForm() {
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value))}
                           disabled={isCreating}
-                          aria-label="Dimension"
                         />
                       </FormControl>
                       <FormMessage />
@@ -243,7 +238,6 @@ export function ArticleForm() {
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value))}
                           disabled={isCreating}
-                          aria-label="Épaisseur"
                         />
                       </FormControl>
                       <FormMessage />
@@ -263,7 +257,7 @@ export function ArticleForm() {
                         disabled={isCreating}
                       >
                         <FormControl>
-                          <SelectTrigger aria-label="Unité de stock">
+                          <SelectTrigger>
                             <SelectValue placeholder="Sélectionnez une unité" />
                           </SelectTrigger>
                         </FormControl>
@@ -295,7 +289,6 @@ export function ArticleForm() {
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value))}
                           disabled={isCreating}
-                          aria-label="Poids théorique"
                         />
                       </FormControl>
                       <FormMessage />
@@ -304,20 +297,18 @@ export function ArticleForm() {
                 />
               </div>
 
-              <div className="flex justify-end pt-4 gap-2">
+              <div className="flex justify-end pt-6 gap-3">
                 <Button 
                   type="button" 
                   variant="outline"
                   onClick={handleCancel}
                   disabled={isCreating}
-                  aria-label="Annuler"
                 >
                   Annuler
                 </Button>
                 <Button 
                   type="submit"
                   disabled={isCreating || isCategoriesLoading}
-                  aria-label="Enregistrer l'article"
                 >
                   {isCreating ? (
                     <>

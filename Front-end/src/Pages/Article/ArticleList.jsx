@@ -1,53 +1,80 @@
 import { DataTable } from "../../components/tubeList/data-table";
-import { MoreHorizontal, Loader2, Plus, Copy, Edit, Trash2 } from "lucide-react";
-
+import { Loader2, Plus } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { Articlecolumns } from "./ArticleColumns";
 import { useQuery } from '@tanstack/react-query';
 import { ArticleApi } from "../../Api/ArticleApi";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function ArticleList() {
-
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['articles'],
     queryFn: ArticleApi.getAll,
+    onError: (error) => {
+      toast.error("Failed to load articles", {
+        description: error.message,
+      });
+    }
   });
 
+  const articles = data?.data?.data || [];
+
   return (
-    <div className="container mx-auto px-4 py-6 mt-20">
+    <div className="container mx-auto px-4 py-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Article Management</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {data?.length || 0} {data?.length === 1 ? 'article' : 'articles'} in database
+          <h1 className="text-2xl font-bold">Article Management</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {articles.length} {articles.length === 1 ? 'article' : 'articles'} in database
           </p>
         </div>
-        <Link 
-          to="/article/AddArticle" 
-          className="inline-flex items-center justify-center gap-2 bg-black hover:bg-gray-800 transition-colors duration-200 rounded-lg px-4 py-2 text-white font-semibold"
-        >
-          <Plus className="h-4 w-4" />
-          Add Article
-        </Link>  
+        <Button asChild>
+          <Link 
+            to="/article/AddArticle" 
+            className="inline-flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Add Article
+          </Link>
+        </Button>
       </div>
       
       {isLoading ? (
-        <div className="flex justify-center items-center h-64">
-          <Loader2 className="mr-2 h-8 w-8 animate-spin" />
-          <span>Loading articles...</span>
+        <div className="flex flex-col items-center justify-center h-64 gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <span className="text-muted-foreground">Loading articles...</span>
         </div>
       ) : isError ? (
-        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg">
-          {error.message}
-        </div>
+        <Alert variant="destructive">
+          <AlertTitle>Error loading articles</AlertTitle>
+          <AlertDescription>
+            {error.message}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="mt-2"
+              onClick={() => refetch()}
+            >
+              Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
       ) : (
-        <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+        <div className="rounded-lg border shadow-sm overflow-hidden">
           <DataTable 
             columns={Articlecolumns} 
-            data={data?.data?.data || []} 
+            data={articles} 
             emptyState={
-              <div className="p-8 text-center">
-                <p className="text-gray-500">No articles found</p>
+              <div className="p-8 text-center space-y-2">
+                <p className="text-muted-foreground font-medium">No articles found</p>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/article/AddArticle" className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Add your first article
+                  </Link>
+                </Button>
               </div>
             }
           />

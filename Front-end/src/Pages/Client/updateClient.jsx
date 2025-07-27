@@ -134,7 +134,7 @@ export function UpdateClient({ codeClient }) {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 min-h-full">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
                 <FormField
                   control={form.control}
                   name="codeClient"

@@ -30,7 +30,7 @@ const schemaArticle = z.object({
   dimension: z.number().min(1, { message: "La dimension est requise" }),
   thickness: z.number().min(1, { message: "L'épaisseur est requise" }),
   unit: z.string().min(1, { message: "L'unité est requise" }),
-theoreticalWeight: z.number().min(1, { message: "Le poids théorique est requis" }),
+  theoreticalWeight: z.number().min(1, { message: "Le poids théorique est requis" }),
 });
 
 const unités = [
@@ -40,7 +40,7 @@ const unités = [
   { value: "cm", label: "Centimètre (cm)" },
   { value: "mm", label: "Millimètre (mm)" },
   { value: "pcs", label: "Pièce (pcs)" },
-] ;
+];
 
 export function UpdateArticle({ id }) {
   const form = useForm({
@@ -49,21 +49,27 @@ export function UpdateArticle({ id }) {
       articleCode: "",
       category: "",
       designation: "",
-      dimension: "",
-      thickness: "",
+      dimension: 0,
+      thickness: 0,
       unit: "",
-      theoreticalWeight: "",
+      theoreticalWeight: 0,
     },
   });
 
-  // Récupération des catégories
   const { data: categories, isLoading: isLoadingCategories } = useQuery({
     queryKey: ['categories'],
     queryFn: CategorieApi.getAll,
-    select: (data) => data.data.data.map((cat) => cat.CategorieArticle),
+    select: (data) => data.data.data.map((cat) => ({
+      label: cat.CategorieArticle,
+      value: cat.CategorieArticle
+    })),
+    onError: (error) => {
+      toast.error("Erreur de chargement des catégories", {
+        description: error.message,
+      });
+    }
   });
 
-  // Récupération des données de l'article
   const { data: articleData, isLoading: isLoadingArticle } = useQuery({
     queryKey: ['article', id],
     queryFn: () => ArticleApi.getArticleById(id),
@@ -75,7 +81,6 @@ export function UpdateArticle({ id }) {
     }
   });
 
-  // Pré-remplissage du formulaire
   useEffect(() => {
     if (articleData?.data?.data) {
       const { data } = articleData.data;
@@ -91,12 +96,10 @@ export function UpdateArticle({ id }) {
     }
   }, [articleData, form]);
 
-  // Mutation pour la mise à jour
   const { mutate: updateArticle, isPending: isUpdating } = useMutation({
     mutationFn: (values) => ArticleApi.updateArticle(id, values),
     onSuccess: () => {
       toast.success("Article mis à jour avec succès");
-      // Fermer le sheet après succès
       document.querySelector('button[data-rsbs-dismiss]')?.click();
     },
     onError: (error) => {
@@ -108,33 +111,35 @@ export function UpdateArticle({ id }) {
 
   const handleSubmit = (values) => {
     updateArticle({
-      codeArticle :values.articleCode,
-      ArticleName:values.designation,
-      Unite_Stock:values.unit,
-      Poids:values.theoreticalWeight,
-      Diametre:values.dimension,
-      Epaisseur:values.thickness,
-      categorie:values.category 
+      codeArticle: values.articleCode,
+      ArticleName: values.designation,
+      Unite_Stock: values.unit,
+      Poids: values.theoreticalWeight,
+      Diametre: values.dimension,
+      Epaisseur: values.thickness,
+      categorie: values.category 
     });
   };
 
   const isLoading = isLoadingCategories || isLoadingArticle;
 
   return (
-    <div className="h-full flex justify-center items-center p-4">
+    <div className="h-full flex justify-center items-center p-4 bg-background">
       <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <h1 className="text-2xl font-bold text-center">Modifier l'article</h1>
+        <CardHeader className="bg-secondary/50 -mt-6">
+          <h1 className="text-2xl font-bold text-center">
+            Modifier l'article
+          </h1>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {isLoading ? (
             <div className="flex justify-center items-center h-64">
-              <Loader2 className="h-8 w-8 animate-spin" />
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
           ) : (
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
                   <FormField
                     control={form.control}
                     name="articleCode"
@@ -142,7 +147,10 @@ export function UpdateArticle({ id }) {
                       <FormItem>
                         <FormLabel>Code article*</FormLabel>
                         <FormControl>
-                          <Input placeholder="Code article" {...field} />
+                          <Input 
+                            placeholder="Code article" 
+                            {...field} 
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -154,7 +162,7 @@ export function UpdateArticle({ id }) {
                     name="category"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Catégorie*</FormLabel>
+                       
                         <FormControl>
                           <AutocompleteInput
                             data={categories || []}
@@ -174,10 +182,13 @@ export function UpdateArticle({ id }) {
                     control={form.control}
                     name="designation"
                     render={({ field }) => (
-                      <FormItem className="md:col-span-2">
+                      <FormItem>
                         <FormLabel>Désignation*</FormLabel>
                         <FormControl>
-                          <Input placeholder="Description de l'article" {...field} />
+                          <Input 
+                            placeholder="Description de l'article" 
+                            {...field} 
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -191,7 +202,14 @@ export function UpdateArticle({ id }) {
                       <FormItem>
                         <FormLabel>Dimension*</FormLabel>
                         <FormControl>
-                          <Input placeholder="ex: 100x200" {...field} />
+                          <Input 
+                            placeholder="ex: 100x200" 
+                            type="number"
+                            min="0.01"
+                            step="0.01"
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -208,9 +226,10 @@ export function UpdateArticle({ id }) {
                           <Input 
                             placeholder="ex: 2.5" 
                             type="number"
-                            min="0"
+                            min="0.01"
                             step="0.01"
-                            {...field} 
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                           />
                         </FormControl>
                         <FormMessage />
@@ -253,9 +272,10 @@ export function UpdateArticle({ id }) {
                           <Input 
                             placeholder="ex: 1.25" 
                             type="number"
-                            min="0"
+                            min="0.01"
                             step="0.01"
-                            {...field} 
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                           />
                         </FormControl>
                         <FormMessage />
@@ -264,7 +284,7 @@ export function UpdateArticle({ id }) {
                   />
                 </div>
 
-                <div className="flex justify-end items-center pt-4 gap-2">
+                <div className="flex justify-end items-center pt-6 gap-3">
                   <SheetClose asChild>
                     <Button variant="outline" type="button">
                       Annuler

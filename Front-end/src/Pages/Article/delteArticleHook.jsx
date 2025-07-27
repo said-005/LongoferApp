@@ -11,7 +11,7 @@ export const useDeleteArticle = () => {
     mutationFn: (codeArticle) =>ArticleApi.deleteArticle(codeArticle), // Accept string directly
     onSuccess: (_, codeArticle) => {
       toast.success(`Article ${codeArticle} deleted successfully`);
-      queryClient.invalidateQueries({ queryKey: ['Articles'] });
+      queryClient.invalidateQueries({ queryKey: ['articles'] });
     },
     onError: (error) => {
       toast.error(

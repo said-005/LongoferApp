@@ -1,11 +1,11 @@
+"use client";
+
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { AxiosError } from "axios";
 import { Loader2 } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,22 +19,21 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { CausseApi } from "@/api/causseApi";
 import SheetCloseComponent from "../SheetClose";
+import { cn } from "@/lib/utils";
 
-
-// Constants
 const FORM_SCHEMA = z.object({
   code_causse: z.string().min(2, {
-    message: "Cause code must be at least 2 characters.",
+    message: "Le code cause doit contenir au moins 2 caractères",
   }),
   causse: z.string().min(2, {
-    message: "Cause description must be at least 2 characters.",
+    message: "La description doit contenir au moins 2 caractères",
   }),
 });
 
 const ERROR_MESSAGES = {
-  FETCH_ERROR: "Failed to load cause data",
-  UPDATE_ERROR: "Error updating cause",
-  SUCCESS: "Cause updated successfully",
+  FETCH_ERROR: "Échec du chargement des données",
+  UPDATE_ERROR: "Erreur lors de la mise à jour",
+  SUCCESS: "Cause mise à jour avec succès",
 };
 
 export function UpdateCausse({ id, onSuccess }) {
@@ -52,17 +51,19 @@ export function UpdateCausse({ id, onSuccess }) {
     onError: (err) => {
       toast.error(ERROR_MESSAGES.FETCH_ERROR, {
         description: err.response?.data?.message || err.message,
+        className: "bg-red-100 dark:bg-red-900/50 dark:text-red-200 border-red-200 dark:border-red-800",
       });
     },
+    enabled: !!id,
   });
 
   // Mutation for updating data
   const { mutate: updateCausse, isPending } = useMutation({
-    mutationFn: (values) =>
-      CausseApi.updateCausse(id, values),
+    mutationFn: (values) => CausseApi.updateCausse(id, values),
     onSuccess: (data) => {
       toast.success(ERROR_MESSAGES.SUCCESS, {
         description: `Code: ${data.code_causse}`,
+        className: "bg-green-100 dark:bg-green-900/50 dark:text-green-200 border-green-200 dark:border-green-800",
       });
       queryClient.invalidateQueries({ queryKey: ["causses"] });
       queryClient.invalidateQueries({ queryKey: ["causse", id] });
@@ -71,6 +72,7 @@ export function UpdateCausse({ id, onSuccess }) {
     onError: (error) => {
       toast.error(ERROR_MESSAGES.UPDATE_ERROR, {
         description: error.response?.data?.message || error.message,
+        className: "bg-red-100 dark:bg-red-900/50 dark:text-red-200 border-red-200 dark:border-red-800",
       });
     },
   });
@@ -98,19 +100,23 @@ export function UpdateCausse({ id, onSuccess }) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Loader2 className="h-8 w-8 animate-spin text-gray-600 dark:text-gray-400" />
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="bg-destructive/10 border border-destructive text-destructive p-4 rounded-lg">
+      <div className={cn(
+        "bg-destructive/10 border border-destructive text-destructive",
+        "dark:bg-red-900/20 dark:border-red-800 dark:text-red-200",
+        "p-4 rounded-lg"
+      )}>
         <p>{ERROR_MESSAGES.FETCH_ERROR}</p>
         <p className="text-sm mt-1">
           {fetchError instanceof Error
             ? fetchError.message
-            : "Unknown error occurred"}
+            : "Erreur inconnue"}
         </p>
       </div>
     );
@@ -118,22 +124,43 @@ export function UpdateCausse({ id, onSuccess }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className={cn(
+        "space-y-6 w-full max-w-md p-6 rounded-lg",
+        "bg-white dark:bg-gray-900",
+        "border border-gray-200 dark:border-gray-800",
+        "shadow-md dark:shadow-gray-950/50"
+      )}>
+        <h2 className={cn(
+          "text-xl font-bold text-center",
+          "text-gray-800 dark:text-gray-100"
+        )}>
+          Modifier la Cause
+        </h2>
+
         <FormField
           control={form.control}
           name="code_causse"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Cause Code *</FormLabel>
+              <FormLabel className={cn(
+                "text-gray-700 dark:text-gray-300"
+              )}>
+                Code Cause*
+              </FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Enter cause code (e.g., C01)"
+                  placeholder="Entrez le code cause (ex: C01)"
                   {...field}
                   disabled={isPending}
                   aria-disabled={isPending}
+                  className={cn(
+                    "dark:bg-gray-800 dark:border-gray-700",
+                    "dark:text-white dark:placeholder-gray-400",
+                    "focus-visible:ring-2 focus-visible:ring-blue-500"
+                  )}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-500 dark:text-red-400 text-sm" />
             </FormItem>
           )}
         />
@@ -143,39 +170,56 @@ export function UpdateCausse({ id, onSuccess }) {
           name="causse"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Cause Description *</FormLabel>
+              <FormLabel className={cn(
+                "text-gray-700 dark:text-gray-300"
+              )}>
+                Description*
+              </FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Enter cause description"
+                  placeholder="Entrez la description"
                   {...field}
                   disabled={isPending}
                   aria-disabled={isPending}
+                  className={cn(
+                    "dark:bg-gray-800 dark:border-gray-700",
+                    "dark:text-white dark:placeholder-gray-400",
+                    "focus-visible:ring-2 focus-visible:ring-blue-500"
+                  )}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-500 dark:text-red-400 text-sm" />
             </FormItem>
           )}
         />
 
-        <div className="flex justify-end items-center gap-4 pt-2">
-          <div className="w-xl">
-            <SheetCloseComponent />
-          </div>
+        <div className="flex justify-end items-center flex-col gap-2  pt-2">
+        
           <Button
             type="submit"
             disabled={isPending}
             aria-busy={isPending}
-            className="min-w-32"
+            className={cn(
+              "w-full",
+              "bg-blue-600 hover:bg-blue-700",
+              "dark:bg-blue-700 dark:hover:bg-blue-800",
+              "text-white dark:text-gray-100"
+            )}
           >
             {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Updating...
+                Mise à jour...
               </>
             ) : (
-              "Update Cause"
+              "Mettre à jour"
             )}
-          </Button>
+          </Button>  
+          <SheetCloseComponent className={cn(
+            "border-gray-300 hover:bg-gray-100",
+            "dark:border-gray-700 dark:hover:bg-gray-800",
+            "text-gray-800 dark:text-gray-200"
+          )} />
         </div>
       </form>
     </Form>

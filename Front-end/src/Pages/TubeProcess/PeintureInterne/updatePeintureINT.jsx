@@ -244,277 +244,295 @@ export default function UpdatePeintureInt({ id }) {
   const isLoadingData = isLoadingProductions || isLoadingMachines || 
                        isLoadingStatus || isLoadingDefects || isLoadingCauses || 
                        isLoadingOperateurs || isLoadingPeinture;
-
-  if (isLoadingData) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Chargement des données...</span>
-      </div>
-    );
-  }
-
+if (isLoadingData) {
   return (
-    <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-8 md:mt-12">
-      <h1 className="text-xl md:text-2xl font-bold mb-6 text-center text-gray-800">
-        Modifier la Peinture Interne
-      </h1>
-      
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
-          <div className="flex flex-col gap-2">
-            {/* Production Reference */}
-            <FormField
-              control={form.control}
-              name="ref_production"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Référence Production</FormLabel>
-                  <FormControl>
-                    <AutocompleteInput
-                      data={productions}
-                      text="Sélectionnez une référence"
-                      place="Choisissez parmi les suggestions"
-                      value={field.value}
-                      onChange={field.onChange}
-                      required
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Peinture Code */}
-            <FormField
-              control={form.control}
-              name="code_Peinture_internes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Code Peinture Interne</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Entrez le code peinture"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Date */}
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Sélectionner une date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Machine */}
-            <FormField
-              control={form.control}
-              name="machine"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Machine</FormLabel>
-                  <FormControl>
-                    <AutocompleteInput
-                      data={machines}
-                      text="Sélectionnez une machine"
-                      place="Choisissez parmi les suggestions"
-                      value={field.value}
-                      onChange={field.onChange}
-                      required
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Status */}
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Statut</FormLabel>
-                  <FormControl>
-                    <AutocompleteInput
-                      data={statusOptions}
-                      text="Sélectionnez un statut"
-                      place="Choisissez parmi les suggestions"
-                      value={field.value}
-                      onChange={field.onChange}
-                      required
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Defect */}
-            <FormField
-              control={form.control}
-              name="defect"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Défaut (optionnel)</FormLabel>
-                  <FormControl>
-                    <AutocompleteInput
-                      data={defects}
-                      text="Sélectionnez un défaut"
-                      place="Choisissez parmi les suggestions"
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Cause */}
-            <FormField
-              control={form.control}
-              name="cause"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cause (optionnel)</FormLabel>
-                  <FormControl>
-                    <AutocompleteInput
-                      data={causes}
-                      text="Sélectionnez une cause"
-                      place="Choisissez parmi les suggestions"
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Operator */}
-            <FormField
-              control={form.control}
-              name="operator"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Opérateur</FormLabel>
-                  <FormControl>
-                    <AutocompleteInput
-                      data={operateurs.operators}
-                      text="Sélectionnez un opérateur"
-                      place="Choisissez parmi les suggestions"
-                      value={field.value}
-                      onChange={field.onChange}
-                      required
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Welder */}
-            <FormField
-              control={form.control}
-              name="welder"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Soudeur</FormLabel>
-                  <FormControl>
-                    <AutocompleteInput
-                      data={operateurs.welders}
-                      text="Sélectionnez un soudeur"
-                      place="Choisissez parmi les suggestions"
-                      value={field.value}
-                      onChange={field.onChange}
-                      required
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Inspector */}
-            <FormField
-              control={form.control}
-              name="inspector"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Inspecteur</FormLabel>
-                  <FormControl>
-                    <AutocompleteInput
-                      data={operateurs.inspectors}
-                      text="Sélectionnez un inspecteur"
-                      place="Choisissez parmi les suggestions"
-                      value={field.value}
-                      onChange={field.onChange}
-                      required
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="flex justify-center items-center gap-4 mt-8 pt-4 border-t">
-            <div className="w-1/3">
-              <SheetCloseComponent/>
-            </div>
-            <Button 
-              type="submit"
-              className="min-w-[120px] bg-blue-600 hover:bg-blue-700" 
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Enregistrement...
-                </>
-              ) : 'Enregistrer'}
-            </Button>
-          </div>
-        </form>
-      </Form>
+    <div className="flex justify-center items-center h-64">
+      <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-400" />
+      <span className="ml-2 text-gray-800 dark:text-blue-100">Chargement des données...</span>
     </div>
   );
 }
+
+return (
+  <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-md dark:shadow-gray-800/50 mt-8 md:mt-12">
+    <h1 className="text-xl md:text-2xl font-bold mb-6 text-center text-gray-800 dark:text-blue-100">
+      Modifier la Peinture Interne
+    </h1>
+    
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
+        <div className="flex flex-col gap-2">
+          {/* Production Reference */}
+          <FormField
+            control={form.control}
+            name="ref_production"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="dark:text-blue-100">Référence Production</FormLabel>
+                <FormControl>
+                  <AutocompleteInput
+                    data={productions}
+                    text="Sélectionnez une référence"
+                    place="Choisissez parmi les suggestions"
+                    value={field.value}
+                    onChange={field.onChange}
+                    required
+                    className="dark:bg-gray-800 dark:border-gray-700 dark:text-blue-100 dark:placeholder:text-blue-200/50"
+                  />
+                </FormControl>
+                <FormMessage className="dark:text-blue-300" />
+              </FormItem>
+            )}
+          />
+
+          {/* Peinture Code */}
+          <FormField
+            control={form.control}
+            name="code_Peinture_internes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="dark:text-blue-100">Code Peinture Interne</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Entrez le code peinture"
+                    {...field}
+                    className="dark:bg-gray-800 dark:border-gray-700 dark:text-blue-100 dark:placeholder:text-blue-200/50"
+                  />
+                </FormControl>
+                <FormMessage className="dark:text-blue-300" />
+              </FormItem>
+            )}
+          />
+
+          {/* Date */}
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel className="dark:text-blue-100">Date</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full pl-3 text-left font-normal",
+                          "dark:bg-gray-800 dark:border-gray-700 dark:text-blue-100 dark:hover:bg-gray-700",
+                          !field.value && "text-muted-foreground dark:text-blue-200/70"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>Sélectionner une date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50 dark:text-blue-300" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 dark:bg-gray-800 dark:border-gray-700" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      initialFocus
+                      className="dark:bg-gray-800"
+                      classNames={{
+                        day_selected: "bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800",
+                        day_today: "border-blue-500 dark:border-blue-400",
+                        day_disabled: "text-gray-400 dark:text-gray-500",
+                        day_range_middle: "bg-blue-100 dark:bg-blue-900/50",
+                        head_cell: "text-gray-800 dark:text-blue-200",
+                        cell: "hover:bg-blue-100 dark:hover:bg-blue-900/50",
+                        button: "hover:bg-blue-100 dark:hover:bg-blue-900/50",
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage className="dark:text-blue-300" />
+              </FormItem>
+            )}
+          />
+
+          {/* Machine */}
+          <FormField
+            control={form.control}
+            name="machine"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="dark:text-blue-100">Machine</FormLabel>
+                <FormControl>
+                  <AutocompleteInput
+                    data={machines}
+                    text="Sélectionnez une machine"
+                    place="Choisissez parmi les suggestions"
+                    value={field.value}
+                    onChange={field.onChange}
+                    required
+                    className="dark:bg-gray-800 dark:border-gray-700 dark:text-blue-100 dark:placeholder:text-blue-200/50"
+                  />
+                </FormControl>
+                <FormMessage className="dark:text-blue-300" />
+              </FormItem>
+            )}
+          />
+
+          {/* Status */}
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="dark:text-blue-100">Statut</FormLabel>
+                <FormControl>
+                  <AutocompleteInput
+                    data={statusOptions}
+                    text="Sélectionnez un statut"
+                    place="Choisissez parmi les suggestions"
+                    value={field.value}
+                    onChange={field.onChange}
+                    required
+                    className="dark:bg-gray-800 dark:border-gray-700 dark:text-blue-100 dark:placeholder:text-blue-200/50"
+                  />
+                </FormControl>
+                <FormMessage className="dark:text-blue-300" />
+              </FormItem>
+            )}
+          />
+
+          {/* Defect */}
+          <FormField
+            control={form.control}
+            name="defect"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="dark:text-blue-100">Défaut (optionnel)</FormLabel>
+                <FormControl>
+                  <AutocompleteInput
+                    data={defects}
+                    text="Sélectionnez un défaut"
+                    place="Choisissez parmi les suggestions"
+                    value={field.value}
+                    onChange={field.onChange}
+                    className="dark:bg-gray-800 dark:border-gray-700 dark:text-blue-100 dark:placeholder:text-blue-200/50"
+                  />
+                </FormControl>
+                <FormMessage className="dark:text-blue-300" />
+              </FormItem>
+            )}
+          />
+
+          {/* Cause */}
+          <FormField
+            control={form.control}
+            name="cause"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="dark:text-blue-100">Cause (optionnel)</FormLabel>
+                <FormControl>
+                  <AutocompleteInput
+                    data={causes}
+                    text="Sélectionnez une cause"
+                    place="Choisissez parmi les suggestions"
+                    value={field.value}
+                    onChange={field.onChange}
+                    className="dark:bg-gray-800 dark:border-gray-700 dark:text-blue-100 dark:placeholder:text-blue-200/50"
+                  />
+                </FormControl>
+                <FormMessage className="dark:text-blue-300" />
+              </FormItem>
+            )}
+          />
+
+          {/* Operator */}
+          <FormField
+            control={form.control}
+            name="operator"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="dark:text-blue-100">Opérateur</FormLabel>
+                <FormControl>
+                  <AutocompleteInput
+                    data={operateurs.operators}
+                    text="Sélectionnez un opérateur"
+                    place="Choisissez parmi les suggestions"
+                    value={field.value}
+                    onChange={field.onChange}
+                    required
+                    className="dark:bg-gray-800 dark:border-gray-700 dark:text-blue-100 dark:placeholder:text-blue-200/50"
+                  />
+                </FormControl>
+                <FormMessage className="dark:text-blue-300" />
+              </FormItem>
+            )}
+          />
+
+          {/* Welder */}
+          <FormField
+            control={form.control}
+            name="welder"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="dark:text-blue-100">Soudeur</FormLabel>
+                <FormControl>
+                  <AutocompleteInput
+                    data={operateurs.welders}
+                    text="Sélectionnez un soudeur"
+                    place="Choisissez parmi les suggestions"
+                    value={field.value}
+                    onChange={field.onChange}
+                    required
+                    className="dark:bg-gray-800 dark:border-gray-700 dark:text-blue-100 dark:placeholder:text-blue-200/50"
+                  />
+                </FormControl>
+                <FormMessage className="dark:text-blue-300" />
+              </FormItem>
+            )}
+          />
+
+          {/* Inspector */}
+          <FormField
+            control={form.control}
+            name="inspector"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="dark:text-blue-100">Inspecteur</FormLabel>
+                <FormControl>
+                  <AutocompleteInput
+                    data={operateurs.inspectors}
+                    text="Sélectionnez un inspecteur"
+                    place="Choisissez parmi les suggestions"
+                    value={field.value}
+                    onChange={field.onChange}
+                    required
+                    className="dark:bg-gray-800 dark:border-gray-700 dark:text-blue-100 dark:placeholder:text-blue-200/50"
+                  />
+                </FormControl>
+                <FormMessage className="dark:text-blue-300" />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="flex justify-center items-center gap-4 mt-8 pt-4 border-t dark:border-gray-700">
+          <div className="w-1/3">
+            <SheetCloseComponent className="dark:border-gray-600 dark:text-blue-100 dark:hover:bg-gray-800 dark:hover:text-blue-300" />
+          </div>
+          <Button 
+            type="submit"
+            className="min-w-[120px] bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-blue-50" 
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Enregistrement...
+              </>
+            ) : 'Enregistrer'}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  </div>
+)};

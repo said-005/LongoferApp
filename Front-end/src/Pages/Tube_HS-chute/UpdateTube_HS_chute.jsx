@@ -27,6 +27,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import SheetCloseComponent from './../SheetClose';
 import { useEffect } from "react";
+import { Card } from "@/components/ui/card";
 
 const formSchema = z.object({
   article: z.string().min(1, "L'article est requis").max(50, "Maximum 50 caractères"),
@@ -70,15 +71,16 @@ export function UpdateTubeHS({ id }) {
   // Populate form when data is loaded
   useEffect(() => {
     if (tubeHS) {
+      const date = tubeHS.Date ? new Date(tubeHS.Date) : new Date();
       form.reset({
         article: tubeHS.Article,
         of: tubeHS.OF,
         qteChuteHs: tubeHS.Qte_Chute_HS,
         code_tube_HS: tubeHS.code_tube_HS,
-        date: tubeHS.date
+        date
       });
     }
-  }, [tubeHS, form, id]);
+  }, [tubeHS, form]);
 
   // Fetch OFs and articles
   const { data: ofsData, isLoading: isOfsLoading } = useQuery({
@@ -117,7 +119,6 @@ export function UpdateTubeHS({ id }) {
   // Update mutation
   const { mutate: updateTubeHS, isPending } = useMutation({
     mutationFn: async (values) => {
-    
       await TubeHSApi.updateTube_HS(id, values);
     },
     onSuccess: () => {
@@ -132,190 +133,211 @@ export function UpdateTubeHS({ id }) {
     }
   });
 
-const onSubmit = (values) => {
-  const dateObj = new Date(values.date);
+  const onSubmit = (values) => {
+    const dateObj = new Date(values.date);
+    const pad = (num) => String(num).padStart(2, '0');
+    const formattedDate = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
+    
+    updateTubeHS({
+      code_tube_HS: values.code_tube_HS,
+      Article: values.article,
+      OF: values.of,
+      Qte_Chute_HS: values.qteChuteHs,
+      Date: formattedDate
+    });
+  };
 
-  const pad = (num) => String(num).padStart(2, '0');
-
-  const formattedDate = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
-  updateTubeHS({
-    code_tube_HS: values.code_tube_HS,
-    Article: values.article,
-    OF: values.of,
-    Qte_Chute_HS: values.qteChuteHs,
-    Date: formattedDate // or "date" if that's what your backend uses
-  });
-};
   if (isTubeHSLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 flex justify-center items-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <span className="sr-only">Chargement...</span>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg">
-          <h1 className="text-2xl font-bold text-center mb-6">Modifier Tube HS</h1>
-          
-          {/* Code Tube HS */}
-          <FormField
-            control={form.control}
-            name="code_tube_HS"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-medium">Code Tube HS*</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="ex: CTH-0001" 
-                    {...field} 
-                    aria-describedby="code_tube_HS-help"
-                  />
-                </FormControl>
-                <FormMessage className="text-xs text-red-500" />
-              </FormItem>
-            )}
-          />
-          
-          {/* Article */}
-          <FormField
-            control={form.control}
-            name="article"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-medium">Article*</FormLabel>
-                <FormControl>
-                  <AutocompleteInput
-                    data={articlesOptions}
-                    text="Sélectionnez un article"
-                    place="Rechercher un article..."
-                    value={field.value}
-                    onChange={field.onChange}
-                    required
-                    disabled={isArticlesLoading}
-                    aria-label="Sélectionner un article"
-                  />
-                </FormControl>
-                <FormMessage className="text-xs text-red-500" />
-              </FormItem>
-            )}
-          />
-
-          {/* OF */}
-          <FormField
-            control={form.control}
-            name="of"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-medium">OF*</FormLabel>
-                <FormControl>
-                  <AutocompleteInput
-                    data={ofsOptions}
-                    text="Sélectionnez un OF"
-                    place="Rechercher un OF..."
-                    value={field.value}
-                    onChange={field.onChange}
-                    required
-                    disabled={isOfsLoading}
-                    aria-label="Sélectionner un OF"
-                  />
-                </FormControl>
-                <FormMessage className="text-xs text-red-500" />
-              </FormItem>
-            )}
-          />
-
-          {/* Date */}
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel className="font-medium">Date*</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
+    <div className="flex justify-center p-4">
+      <Card className="w-full max-w-md">
+        <div className="bg-primary dark:bg-primary/90 px-6 py-4 rounded-t-lg -mt-6">
+          <h1 className="text-2xl font-bold text-primary-foreground text-center">
+            Modifier Tube HS
+          </h1>
+        </div>
+        
+        <div className="p-6">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {/* Code Tube HS */}
+              <FormField
+                control={form.control}
+                name="code_tube_HS"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-foreground/80 dark:text-foreground/70">
+                      Code Tube HS
+                    </FormLabel>
                     <FormControl>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                        aria-label="Sélectionner une date"
-                      >
-                        {field.value ? (
-                          format(field.value, 'PPP', { locale: fr })
-                        ) : (
-                          <span>Sélectionner une date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
+                      <Input 
+                        placeholder="ex: CTH-0001" 
+                        {...field} 
+                        className="bg-background dark:bg-background/95"
+                        aria-describedby="code_tube_HS-help"
+                      />
                     </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) => date > new Date()}
-                      initialFocus
-                      locale={fr}
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage className="text-xs text-red-500" />
-              </FormItem>
-            )}
-          />
+                    <FormMessage className="text-destructive dark:text-destructive-foreground text-xs" />
+                  </FormItem>
+                )}
+              />
+              
+              {/* Article */}
+              <FormField
+                control={form.control}
+                name="article"
+                render={({ field }) => (
+                  <FormItem>
+                    
+                    <FormControl>
+                      <AutocompleteInput
+                        data={articlesOptions}
+                        text="Sélectionnez un article"
+                        place="Rechercher un article..."
+                        value={field.value}
+                        onChange={field.onChange}
+                        required
+                        disabled={isArticlesLoading}
+                        className="bg-background dark:bg-background/95"
+                        aria-label="Sélectionner un article"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-destructive dark:text-destructive-foreground text-xs" />
+                  </FormItem>
+                )}
+              />
 
-          {/* Quantity */}
-          <FormField
-            control={form.control}
-            name="qteChuteHs"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-medium">Quantité Chute/HS (kg)*</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    min="1"
-                    step="0.01"
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                    aria-describedby="qteChuteHs-help"
-                  />
-                </FormControl>
-                <FormMessage className="text-xs text-red-500" />
-              </FormItem>
-            )}
-          />
+              {/* OF */}
+              <FormField
+                control={form.control}
+                name="of"
+                render={({ field }) => (
+                  <FormItem>
+                    
+                    <FormControl>
+                      <AutocompleteInput
+                        data={ofsOptions}
+                        text="Sélectionnez un OF"
+                        place="Rechercher un OF..."
+                        value={field.value}
+                        onChange={field.onChange}
+                        required
+                        disabled={isOfsLoading}
+                        className="bg-background dark:bg-background/95"
+                        aria-label="Sélectionner un OF"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-destructive dark:text-destructive-foreground text-xs" />
+                  </FormItem>
+                )}
+              />
 
-          <div className="flex gap-4 pt-4 justify-center items-center">
-            <Button
-              type="submit"
-              className="flex-1 bg-blue-600 hover:bg-blue-700"
-              disabled={isPending}
-              aria-busy={isPending}
-            >
-              {isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  En cours...
-                </>
-              ) : (
-                "Mettre à jour"
-              )}
-            </Button>
-            <div className="w-1/4 -mt-1">
-              <SheetCloseComponent />
-            </div>
-          </div>
-        </form>
-      </Form>
+              {/* Date */}
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="text-foreground/80 dark:text-foreground/70">
+                      Date*
+                    </FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground",
+                              "bg-background dark:bg-background/95"
+                            )}
+                            aria-label="Sélectionner une date"
+                          >
+                            {field.value ? (
+                              format(field.value, 'PPP', { locale: fr })
+                            ) : (
+                              <span>Sélectionner une date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => date > new Date()}
+                          initialFocus
+                          locale={fr}
+                          className="bg-background dark:bg-background/95"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage className="text-destructive dark:text-destructive-foreground text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              {/* Quantity */}
+              <FormField
+                control={form.control}
+                name="qteChuteHs"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-foreground/80 dark:text-foreground/70">
+                      Quantité Chute/HS (kg)*
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        min="1"
+                        step="0.01"
+                        {...field}
+                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        className="bg-background dark:bg-background/95"
+                        aria-describedby="qteChuteHs-help"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-destructive dark:text-destructive-foreground text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex gap-4 pt-6 justify-center items-center">
+                  <div className="w-1/4 -mt-1">
+                  <SheetCloseComponent className="border-input hover:bg-accent dark:hover:bg-accent/50" />
+                </div>
+                <Button
+                  type="submit"
+                  className="flex-1"
+                  disabled={isPending}
+                  aria-busy={isPending}
+                >
+                  {isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      En cours...
+                    </>
+                  ) : (
+                    "Mettre à jour"
+                  )}
+                </Button>
+              
+              </div>
+            </form>
+          </Form>
+        </div>
+      </Card>
     </div>
   );
 }

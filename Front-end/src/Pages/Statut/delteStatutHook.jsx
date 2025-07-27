@@ -10,7 +10,7 @@ export const useDeleteStatut = () => {
     mutationFn: (codeStatut) =>StatutApi.deleteStatut(codeStatut),
     onSuccess: (_, codeClient) => {
       toast.success(`Statut  ${codeClient} deleted successfully`);
-      queryClient.invalidateQueries({ queryKey: ['Statuts'] });
+      queryClient.invalidateQueries({ queryKey: ['statuts'] });
     },
     onError: (error) => {
       toast.error(
