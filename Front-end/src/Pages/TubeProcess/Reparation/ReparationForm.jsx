@@ -69,7 +69,7 @@ export default function ReparationForm() {
 
   // Fetch production references
   const { data: productions = [], isLoading: isLoadingProductions } = useQuery({
-    queryKey: ['productions'],
+    queryKey: ['productionOptions'],
     queryFn: async () => {
       const response = await ProductionApi.getAll();
 const formatted = response.data.data.map((pro) => ({
@@ -84,7 +84,7 @@ return formatted;
 
   // Fetch other data
   const { data: machines = [], isLoading: isLoadingMachines } = useQuery({
-    queryKey: ['machines'],
+    queryKey: ['machineOptions'],
     queryFn: async () => {
       const response = await MachineApi.getAll();
       return response.data.data.map((machine) => ({
@@ -94,6 +94,7 @@ return formatted;
     },
     ...queryOptions
   });
+ 
 
   const { data: statusOptions = [], isLoading: isLoadingStatus } = useQuery({
     queryKey: ['statusOptions'],
@@ -108,7 +109,7 @@ return formatted;
   });
 
   const { data: defects = [], isLoading: isLoadingDefects } = useQuery({
-    queryKey: ['defects'],
+    queryKey: ['defectOptions'],
     queryFn: async () => {
       const res = await DefautApi.getAll();
       return res.data.data.map((defect) => ({
@@ -120,7 +121,7 @@ return formatted;
   });
 
   const { data: causes = [], isLoading: isLoadingCauses } = useQuery({
-    queryKey: ['causes'],
+    queryKey: ['causeOptions'],
     queryFn: async () => {
       const response = await CausseApi.getAll();
       return response.data.data.map((cause) => ({
@@ -132,7 +133,7 @@ return formatted;
   });
 
   const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoading: isLoadingOperateurs } = useQuery({
-    queryKey: ['operateurs'],
+    queryKey: ['operateurOptions'],
     queryFn: async () => {
       const response = await OperateurApi.getAll();
       const data = response.data.data;

@@ -63,7 +63,7 @@ export default function ManchetteForm() {
 
   // Fetch production references
   const { data: productions = [], isLoading: isLoadingProductions } = useQuery({
-    queryKey: ['productios'],
+    queryKey: ['productionOptions'],
     queryFn: async () => {const response = await ProductionApi.getAll();
 const formatted = response.data.data.map((pro) => ({
   label: `${pro.production_code}`,
@@ -77,7 +77,7 @@ return formatted;
  console.log(productions)
   // Fetch other data
   const { data: machines = [], isLoading: isLoadingMachines } = useQuery({
-    queryKey: ['machines'],
+    queryKey: ['machinesOptions'],
     queryFn: async () => {
       const response = await MachineApi.getAll();
       return response.data.data.map((machine) => ({
@@ -101,7 +101,7 @@ return formatted;
   });
 
   const { data: defects = [], isLoading: isLoadingDefects } = useQuery({
-    queryKey: ['defects'],
+    queryKey: ['defectsOptions'],
     queryFn: async () => {
       const res = await DefautApi.getAll();
       return res.data.data.map((defect) => ({
@@ -113,7 +113,7 @@ return formatted;
   });
 
   const { data: causes = [], isLoading: isLoadingCauses } = useQuery({
-    queryKey: ['causes'],
+    queryKey: ['causesOptions'],
     queryFn: async () => {
       const response = await CausseApi.getAll();
       return response.data.data.map((cause) => ({
@@ -125,7 +125,7 @@ return formatted;
   });
 
   const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoading: isLoadingOperateurs } = useQuery({
-    queryKey: ['operateurs'],
+    queryKey: ['operateursOptions'],
     queryFn: async () => {
       const response = await OperateurApi.getAll();
       const data = response.data.data;

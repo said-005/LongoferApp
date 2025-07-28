@@ -75,7 +75,7 @@ export default function UpdateSablageEXT({ id }) {
   });
 
   const { data: productions = [] } = useQuery({
-    queryKey: ['productions'],
+    queryKey: ['productionsOptions'],
     queryFn: async () => {
   const response = await ProductionApi.getAll();
 const formatted = response.data.data.map((pro) => ({
@@ -89,7 +89,7 @@ return formatted;
   });
 
   const { data: machines = [] } = useQuery({
-    queryKey: ['machines'],
+    queryKey: ['machinesOptions'],
     queryFn: async () => {
       const response = await MachineApi.getAll();
       return response.data.data.map(machine => ({
@@ -101,7 +101,7 @@ return formatted;
   });
 
   const { data: statusOptions = [] } = useQuery({
-    queryKey: ['statusOptions'],
+    queryKey: ['statusOptionsOptions'],
     queryFn: async () => {
       const response = await StatutApi.getAll();
       return response.data.data.map(status => ({
@@ -113,7 +113,7 @@ return formatted;
   });
 
   const { data: defects = [] } = useQuery({
-    queryKey: ['defects'],
+    queryKey: ['defectsOptions'],
     queryFn: async () => {
       const res = await DefautApi.getAll();
       return res.data.data.map(defect => ({
@@ -125,7 +125,7 @@ return formatted;
   });
 
   const { data: causes = [] } = useQuery({
-    queryKey: ['causes'],
+    queryKey: ['causesOptions'],
     queryFn: async () => {
       const response = await CausseApi.getAll();
       return response.data.data.map(cause => ({
@@ -137,7 +137,7 @@ return formatted;
   });
 
   const { data: operateurs = { operators: [], welders: [], inspectors: [] } } = useQuery({
-    queryKey: ['operateurs'],
+    queryKey: ['operateursOptions'],
     queryFn: async () => {
       const response = await OperateurApi.getAll();
       const data = response.data.data;

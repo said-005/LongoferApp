@@ -76,7 +76,7 @@ export default function UpdateProduction({id}) {
 
   // Fetch data queries
   const { data: refOFs = [], isLoading: isLoadingOFs } = useQuery({
-    queryKey: ['refOFs'],
+    queryKey: ['refOFsOptions'],
     queryFn: async () => {
       const response = await OfApi.getAll();
       return response.data.data.map((of) => ({
@@ -88,7 +88,7 @@ export default function UpdateProduction({id}) {
   });
 
   const { data: articles = [], isLoading: isLoadingArticles } = useQuery({
-    queryKey: ['articles'],
+    queryKey: ['articlesOptions'],
     queryFn: async () => {
       const response = await ArticleApi.getAll();
       return response.data.data.map((article) => ({
@@ -100,7 +100,7 @@ export default function UpdateProduction({id}) {
   });
 
   const { data: machines = [], isLoading: isLoadingMachines } = useQuery({
-    queryKey: ['machines'],
+    queryKey: ['machinesOptions'],
     queryFn: async () => {
       const response = await MachineApi.getAll();
       return response.data.data.map((machine) => ({
@@ -124,7 +124,7 @@ export default function UpdateProduction({id}) {
   });
 
   const { data: defects = [], isLoading: isLoadingDefects } = useQuery({
-    queryKey: ['defects'],
+    queryKey: ['defectsOptions'],
     queryFn: async () => {
       const res = await DefautApi.getAll();
       return res.data.data.map((defect) => ({
@@ -136,7 +136,7 @@ export default function UpdateProduction({id}) {
   });
 
   const { data: causes = [], isLoading: isLoadingCauses } = useQuery({
-    queryKey: ['causes'],
+    queryKey: ['causesOptions'],
     queryFn: async () => {
       const response = await CausseApi.getAll();
       return response.data.data.map((cause) => ({
@@ -148,7 +148,7 @@ export default function UpdateProduction({id}) {
   });
 
   const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoading: isLoadingOperateurs } = useQuery({
-    queryKey: ['operateurs'],
+    queryKey: ['operateursOptions'],
     queryFn: async () => {
       const response = await OperateurApi.getAll();
       const data = response.data.data;
