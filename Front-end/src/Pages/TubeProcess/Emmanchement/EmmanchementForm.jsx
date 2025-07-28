@@ -233,7 +233,7 @@ return (
                 <FormControl>
                   <AutocompleteInput
                     data={productions}
-                    text="Sélectionnez une référence production"
+                    text="Sélectionnez une  production"
                     place="Choisissez parmi les suggestions"
                     value={field.value || ''}
                     onChange={(value) => field.onChange(value || '')}
@@ -252,7 +252,7 @@ return (
             name="code_Emmanchement"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-blue-100">Code Emmanchement</FormLabel>
+                <FormLabel className="dark:text-blue-100">Référence Emmanchement</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Entrez le code Emmanchement"

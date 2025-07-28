@@ -30,28 +30,22 @@ import { Card } from "@/components/ui/card";
 
 const formSchema = z.object({
   articleMatiere: z.string()
-    .min(1, { message: "Veuillez sélectionner une matière" })
-    .max(50, { message: "Maximum 50 caractères" }),
+    .min(1, { message: "Veuillez sélectionner une matière" }),
   date: z.date({
     required_error: "Veuillez sélectionner une date",
     invalid_type_error: "Format de date invalide",
   }),
   numeroLot: z.string()
-    .min(1, { message: "Le numéro de lot est obligatoire" })
-    .max(20, { message: "Maximum 20 caractères" }),
+    .min(1, { message: "Le numéro de lot est obligatoire" }),
   of: z.string()
-    .min(1, { message: "Veuillez sélectionner un OF" })
-    .max(20, { message: "Maximum 20 caractères" }),
+    .min(1, { message: "Veuillez sélectionner un OF" }),
   articleOF: z.string()
-    .min(1, { message: "Veuillez sélectionner un article" })
-    .max(50, { message: "Maximum 50 caractères" }),
+    .min(1, { message: "Veuillez sélectionner un article" }),
   qteConso: z.number()
     .min(0.01, { message: "Doit être supérieur à 0" })
-    .max(999999, { message: "Quantité trop élevée" })
     .refine(val => !isNaN(val)),
   qteChute: z.number()
     .min(0, { message: "Ne peut pas être négatif" })
-    .max(999999, { message: "Quantité trop élevée" })
     .refine(val => !isNaN(val)),
 });
 
@@ -118,13 +112,10 @@ const { rawMaterials, finishedProducts } = articlesData;
     },
     onSuccess: (data) => {
       toast.success("Consommation enregistrée avec succès", {
-        action: {
-          label: "Voir",
-          onClick: () => navigate(`/consommations/${data.id}`),
-        },
       });
       queryClient.invalidateQueries({ queryKey: ['consommations'] });
       form.reset();
+      navigate('/consommation')
     },
     onError: (error) => {
       toast.error("Erreur lors de l'enregistrement", {
@@ -194,8 +185,8 @@ const { rawMaterials, finishedProducts } = articlesData;
                       <FormControl>
                         <AutocompleteInput
                           data={ProduitFiniOptions}
-                          text="Sélectionnez un article"
-                          place="Rechercher un article..."
+                          text="Sélectionnez un produit fini"
+                          place="Rechercher un produit fini..."
                           value={field.value}
                           onChange={field.onChange}
                           required
@@ -216,7 +207,7 @@ const { rawMaterials, finishedProducts } = articlesData;
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel className="text-foreground/80 dark:text-foreground/70">
-                        Date*
+                        Date
                       </FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -268,7 +259,7 @@ const { rawMaterials, finishedProducts } = articlesData;
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-foreground/80 dark:text-foreground/70">
-                        N° Lot*
+                        N° Lot
                       </FormLabel>
                       <FormControl>
                         <Input 
@@ -309,7 +300,7 @@ const { rawMaterials, finishedProducts } = articlesData;
                   )}
                 />
 
-                {/* Article OF */}
+                {/* Article  */}
                 <FormField
                   control={form.control}
                   name="articleOF"
@@ -319,8 +310,8 @@ const { rawMaterials, finishedProducts } = articlesData;
                       <FormControl>
                         <AutocompleteInput
                           data={MatierePrimierOptions}
-                          text="Sélectionnez un article"
-                          place="Rechercher un article..."
+                          text="Sélectionnez matiere premiere "
+                          place="Rechercher un matiere premiere..."
                           value={field.value}
                           onChange={field.onChange}
                           required
@@ -341,7 +332,7 @@ const { rawMaterials, finishedProducts } = articlesData;
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-foreground/80 dark:text-foreground/70">
-                        Quantité Consommée*
+                        Quantité Consommée
                       </FormLabel>
                       <FormControl>
                         <Input

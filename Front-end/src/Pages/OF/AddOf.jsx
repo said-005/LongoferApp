@@ -153,7 +153,7 @@ export function OFForm() {
                   name="ofNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>N° OF*</FormLabel>
+                      <FormLabel>N° OF</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="OF-12345" 
@@ -194,9 +194,7 @@ export function OFForm() {
                     name={`article${num}`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>
-                          Article {num}{num === 1 ? '*' : ''}
-                        </FormLabel>
+                       
                         <FormControl>
                           <AutocompleteInput
                             data={articleOptions}
@@ -219,7 +217,7 @@ export function OFForm() {
                   name="ofDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Date OF*</FormLabel>
+                      <FormLabel>Date OF</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -260,7 +258,7 @@ export function OFForm() {
                   name="deliveryDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Date Prévue livraison*</FormLabel>
+                      <FormLabel>Date Prévue livraison</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>

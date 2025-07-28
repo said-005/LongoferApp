@@ -24,9 +24,9 @@ class StoreClientsRequest extends FormRequest
         return [
             'Client'=>'string|max:50',
             'codeClient'=>'string:unique:Clients,codeClient',
-            'tele'=>'|min:10|max:10',
-            'address'=>'max:255',
-            'email'=>'email'
+            'tele'=>'|min:10|nullable',
+            'address'=>'max:255|nullable',
+            'email'=>'email|nullable'
         ];
     }
 }

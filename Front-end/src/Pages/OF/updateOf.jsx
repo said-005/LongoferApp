@@ -190,7 +190,7 @@ export function UpdateOf({ id }) {
                 name="ofNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>N° OF*</FormLabel>
+                    <FormLabel>N° OF</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="OF-12345" 
@@ -232,7 +232,7 @@ export function UpdateOf({ id }) {
                   name={`article${num}`}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Article {num}{num === 1 ? '*' : ''}</FormLabel>
+              
                       <FormControl>
                         <AutocompleteInput
                           data={articleOptions}
@@ -253,7 +253,7 @@ export function UpdateOf({ id }) {
               <DatePickerField 
                 control={form.control}
                 name="ofDate"
-                label="Date OF*"
+                label="Date OF"
                 disabled={isLoading}
                 maxDate={new Date()}
               />
@@ -261,7 +261,7 @@ export function UpdateOf({ id }) {
               <DatePickerField 
                 control={form.control}
                 name="deliveryDate"
-                label="Date livraison*"
+                label="Date livraison"
                 disabled={isLoading}
                 minDate={new Date()}
               />

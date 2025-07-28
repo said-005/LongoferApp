@@ -231,7 +231,7 @@ return (
                 <FormControl>
                   <AutocompleteInput
                     data={productions}
-                    text="Sélectionnez une référence production"
+                    text="Sélectionnez une  production"
                     place="Choisissez parmi les suggestions"
                     value={field.value}
                     onChange={field.onChange}
@@ -250,7 +250,7 @@ return (
             name="code_Peinture_Externe"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-blue-100">Code Peinture Externe</FormLabel>
+                <FormLabel className="dark:text-blue-100">Référence Peinture Externe</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Entrez le code peinture externe"

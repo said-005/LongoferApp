@@ -24,9 +24,6 @@ const formSchema = z.object({
   .min(2, {
     message: "Le nom doit contenir au moins 2 caractères",
   })
-  .max(50, {
-    message: "Le nom ne doit pas dépasser 50 caractères",
-  }),
 });
 
 export function CategoryForm() {
@@ -78,7 +75,7 @@ export function CategoryForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="block mb-2 font-medium text-gray-900 dark:text-gray-300">
-                  Nom de la catégorie*
+                  Nom de la catégorie
                 </FormLabel>
                 <FormControl>
                   <Input

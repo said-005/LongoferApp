@@ -49,6 +49,7 @@ export function MachineForm() {
       });
       queryClient.invalidateQueries({ queryKey: ["machines"] });
       form.reset();
+       navigate('/machine');
     },
     onError: (error) => {
       toast.error("Erreur lors de la création", {
@@ -93,7 +94,7 @@ export function MachineForm() {
                 <FormLabel className={cn(
                   "text-gray-700 dark:text-gray-300"
                 )}>
-                  Code Machine*
+                  Code Machine
                 </FormLabel>
                 <FormControl>
                   <Input 
@@ -120,7 +121,7 @@ export function MachineForm() {
                 <FormLabel className={cn(
                   "text-gray-700 dark:text-gray-300"
                 )}>
-                  Nom de la Machine*
+                  Nom de la Machine
                 </FormLabel>
                 <FormControl>
                   <Input 

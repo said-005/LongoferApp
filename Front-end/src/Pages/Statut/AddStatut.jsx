@@ -26,7 +26,6 @@ const formSchema = z.object({
     required_error: "Le statut est requis",
   })
   .min(1, "Le statut ne peut pas être vide")
-  .max(50, "Le statut doit contenir moins de 50 caractères"),
 });
 
 export function StatutForm() {
@@ -50,6 +49,7 @@ export function StatutForm() {
       });
       queryClient.invalidateQueries(['statuts']);
       form.reset();
+       navigate('/statut');
     },
     onError: (error) => {
       toast.error("Échec de la création", {
@@ -98,7 +98,7 @@ export function StatutForm() {
                   "text-gray-700 dark:text-gray-300",
                   "transition-colors"
                 )}>
-                  Statut*
+                  Statut
                 </FormLabel>
                 <FormControl>
                   <Input 

@@ -24,7 +24,7 @@ const formSchema = z.object({
     required_error: "Le statut est requis",
   })
   .min(1, "Le statut ne peut pas être vide")
-  .max(50, "Le statut doit contenir moins de 50 caractères"),
+
 });
 
 export function UpdateStatut({ id }) {
@@ -130,7 +130,7 @@ export function UpdateStatut({ id }) {
                   "text-gray-700 dark:text-gray-300",
                   "transition-colors"
                 )}>
-                  Statut*
+                  Statut
                 </FormLabel>
                 <FormControl>
                   <Input 

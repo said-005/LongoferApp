@@ -9,7 +9,6 @@ use App\Http\Controllers\DefautController;
 use App\Http\Controllers\EmmanchementController;
 use App\Http\Controllers\MachineController;
 use App\Http\Controllers\ManchetteController;
-use App\Http\Controllers\MatiereController;
 use App\Http\Controllers\OfController;
 use App\Http\Controllers\OperateurController;
 use App\Http\Controllers\PeintureEXTController;
@@ -20,8 +19,13 @@ use App\Http\Controllers\SablageEXTController;
 use App\Http\Controllers\SablageIntController;
 use App\Http\Controllers\TubeHSshuteController;
 use App\Http\Controllers\TubeStatutController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+
+
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
@@ -37,7 +41,6 @@ Route::apiResources([
  'Causse'=>CausseController::class,
  'OF'=>OfController::class,
  'Tube_HS'=>TubeHSshuteController::class,
- 'Matiere'=>MatiereController::class,
  'Consommation'=>ConsommationController::class,
  'Production'=>ProductionController::class,
  'Reparation'=>ReparationController::class,
@@ -48,3 +51,21 @@ Route::apiResources([
  'Manchette'=>ManchetteController::class,
  'Emmanchement'=>EmmanchementController::class
 ]);
+
+Route::post('/change-password', function (Request $request) {
+    $request->validate([
+        'password' => 'required|min:6|confirmed',
+    ]);
+
+    // Hardcoded user ID (you mentioned one user only)
+    $user = User::find(1);
+
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+
+    $user->password = Hash::make($request->password);
+    $user->save();
+
+    return response()->json(['message' => 'Password updated successfully']);
+});

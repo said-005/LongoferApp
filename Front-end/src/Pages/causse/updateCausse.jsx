@@ -22,11 +22,11 @@ import SheetCloseComponent from "../SheetClose";
 import { cn } from "@/lib/utils";
 
 const FORM_SCHEMA = z.object({
-  code_causse: z.string().min(2, {
-    message: "Le code cause doit contenir au moins 2 caractères",
+  code_causse: z.string().min(1, {
+    message: "Le code cause doit contenir au moins 1 caractères",
   }),
-  causse: z.string().min(2, {
-    message: "La description doit contenir au moins 2 caractères",
+  causse: z.string().min(1, {
+    message: "La description doit contenir au moins 1 caractères",
   }),
 });
 
@@ -145,7 +145,7 @@ export function UpdateCausse({ id, onSuccess }) {
               <FormLabel className={cn(
                 "text-gray-700 dark:text-gray-300"
               )}>
-                Code Cause*
+                Code Cause
               </FormLabel>
               <FormControl>
                 <Input
@@ -173,7 +173,7 @@ export function UpdateCausse({ id, onSuccess }) {
               <FormLabel className={cn(
                 "text-gray-700 dark:text-gray-300"
               )}>
-                Description*
+                Description
               </FormLabel>
               <FormControl>
                 <Input

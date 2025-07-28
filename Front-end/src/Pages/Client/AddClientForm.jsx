@@ -1,4 +1,3 @@
-"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -19,17 +18,28 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ClientApi } from "../../Api/ClientApi";
 import { Loader2 } from "lucide-react";
 
+// 1. Define proper schema with correct optional placement
 const formSchema = z.object({
   codeClient: z.string().min(2, "Must be at least 2 characters"),
   client: z.string().min(2, "Must be at least 2 characters"),
-  address: z.string(),
-  phone: z.string().min(10, "Must be at least 10 digits").regex(/^[0-9]+$/, "Only numbers allowed"),
-  email: z.string().email("Please enter a valid email"),
+  address: z.string().optional(),
+  phone: z.string()
+    .transform((val) => val === "" ? undefined : val) // Convert empty string to undefined
+    .refine((val) => val === undefined || (val.length >= 10 && /^[0-9]+$/.test(val)), {
+      message: "Must be at least 10 digits and only numbers"
+    }),
+  email: z.string()
+    .transform((val) => val === "" ? undefined : val) // Convert empty string to undefined
+    .refine((val) => val === undefined || /.+@.+\..+/.test(val), {
+      message: "Please enter a valid email"
+    }),
 });
 
 export function ClientForm() {
   const navigate = useNavigate();
-  const queryClient=useQueryClient()
+  const queryClient = useQueryClient();
+
+  // 3. Initialize form with proper types and consistent empty values
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,34 +51,33 @@ export function ClientForm() {
     },
   });
 
+  // 4. Add proper typing for mutation
   const { mutate: createClient, isPending } = useMutation({
-    mutationFn: (data) => ClientApi.createClient(data),
+    mutationFn: (data) => ClientApi.createClient({
+      address: data.address || undefined, // Convert empty string to undefined
+      Client: data.client,
+      codeClient: data.codeClient,
+      email: data.email || undefined,     // Convert empty string to undefined
+      tele: data.phone || undefined       // Convert empty string to undefined
+    }),
     onSuccess: () => {
       toast.success("Client created successfully");
-      queryClient.invalidateQueries('clients')
-      navigate(-1); // Go back after successful creation
-
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      navigate(-1);
     },
     onError: (error) => {
-      console.log(error)
       toast.error(error.message || "Failed to create client");
     }
   });
 
   function onSubmit(values) {
-    const ClientsData = {
-      address: values.address,
-      Client: values.client,
-      codeClient: values.codeClient,
-      email: values.email,
-      tele: values.phone
-    }
-    createClient(ClientsData);
+    createClient(values);
   }
 
   const handleCancel = () => {
     navigate('/client');
   };
+
 
   return (
     <div className="w-full h-full flex justify-center items-center p-4">
@@ -87,7 +96,7 @@ export function ClientForm() {
                   name="codeClient"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground">Code Client*</FormLabel>
+                      <FormLabel className="text-foreground">Code Client</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="CL-001" 
@@ -105,7 +114,7 @@ export function ClientForm() {
                   name="client"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground">Client Name*</FormLabel>
+                      <FormLabel className="text-foreground">Client Name</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Client Name" 

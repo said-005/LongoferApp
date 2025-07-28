@@ -12,9 +12,6 @@ export default function StatutsList() {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['statuts'],
     queryFn: StatutApi.getAll,
-    refetchInterval: 30000,
-    refetchOnWindowFocus: true,
-    staleTime: 10000,
     onError: (error) => {
       toast.error("Erreur de chargement des statuts", {
         description: error.message || "Impossible de charger les statuts qualité",
@@ -22,7 +19,7 @@ export default function StatutsList() {
     }
   });
 
-  const statuts = data?.data || [];
+  const statuts = data?.data.data || [];
 
   return (
     <div className="container mx-auto px-4 py-6">

@@ -21,11 +21,9 @@ import { Card } from "@/components/ui/card";
 // Schema validation
 const formSchema = z.object({
   codeDefaut: z.string()
-    .min(1, { message: "Le code défaut est requis" })
-    .max(20, { message: "Le code ne doit pas dépasser 20 caractères" }),
+    .min(1, { message: "Le code défaut est requis" }),
   defautDescription: z.string()
-    .min(10, { message: "La description doit contenir au moins 10 caractères" })
-    .max(500, { message: "La description ne doit pas dépasser 500 caractères" })
+    .min(10, { message: "La description doit contenir au moins 10 caractères" }),
 });
 
 export function DefautForm() {
@@ -46,6 +44,7 @@ export function DefautForm() {
     onSuccess: () => {
       toast.success("Le défaut a été créé avec succès");
       queryClient.invalidateQueries({ queryKey: ['defauts'] });
+       navigate('/defaut');
     },
     onError: (error) => {
       toast.error(error.message || "Une erreur est survenue lors de la création du défaut");
@@ -76,7 +75,7 @@ export function DefautForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-semibold text-foreground/80 dark:text-foreground/70">
-                    Code Défaut*
+                    Code Défaut
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -97,7 +96,7 @@ export function DefautForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-semibold text-foreground/80 dark:text-foreground/70">
-                    Description du Défaut*
+                    Description du Défaut
                   </FormLabel>
                   <FormControl>
                     <Textarea

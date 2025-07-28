@@ -65,7 +65,7 @@ export const ClientColumns = [
     header: "Address",
     cell: ({ row }) => (
       <div className="text-sm text-gray-600 line-clamp-1">
-        {row.getValue("address") || "N/A"}
+        {row.getValue("address") || "-"}
       </div>
     ),
   },
@@ -74,7 +74,7 @@ export const ClientColumns = [
     header: "Phone",
     cell: ({ row }) => (
       <div className="whitespace-nowrap">
-        {row.getValue("tele") || "N/A"}
+        {row.getValue("tele") || "-"}
       </div>
     ),
   },
@@ -91,7 +91,7 @@ export const ClientColumns = [
           {email}
         </a>
       ) : (
-        <span className="text-sm text-gray-400">N/A</span>
+        <span className="text-sm text-gray-400">-</span>
       );
     },
   },

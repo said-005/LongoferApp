@@ -34,7 +34,7 @@ const formSchema = z.object({
     .max(50, "Maximum 50 caractères")
     .trim(),
   machine: z.string()
-    .min(1, "La machine est requise"),
+    .optional(),
   code_operateur: z.string()
     .min(1, "Le code est requis")
     .trim(),
@@ -164,7 +164,7 @@ export function UpdateOperateur({ id }) {
                 "font-medium",
                 "text-gray-700 dark:text-gray-300"
               )}>
-                Code Opérateur*
+                Code Opérateur
               </FormLabel>
               <FormControl>
                 <Input 
@@ -193,7 +193,7 @@ export function UpdateOperateur({ id }) {
                 "font-medium",
                 "text-gray-700 dark:text-gray-300"
               )}>
-                Nom Complet*
+                Nom Complet
               </FormLabel>
               <FormControl>
                 <Input 
@@ -222,7 +222,7 @@ export function UpdateOperateur({ id }) {
                 "font-medium",
                 "text-gray-700 dark:text-gray-300"
               )}>
-                Fonction*
+                Fonction
               </FormLabel>
               <FormControl>
                 <Input 

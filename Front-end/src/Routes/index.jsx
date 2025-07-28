@@ -65,6 +65,7 @@ import ManchetteForm from "../Pages/TubeProcess/Manchette_ISO/ManchetteForm";
 import EmmanchementList from "../Pages/TubeProcess/Emmanchement/EmmanchementList";
 import EmmanchementForm from '../Pages/TubeProcess/Emmanchement/EmmanchementForm';
 import Home from "../Pages/home";
+import { PasswordChangeForm } from "../Pages/ChangePassword";
 
 export const Routers = createBrowserRouter([
   {
@@ -261,5 +262,10 @@ export const Routers = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />
+  },
+   {
+    path: '/forgot-password',
+    element: <PasswordChangeForm/>
   }
+
 ])

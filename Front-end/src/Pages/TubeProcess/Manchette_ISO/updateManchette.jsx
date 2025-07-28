@@ -266,7 +266,7 @@ return (
                 <FormControl>
                   <AutocompleteInput
                     data={productions}
-                    text="Sélectionnez une référence"
+                    text="Sélectionnez une Production"
                     place="Choisissez parmi les suggestions"
                     value={field.value}
                     onChange={field.onChange}
@@ -285,7 +285,7 @@ return (
             name="code_manchette"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-800 dark:text-gray-300">Code Manchette</FormLabel>
+                <FormLabel className="text-gray-800 dark:text-gray-300">Référence Manchette</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Entrez le code manchette"

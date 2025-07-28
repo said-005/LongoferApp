@@ -21,11 +21,9 @@ import { Card } from "@/components/ui/card";
 
 const formSchema = z.object({
   codeDefaut: z.string()
-    .min(1, { message: "Le code défaut est requis" })
-    .max(20, { message: "Le code ne doit pas dépasser 20 caractères" }),
+    .min(1, { message: "Le code défaut est requis" }),
   defautDescription: z.string()
     .min(10, { message: "La description doit contenir au moins 10 caractères" })
-    .max(500, { message: "La description ne doit pas dépasser 500 caractères" })
 });
 
 export function UpdateDefaut({ id }) {
@@ -108,7 +106,7 @@ export function UpdateDefaut({ id }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-semibold text-foreground/80 dark:text-foreground/70">
-                    Code du Défaut*
+                    Code du Défaut
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -128,7 +126,7 @@ export function UpdateDefaut({ id }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-semibold text-foreground/80 dark:text-foreground/70">
-                    Description du Défaut*
+                    Description du Défaut
                   </FormLabel>
                   <FormControl>
                     <Textarea

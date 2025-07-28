@@ -22,11 +22,11 @@ class UpdateClientsRequest extends FormRequest
    public function rules(): array
 {
     return [
-        'Client'     => 'string|max:50',
-        'codeClient' => 'string|unique:Clients,codeClient,' . $this->route('Client') . ',codeClient',
-        'tele'       => 'min:10|max:10',
-        'address'    => 'max:255',
-        'email'      => 'email',
+        'Client'     => 'string|required',
+        'codeClient' => 'string|required|unique:Clients,codeClient,' . $this->route('Client') . ',codeClient',
+        'tele'       => 'min:10|nullable',
+        'address'    => 'max:255|nullable',
+        'email'      => 'email|nullable',
     ];
 }
 

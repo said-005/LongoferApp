@@ -19,11 +19,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { LoginApi } from "../../Api/Login";
 import { useState } from "react";
-import  ModeToggle  from "@/components/mode-toggle";
+import ModeToggle from "@/components/mode-toggle";
 
 const formSchema = z.object({
-  email: z.string().email("Please enter a valid email/Veuillez entrer un email valide"),
-  password: z.string().min(1, "Password is required/Mot de passe est requis"),
+  email: z.string().email("Veuillez entrer un email valide"),
+  password: z.string().min(1, "Le mot de passe est requis"),
 });
 
 export default function LoginPage() {
@@ -43,17 +43,18 @@ export default function LoginPage() {
     mutationFn: async (data) => {
       return LoginApi.login(data);
     },
-    onSuccess: () => {
-     localStorage.setItem('authenticated',true)
-      toast.success("Login successful", {
-        description: "You have been successfully logged in",
+    onSuccess: (data) => {
+      console.log(data);
+      localStorage.setItem('authenticated', true);
+      toast.success("Connexion réussie", {
+        description: "Vous avez été connecté avec succès",
       });
       form.reset();
       navigate('/home');
     },
     onError: (error) => {
-      toast.error("Login failed", {
-        description: error.response?.data?.message || "Invalid credentials. Please try again.",
+      toast.error("Échec de la connexion", {
+        description: error.response?.data?.message || "Identifiants invalides. Veuillez réessayer.",
       });
     }
   });
@@ -65,26 +66,26 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background to-muted p-4 relative overflow-hidden">
-      {/* Background elements */}
+      {/* Éléments d'arrière-plan */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 dark:bg-blue-800" />
         <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 dark:bg-indigo-800" />
       </div>
 
-      {/* Theme toggle */}
+      {/* Bouton de thème */}
       <div className="absolute top-4 right-4">
         <ModeToggle />
       </div>
       
-      {/* Login card */}
+      {/* Carte de connexion */}
       <Card className="w-full max-w-md relative z-10 border-0 shadow-xl">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-lg opacity-60 -z-10" />
         <CardHeader className="text-center space-y-1">
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
-            Welcome back
+            Bienvenue
           </h1>
           <p className="text-sm text-muted-foreground">
-            Enter your credentials to access your account
+            Entrez vos identifiants pour accéder à votre compte
           </p>
         </CardHeader>
         
@@ -99,7 +100,7 @@ export default function LoginPage() {
                     <FormLabel className="text-foreground">Email</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="your@email.com"
+                        placeholder="votre@email.com"
                         {...field}
                         type="email"
                         autoComplete="email"
@@ -117,12 +118,12 @@ export default function LoginPage() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex justify-between items-center">
-                      <FormLabel className="text-foreground">Password</FormLabel>
+                      <FormLabel className="text-foreground">Mot de passe</FormLabel>
                       <Link
                         to="/forgot-password"
                         className="text-sm font-medium text-primary hover:underline"
                       >
-                        Forgot password?
+                        Mot de passe oublié ?
                       </Link>
                     </div>
                     <FormControl>
@@ -158,11 +159,11 @@ export default function LoginPage() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
+                    Connexion en cours...
                   </>
                 ) : (
                   <span className="flex items-center justify-center">
-                    Sign in
+                    Se connecter
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className={`ml-2 h-4 w-4 transition-transform duration-300 ${isHovering ? 'translate-x-1' : ''}`}
@@ -178,7 +179,6 @@ export default function LoginPage() {
             </form>
           </Form>
         </CardContent>
-        
       </Card>
     </div>
   );

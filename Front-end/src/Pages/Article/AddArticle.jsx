@@ -34,22 +34,17 @@ const UNITS = [
 
 const FORM_SCHEMA = z.object({
   articleCode: z.string()
-    .min(2, { message: "Minimum 2 caractères" })
-    .max(20, { message: "Maximum 20 caractères" }),
+    .min(1, { message: "Minimum 1 caractères" }),
   category: z.string().min(2, { message: "Veuillez sélectionner une catégorie" }),
   designation: z.string()
-    .min(2, { message: "Minimum 2 caractères" })
-    .max(100, { message: "Maximum 100 caractères" }),
+    .min(2, { message: "Minimum 2 caractères" }),
   dimension: z.number()
-    .min(0.01, { message: "Doit être positif" })
-    .max(9999, { message: "Valeur trop élevée" }),
+    .min(0.01, { message: "Doit être positif" }),
   thickness: z.number()
-    .min(0.01, { message: "Doit être positif" })
-    .max(999, { message: "Valeur trop élevée" }),
+    .min(0.01, { message: "Doit être positif" }),
   unit: z.string().min(1, { message: "Veuillez sélectionner une unité" }),
   theoreticalWeight: z.number()
     .min(0.01, { message: "Doit être positif" })
-    .max(9999, { message: "Valeur trop élevée" }),
 });
 
 const ERROR_MESSAGES = {
@@ -188,7 +183,7 @@ export function ArticleForm() {
                   name="designation"
                   render={({ field }) => (
                     <FormItem className="md:col-span-2">
-                      <FormLabel>Désignation*</FormLabel>
+                      <FormLabel>Désignation</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Entrez la description de l'article" 
@@ -206,7 +201,7 @@ export function ArticleForm() {
                   name="dimension"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Dimension*</FormLabel>
+                      <FormLabel>Dimension</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="ex: 100x200" 
@@ -228,7 +223,7 @@ export function ArticleForm() {
                   name="thickness"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Épaisseur*</FormLabel>
+                      <FormLabel>Épaisseur</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="ex: 2.5" 
@@ -250,7 +245,7 @@ export function ArticleForm() {
                   name="unit"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Unité de stock*</FormLabel>
+                      <FormLabel>Unité de stock</FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
                         value={field.value}
@@ -279,7 +274,7 @@ export function ArticleForm() {
                   name="theoreticalWeight"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Poids théorique US*</FormLabel>
+                      <FormLabel>Poids théorique US</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="ex: 1.25" 

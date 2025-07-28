@@ -20,20 +20,20 @@ import { useNavigate } from "react-router-dom";
 import SheetCloseComponent from "../SheetClose";
 import { useEffect } from "react";
 
-const clientFormSchema = z.object({
-  codeClient: z.string().min(2, {
-    message: "Code must be at least 2 characters",
-  }),
-  client: z.string().min(2, {
-    message: "Client name must be at least 2 characters",
-  }),
+const formSchema = z.object({
+  codeClient: z.string().min(2, "Must be at least 2 characters"),
+  client: z.string().min(2, "Must be at least 2 characters"),
   address: z.string().optional(),
   phone: z.string()
-    .min(10, { message: "Phone must be at least 10 digits" })
-    .regex(/^[0-9]+$/, { message: "Only numbers are allowed" }),
-  email: z.string().email({
-    message: "Please enter a valid email address",
-  }),
+    .transform(val => val.trim() === "" ? undefined : val) // Convert empty string to undefined
+    .refine(val => val === undefined || (val.length >= 10 && /^[0-9]+$/.test(val)), {
+      message: "Must be at least 10 digits and only numbers"
+    }),
+  email: z.string()
+    .transform(val => val.trim() === "" ? undefined : val) // Convert empty string to undefined
+    .refine(val => val === undefined || /.+@.+\..+/.test(val), {
+      message: "Please enter a valid email"
+    }),
 });
 
 export function UpdateClient({ codeClient }) {
@@ -41,7 +41,7 @@ export function UpdateClient({ codeClient }) {
   const queryClient = useQueryClient();
 
   const form = useForm({
-    resolver: zodResolver(clientFormSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       codeClient: "",
       client: "",
@@ -54,10 +54,7 @@ export function UpdateClient({ codeClient }) {
   // Fetch client data
   const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['client', codeClient],
-    queryFn: ({ queryKey }) => {
-      const [, codeClient] = queryKey;
-      return ClientApi.getClientById(codeClient);
-    },
+    queryFn: () => ClientApi.getClientById(codeClient),
     onError: (error) => {
       toast.error("Failed to load client data", {
         description: error.message || "Please try again later",
@@ -66,14 +63,16 @@ export function UpdateClient({ codeClient }) {
     enabled: !!codeClient,
   });
 
+  // Reset form with fetched data
   useEffect(() => {
     if (data?.data) {
+      const clientData = data.data.data;
       form.reset({
-        codeClient: data.data.data.codeClient,
-        client: data.data.data.Client,
-        address: data.data.data.address || "",
-        phone: data.data.data.tele,
-        email: data.data.data.email,
+        codeClient: clientData.codeClient || "",
+        client: clientData.Client || "",
+        address: clientData.address || "",
+        phone: clientData.tele || "",
+        email: clientData.email || "",
       });
     }
   }, [data, form]);
@@ -81,22 +80,20 @@ export function UpdateClient({ codeClient }) {
   // Update client mutation
   const { mutate: updateClient, isPending } = useMutation({
     mutationFn: (values) => {
-      const data = {
+      const payload = {
         codeClient: values.codeClient,
         Client: values.client,
-        tele: values.phone,
-        address: values.address,
-        email: values.email,
+        tele: values.phone || null, // Convert empty to null
+        address: values.address || null,
+        email: values.email || null,
       };
-      return ClientApi.updateClient(codeClient, data);
+      return ClientApi.updateClient(codeClient, payload);
     },
     onSuccess: () => {
-      toast.success("Client updated successfully", {
-        description: "The client information has been updated",
-      });
-      queryClient.invalidateQueries(['client', codeClient]);
-      queryClient.invalidateQueries(['clients']);
-      navigate('/Client');
+      toast.success("Client updated successfully");
+      queryClient.invalidateQueries({ queryKey: ['client', codeClient] });
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      navigate('/Client', { replace: true });
     },
     onError: (error) => {
       toast.error("Update failed", {
@@ -109,7 +106,7 @@ export function UpdateClient({ codeClient }) {
     updateClient(values);
   };
 
-  if (isFetching || isLoading) {
+  if (isLoading || isFetching) {
     return (
       <div className="w-full h-full flex justify-center items-center p-4">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -134,19 +131,18 @@ export function UpdateClient({ codeClient }) {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 min-h-full">
-              <div className="flex flex-col gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="codeClient"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground">Client Code*</FormLabel>
+                      <FormLabel>Client Code</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="CL-001" 
                           {...field} 
                           disabled={isPending}
-                          className="bg-background text-foreground border-border"
                         />
                       </FormControl>
                       <FormMessage />
@@ -159,13 +155,12 @@ export function UpdateClient({ codeClient }) {
                   name="client"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground">Client Name*</FormLabel>
+                      <FormLabel>Client Name</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Client Name" 
                           {...field} 
                           disabled={isPending}
-                          className="bg-background text-foreground border-border"
                         />
                       </FormControl>
                       <FormMessage />
@@ -178,13 +173,12 @@ export function UpdateClient({ codeClient }) {
                   name="address"
                   render={({ field }) => (
                     <FormItem className="md:col-span-2">
-                      <FormLabel className="text-foreground">Address</FormLabel>
+                      <FormLabel>Address</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="123 Main St, City" 
                           {...field} 
                           disabled={isPending}
-                          className="bg-background text-foreground border-border"
                         />
                       </FormControl>
                       <FormMessage />
@@ -197,13 +191,12 @@ export function UpdateClient({ codeClient }) {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground">Phone*</FormLabel>
+                      <FormLabel>Phone</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="0612345678" 
                           {...field} 
                           disabled={isPending}
-                          className="bg-background text-foreground border-border"
                         />
                       </FormControl>
                       <FormMessage />
@@ -216,13 +209,12 @@ export function UpdateClient({ codeClient }) {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground">Email*</FormLabel>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="contact@company.com" 
                           {...field} 
                           disabled={isPending}
-                          className="bg-background text-foreground border-border"
                         />
                       </FormControl>
                       <FormMessage />
@@ -232,10 +224,10 @@ export function UpdateClient({ codeClient }) {
               </div>
 
               <div className="flex justify-end items-center pt-4 gap-2">
-                <div className="w-30">
-                  <SheetCloseComponent />
+                <div className="w-1/3">
+                  <SheetCloseComponent className="w-full md:w-auto" />
                 </div>
-              
+                
                 <Button 
                   type="submit" 
                   className="w-full md:w-auto"

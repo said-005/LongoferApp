@@ -21,11 +21,11 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
-  code_causse: z.string().min(2, {
-    message: "Le code cause doit contenir au moins 2 caractères",
+  code_causse: z.string().min(1, {
+    message: "Le code cause doit contenir au moins 1 caractère",
   }),
-  causse: z.string().min(2, {
-    message: "La description doit contenir au moins 2 caractères",
+  causse: z.string().min(1, {
+    message: "La description doit contenir au moins 1 caractère",
   }),
 });
 
@@ -57,6 +57,7 @@ export function CausseForm({ initialData, onSuccess }) {
       );
       queryClient.invalidateQueries({ queryKey: ["causses"] });
       onSuccess?.();
+       navigate('/causse');
     },
     onError: (error) => {
       toast.error("Erreur lors de l'envoi", {
@@ -98,7 +99,7 @@ export function CausseForm({ initialData, onSuccess }) {
                 <FormLabel className={cn(
                   "text-gray-700 dark:text-gray-300"
                 )}>
-                  Code Cause*
+                  Code Cause
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -125,7 +126,7 @@ export function CausseForm({ initialData, onSuccess }) {
                 <FormLabel className={cn(
                   "text-gray-700 dark:text-gray-300"
                 )}>
-                  Description*
+                  Description
                 </FormLabel>
                 <FormControl>
                   <Input

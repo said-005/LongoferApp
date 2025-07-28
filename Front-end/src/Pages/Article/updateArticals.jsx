@@ -145,7 +145,7 @@ export function UpdateArticle({ id }) {
                     name="articleCode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Code article*</FormLabel>
+                        <FormLabel>Code article</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="Code article" 
@@ -183,7 +183,7 @@ export function UpdateArticle({ id }) {
                     name="designation"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Désignation*</FormLabel>
+                        <FormLabel>Désignation</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="Description de l'article" 
@@ -200,7 +200,7 @@ export function UpdateArticle({ id }) {
                     name="dimension"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Dimension*</FormLabel>
+                        <FormLabel>Dimension</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="ex: 100x200" 
@@ -221,7 +221,7 @@ export function UpdateArticle({ id }) {
                     name="thickness"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Épaisseur*</FormLabel>
+                        <FormLabel>Épaisseur</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="ex: 2.5" 
@@ -242,7 +242,7 @@ export function UpdateArticle({ id }) {
                     name="unit"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Unité de stock*</FormLabel>
+                        <FormLabel>Unité de stock</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -267,7 +267,7 @@ export function UpdateArticle({ id }) {
                     name="theoreticalWeight"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Poids théorique*</FormLabel>
+                        <FormLabel>Poids théorique</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="ex: 1.25" 

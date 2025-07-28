@@ -231,7 +231,7 @@ return (
                 <FormControl>
                   <AutocompleteInput
                     data={productions}
-                    text="Sélectionnez une référence production"
+                    text="Sélectionnez une  production"
                     place="Choisissez parmi les suggestions"
                     value={field.value}
                     onChange={field.onChange}
@@ -250,7 +250,7 @@ return (
             name="code_Sablage_Interne"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="dark:text-gray-300">Code Sablage Interne</FormLabel>
+                <FormLabel className="dark:text-gray-300">Référence Sablage Interne</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Entrez le code de sablage interne"

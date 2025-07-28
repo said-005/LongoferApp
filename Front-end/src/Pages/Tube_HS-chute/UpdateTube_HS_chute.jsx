@@ -31,12 +31,11 @@ import { Card } from "@/components/ui/card";
 import { ProductionApi } from "../../Api/ProductionApi";
 
 const formSchema = z.object({
-  article: z.string().min(1, "L'article est requis").max(50, "Maximum 50 caractères"),
-  of: z.string().min(1, "L'OF est requis").max(20, "Maximum 20 caractères"),
+  article: z.string().min(1, "L'article est requis"),
+  of: z.string().min(1, "L'OF est requis"),
   date: z.date({ required_error: "La date est requise" }),
   qteChuteHs: z.number()
-    .min(1, "La quantité doit être positive")
-    .max(999999, "Quantité trop élevée"),
+    .min(1, "La quantité doit être positive"),
   ref_production: z.string().min(1, "Le code tube HS est requis")
 });
 

@@ -29,8 +29,7 @@ const formSchema = z.object({
   position: z.string()
     .min(1, "La fonction est requise")
     .max(50, "Maximum 50 caractères").trim(),
-  machine: z.string()
-    .min(1, "La machine est requise"),
+  machine: z.string().optional(),
   code_operateur: z.string()
     .min(2, "Le code est requis").trim(),
 });
@@ -131,7 +130,7 @@ export function OperateurForm() {
                   "font-medium",
                   "text-gray-700 dark:text-gray-300"
                 )}>
-                  Code Opérateur*
+                  Code Opérateur
                 </FormLabel>
                 <FormControl>
                   <Input 
@@ -161,7 +160,7 @@ export function OperateurForm() {
                   "font-medium",
                   "text-gray-700 dark:text-gray-300"
                 )}>
-                  Nom Complet*
+                  Nom Complet
                 </FormLabel>
                 <FormControl>
                   <Input 
@@ -191,7 +190,7 @@ export function OperateurForm() {
                   "font-medium",
                   "text-gray-700 dark:text-gray-300"
                 )}>
-                  Fonction*
+                  Fonction
                 </FormLabel>
                 <FormControl>
                   <Input 

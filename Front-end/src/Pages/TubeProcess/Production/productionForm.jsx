@@ -292,7 +292,7 @@ export default function ProductionForm() {
                   <FormControl>
                     <AutocompleteInput
                       data={articles}
-                      text="Sélectionnez un reference article"
+                      text="Sélectionnez un  article"
                       place="Choisissez parmi les suggestions"
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
@@ -311,7 +311,7 @@ export default function ProductionForm() {
               name="articleCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Code Article</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-300">Reference Production</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Entrer un code article"

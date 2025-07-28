@@ -131,7 +131,7 @@ export function UpdateMachine({ id }) {
               <FormLabel className={cn(
                 "text-gray-700 dark:text-gray-300"
               )}>
-                Code Machine*
+                Code Machine
               </FormLabel>
               <FormControl>
                 <Input 
@@ -158,7 +158,7 @@ export function UpdateMachine({ id }) {
               <FormLabel className={cn(
                 "text-gray-700 dark:text-gray-300"
               )}>
-                Nom de la Machine*
+                Nom de la Machine
               </FormLabel>
               <FormControl>
                 <Input 
