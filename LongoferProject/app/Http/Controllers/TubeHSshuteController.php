@@ -68,13 +68,13 @@ class TubeHSshuteController extends Controller
      * @param string $code_tube_HS
      * @return TubeHSshuteResource|JsonResponse
      */
-    public function show(string $code_tube_HS)
+    public function show( $id)
     {
         try {
-            $tubeHS = Tube_HS_Shute::where('code_tube_HS', $code_tube_HS)->first();
+            $tubeHS = Tube_HS_Shute::where('id', $id)->first();
             
             if (!$tubeHS) {
-                Log::warning('HS/Shute tube not found', ['code' => $code_tube_HS]);
+                Log::warning('HS/Shute tube not found', ['code' => $id]);
                 return response()->json([
                     'message' => 'HS/Shute tube not found'
                 ], 404);
@@ -82,7 +82,7 @@ class TubeHSshuteController extends Controller
 
             return new TubeHSshuteResource($tubeHS);
         } catch (Exception $e) {
-            Log::error('Failed to fetch HS/Shute tube: ' . $e->getMessage(), ['code' => $code_tube_HS]);
+            Log::error('Failed to fetch HS/Shute tube: ' . $e->getMessage(), ['code' => $id]);
             return response()->json([
                 'message' => 'Failed to retrieve HS/Shute tube',
                 'error' => $e->getMessage()
@@ -97,10 +97,10 @@ class TubeHSshuteController extends Controller
      * @param string $code_tube_HS
      * @return JsonResponse
      */
-    public function update(UpdateTube_HS_ShuteRequest $request, string $code_tube_HS): JsonResponse
+    public function update(UpdateTube_HS_ShuteRequest $request, $code_tube_HS): JsonResponse
     {
         try {
-            $tubeHS = Tube_HS_Shute::where('code_tube_HS', $code_tube_HS)->first();
+            $tubeHS = Tube_HS_Shute::where('id', $code_tube_HS)->first();
             
             if (!$tubeHS) {
                 Log::warning('HS/Shute tube not found for update', ['code' => $code_tube_HS]);
@@ -136,7 +136,7 @@ class TubeHSshuteController extends Controller
     public function destroy(string $code_tube_HS): JsonResponse
     {
         try {
-            $tubeHS = Tube_HS_Shute::where('code_tube_HS', $code_tube_HS)->first();
+            $tubeHS = Tube_HS_Shute::where('id', $code_tube_HS)->first();
 
             if (!$tubeHS) {
                 Log::warning('HS/Shute tube not found for deletion', ['code' => $code_tube_HS]);

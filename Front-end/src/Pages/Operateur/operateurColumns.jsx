@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UpdateSheet } from "../Shette";
-import { MoreHorizontal, Trash2, Edit, Edit2 } from "lucide-react";
+import { MoreHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDeleteOperateur } from "./delteOperateurHook";
 import { toast } from "sonner";
@@ -51,19 +51,24 @@ export const OperateurColumns = [
     ),
   },
   {
-    accessorKey: "Machine",
+    id: "machineInfo",
     header: "Machine",
-    cell: ({ row }) => (
-      <div>
-        {row.getValue("Machine") || "Non affectée"}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const machine = row.original.machine;
+      return (
+        <div>
+          {machine 
+            ? `${machine.MachineName}`
+            : "Non affectée"}
+        </div>
+      );
+    },
   },
   {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
-      const operateur = row.original 
+      const operateur = row.original;
       const { mutate: deleteOperateur, isPending } = useDeleteOperateur();
       
       const handleDelete = () => {

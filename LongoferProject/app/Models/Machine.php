@@ -20,4 +20,10 @@ class Machine extends Model
    'created_at',
    'updated_at'
   ];
+    public function operateur()
+    {
+        return $this->hasMany(Operateur::class, 'Machine', 'codeMachine');
+        // client_numero = clé étrangère dans la table "commandes"
+        // numero_client = clé primaire dans la table "clients"
+    }
 }

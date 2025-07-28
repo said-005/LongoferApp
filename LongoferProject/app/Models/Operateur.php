@@ -24,4 +24,10 @@ class Operateur extends Model
    'created_at',
    'updated_at'
   ];
+    public function machine()
+    {
+        return $this->belongsTo(Machine::class, 'Machine', 'codeMachine');
+        // client_numero = clé étrangère dans la table "commandes"
+        // numero_client = clé primaire dans la table "clients"
+    }
 }

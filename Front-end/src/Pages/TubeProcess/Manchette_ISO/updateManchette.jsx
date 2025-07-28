@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import AutocompleteInput from "../../../AutoComplet/AutoCompletInput";
 import { cn } from '../../../lib/utils';
 import SheetCloseComponent from "../../SheetClose";
-
+import { Textarea } from "@/components/ui/textarea";
 // API imports
 import { ProductionApi } from "../../../Api/ProductionApi";
 import { MachineApi } from "../../../Api/machineApi";

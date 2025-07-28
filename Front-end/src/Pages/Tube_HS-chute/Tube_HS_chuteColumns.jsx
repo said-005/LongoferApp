@@ -26,11 +26,11 @@ import { useDeleteTubeHS } from "./deltetUBE_hsHook";
 
 export const TubeSHcolumns = [
   {
-    accessorKey: "code_tube_HS",
-    header: "Code Tube HS",
+    accessorKey: "ref_production",
+    header: "production reference",
     cell: ({ row }) => (
       <div className="font-mono uppercase">
-        {row.getValue("code_tube_HS")}
+        {row.getValue("ref_production")}
       </div>
     ),
   },
@@ -65,11 +65,12 @@ export const TubeSHcolumns = [
     header: 'Actions',
     cell: ({ row }) => {
       const tube = row.original;
+ 
       const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
       const { mutate:deleteTubeHS, isDeleting } = useDeleteTubeHS();
 
       const handleDelete = async () => {
-          await deleteTubeHS(tube.code_tube_HS);
+          await deleteTubeHS(tube.id);
          setOpenDeleteDialog(false)
    
       };
@@ -89,7 +90,7 @@ export const TubeSHcolumns = [
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem asChild>
-                <UpdateSheet Component={UpdateTubeHS} id={tube.code_tube_HS} text="update the Tube HS below"/>
+                <UpdateSheet Component={UpdateTubeHS} id={tube.id} text="update the Tube HS below"/>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 

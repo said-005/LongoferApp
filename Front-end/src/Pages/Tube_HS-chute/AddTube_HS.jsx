@@ -118,7 +118,7 @@ export function TubeHSForm() {
     const formattedDate = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
 
     createTubeHS({
-      code_tube_HS: values.ref_production,
+      ref_production: values.ref_production,
       Article: values.article,
       OF: values.of,
       Qte_Chute_HS: values.qteChuteHs,

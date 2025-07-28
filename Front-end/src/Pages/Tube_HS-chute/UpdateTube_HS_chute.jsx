@@ -28,6 +28,7 @@ import { fr } from "date-fns/locale";
 import SheetCloseComponent from './../SheetClose';
 import { useEffect } from "react";
 import { Card } from "@/components/ui/card";
+import { ProductionApi } from "../../Api/ProductionApi";
 
 const formSchema = z.object({
   article: z.string().min(1, "L'article est requis").max(50, "Maximum 50 caractères"),
@@ -36,10 +37,11 @@ const formSchema = z.object({
   qteChuteHs: z.number()
     .min(1, "La quantité doit être positive")
     .max(999999, "Quantité trop élevée"),
-  code_tube_HS: z.string().min(1, "Le code tube HS est requis")
+  ref_production: z.string().min(1, "Le code tube HS est requis")
 });
 
 export function UpdateTubeHS({ id }) {
+ 
   const queryClient = useQueryClient();
 
   const form = useForm({
@@ -48,7 +50,7 @@ export function UpdateTubeHS({ id }) {
       article: "",
       of: "",
       qteChuteHs: 0,
-      code_tube_HS: "",
+      ref_production: "",
       date: new Date()
     },
   });
@@ -67,7 +69,7 @@ export function UpdateTubeHS({ id }) {
       });
     }
   });
-
+console.log('the tube HS data',tubeHS)
   // Populate form when data is loaded
   useEffect(() => {
     if (tubeHS) {
@@ -76,7 +78,7 @@ export function UpdateTubeHS({ id }) {
         article: tubeHS.Article,
         of: tubeHS.OF,
         qteChuteHs: tubeHS.Qte_Chute_HS,
-        code_tube_HS: tubeHS.code_tube_HS,
+        ref_production: tubeHS.ref_production,
         date
       });
     }
@@ -104,7 +106,17 @@ export function UpdateTubeHS({ id }) {
       });
     }
   });
-
+const { data: productions = [] } = useQuery({ 
+      queryKey: ['productionOptions'],
+      queryFn: async () => {const response = await ProductionApi.getAll();
+  const formatted = response.data.data.map((pro) => ({
+    label: `${pro.production_code}`,
+    value: pro.production_code
+  }));
+    // ✅ This will show you the final array
+  return formatted;
+      }
+    });
   // Prepare autocomplete options
   const ofsOptions = ofsData?.data?.data?.map((of) => ({
     label: of.codeOf,
@@ -139,7 +151,7 @@ export function UpdateTubeHS({ id }) {
     const formattedDate = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
     
     updateTubeHS({
-      code_tube_HS: values.code_tube_HS,
+      ref_production: values.ref_production,
       Article: values.article,
       OF: values.of,
       Qte_Chute_HS: values.qteChuteHs,
@@ -168,27 +180,28 @@ export function UpdateTubeHS({ id }) {
         <div className="p-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {/* Code Tube HS */}
-              <FormField
-                control={form.control}
-                name="code_tube_HS"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-foreground/80 dark:text-foreground/70">
-                      Code Tube HS
-                    </FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="ex: CTH-0001" 
-                        {...field} 
-                        className="bg-background dark:bg-background/95"
-                        aria-describedby="code_tube_HS-help"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-destructive dark:text-destructive-foreground text-xs" />
-                  </FormItem>
-                )}
-              />
+             {/* Code Tube HS */}
+                           <FormField
+                                      control={form.control}
+                                      name="ref_production"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                         
+                                          <FormControl>
+                                            <AutocompleteInput
+                                              data={productions}
+                                              text="Sélectionnez une référence production"
+                                              place="Choisissez parmi les suggestions"
+                                              value={field.value || ''}
+                                              onChange={(value) => field.onChange(value || '')}
+                                              required
+                                              className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
+                                            />
+                                          </FormControl>
+                                          <FormMessage className="dark:text-red-400" />
+                                        </FormItem>
+                                      )}
+                                    />
               
               {/* Article */}
               <FormField

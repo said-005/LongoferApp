@@ -25,7 +25,7 @@ public function rules(): array
 {
     
     return [
-        'code_tube_HS' => 'required|string|',
+        'ref_production' => 'required|string|',
         'Article' => 'required|string',
         'OF' => 'required|string',
         'Date' => 'required|date',

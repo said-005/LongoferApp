@@ -120,6 +120,15 @@ export const ReparationColumns = [
       </div>
     ),
   },
+   {
+    accessorKey: "description",
+    header: "description",
+    cell: ({ row }) => (
+      <div className="font-mono uppercase text-xs sm:text-sm">
+        {row.getValue("description") || '-'}
+      </div>
+    ),
+  },
   {
     accessorKey: 'Actions',
     header: '',

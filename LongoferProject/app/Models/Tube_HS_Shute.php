@@ -11,9 +11,7 @@ class Tube_HS_Shute extends Model
 
     protected $table = 'tube_hs_shutes'; // Ensure this matches your actual table name
 
-    protected $primaryKey = 'code_tube_HS'; // Custom primary key
-    protected $keyType = 'string'; // Since the primary key is not an integer
-    public $incrementing = false; // No auto-incrementing
+   
 
     protected $fillable = [
         'ref_production',

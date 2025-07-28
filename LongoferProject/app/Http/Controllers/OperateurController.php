@@ -16,7 +16,8 @@ class OperateurController extends Controller
 public function index(): AnonymousResourceCollection | JsonResponse
 {
     try {
-        $operateurs = Operateur::all();
+        $operateurs = Operateur::with('machine')->get(); // chargement de la relation
+      
         return OperateurResource::collection($operateurs);
     } catch (\Exception $e) {
         return response()->json([
@@ -25,6 +26,7 @@ public function index(): AnonymousResourceCollection | JsonResponse
         ], 500);
     }
 }
+
 
     /**
      * Store a newly created resource in storage.
