@@ -24,6 +24,7 @@ class Peinture_Externe extends Model
 'operateur',
 'soudeur',
 'controleur',
+'description'
 
   ];
   protected $hidden=[

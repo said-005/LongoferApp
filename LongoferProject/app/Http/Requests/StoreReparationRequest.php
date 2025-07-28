@@ -26,13 +26,14 @@ class StoreReparationRequest extends FormRequest
 
             'date_reparation' => 'required|date',
            'ref_production' => 'required|string',
-            'machine' => 'required|string|max:100',
-            'statut' => 'required|string|max:50',
+            'machine' => 'required|string|',
+            'statut' => 'required|string',
             'defaut' => 'nullable|string|max:255',
             'causse' => 'nullable|string|max:255',
-            'operateur' => 'required|string|max:100',
-            'soudeur' => 'nullable|string|max:100',
-            'controleur' => 'nullable|string|max:100',
+            'operateur' => 'required|string|',
+            'soudeur' => 'nullable|string|',
+            'controleur' => 'nullable|string|',
+            'description'       =>'nullable|string',
         ];
     }
 }

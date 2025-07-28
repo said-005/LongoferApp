@@ -146,14 +146,13 @@ export default function UpdateProduction({id}) {
     },
     ...queryOptions
   });
-
   const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoading: isLoadingOperateurs } = useQuery({
     queryKey: ['operateursOptions'],
     queryFn: async () => {
       const response = await OperateurApi.getAll();
       const data = response.data.data;
       return {
-        operators: data.map((op) => ({
+        operators:data.filter(op => op.Fonction === 'operateur').map(op => ({
           label: `${op.operateur} - ${op.nom_complete}`,
           value: op.operateur
         })),
@@ -161,7 +160,7 @@ export default function UpdateProduction({id}) {
           label: `${op.operateur} - ${op.nom_complete}`,
           value: op.operateur
         })),
-        inspectors: data.filter(op => op.Fonction === 'inspecteur').map(op => ({
+        inspectors: data.filter(op => op.Fonction === 'controleur').map(op => ({
           label: `${op.operateur} - ${op.nom_complete}`,
           value: op.operateur
         }))

@@ -83,16 +83,34 @@ export function ConsommationForm() {
     }
   });
 
-  const { data: articlesData, isLoading: isArticlesLoading, error: articlesError } = useQuery({
-    queryKey: ['articles'],
-    queryFn: ArticleApi.getAll,
-    staleTime: 1000 * 60 * 5,
-    onError: (error) => {
-      toast.error("Erreur de chargement des articles", {
-        description: error.message,
-      });
-    }
-  });
+ const { data: articlesData = {}, isLoading: isArticlesLoading, error: articlesError } = useQuery({
+  queryKey: ['articles'],
+  queryFn: ArticleApi.getAll,
+  staleTime: 1000 * 60 * 5,
+  onError: (error) => {
+    toast.error("Erreur de chargement des articles", {
+      description: error.message,
+    });
+  },
+  select: (data) => {
+   
+    const rawMaterials = data.data.data.filter(article => 
+      article.categorie === 'matière première' || 
+      article.categorie === 'matiere premiere'
+    );
+    const finishedProducts = data.data.data.filter(article => 
+      article.categorie === 'produit fini'
+    );
+    
+    return {
+      allArticles: data,
+      rawMaterials,
+      finishedProducts
+    };
+  }
+});
+
+const { rawMaterials, finishedProducts } = articlesData;
 
   const { mutate: submitConsommation, isPending } = useMutation({
     mutationFn: async (values) => {
@@ -124,7 +142,11 @@ export function ConsommationForm() {
     value: of.codeOf,
   })) || [];
 
-  const articlesOptions = articlesData?.data?.data?.map((article) => ({
+  const MatierePrimierOptions = rawMaterials?.map((article) => ({
+    label: `${article.codeArticle} - ${article.ArticleName}`,
+    value: article.codeArticle,
+  })) || [];
+ const ProduitFiniOptions = finishedProducts?.map((article) => ({
     label: `${article.codeArticle} - ${article.ArticleName}`,
     value: article.codeArticle,
   })) || [];
@@ -171,7 +193,7 @@ export function ConsommationForm() {
                      
                       <FormControl>
                         <AutocompleteInput
-                          data={articlesOptions}
+                          data={ProduitFiniOptions}
                           text="Sélectionnez un article"
                           place="Rechercher un article..."
                           value={field.value}
@@ -296,7 +318,7 @@ export function ConsommationForm() {
                       
                       <FormControl>
                         <AutocompleteInput
-                          data={articlesOptions}
+                          data={MatierePrimierOptions}
                           text="Sélectionnez un article"
                           place="Rechercher un article..."
                           value={field.value}

@@ -23,7 +23,7 @@ return new class extends Migration
           ->references('codeMachine')
           ->on('machines')
           ->restrictOnDelete();
-$table->softDeletes();
+
     $table->timestamps();
 });
 

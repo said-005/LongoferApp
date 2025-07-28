@@ -30,7 +30,7 @@ return new class extends Migration
              $table->foreign('soudeur')->references('operateur')->on('operateurs')->restrictOnDelete();
             $table->string('controleur')->nullable();
               $table->foreign('controleur')->references('operateur')->on('operateurs')->restrictOnDelete();
-              $table->softDeletes();
+                $table->text('description')->nullable();
             $table->timestamps();
         });
     }

@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('causses', function (Blueprint $table) {
-            $table->string('code_causse')->primary()->unique()->autoIncrement();
+            $table->string('code_causse')->primary()->unique();
             $table->string('causse');
-            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -30,6 +30,7 @@ class UpdateSablage_ExterneRequest extends FormRequest
             'operateur'            => ['nullable', 'string'],
             'soudeur'              => ['nullable', 'string'],
             'controleur'           => ['nullable', 'string'],
+            'description'       =>'nullable|string',
         ];
     }
 }

@@ -23,11 +23,9 @@ class UpdateTube_HS_ShuteRequest extends FormRequest
 
 public function rules(): array
 {
-    // Use 'Tube_H' here to match the route parameter name exactly
-    $currentCode = $this->route('Tube_H');
-
+    
     return [
-        'code_tube_HS' => 'required|string|unique:tube_hs_shutes,code_tube_HS,' . $currentCode . ',code_tube_HS',
+        'code_tube_HS' => 'required|string|',
         'Article' => 'required|string',
         'OF' => 'required|string',
         'Date' => 'required|date',

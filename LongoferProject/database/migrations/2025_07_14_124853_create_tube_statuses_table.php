@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('tube_statuts', function (Blueprint $table) {
             $table->string('Statut')->primary();
-            $table->softDeletes();
             $table->timestamps();
         });
     }

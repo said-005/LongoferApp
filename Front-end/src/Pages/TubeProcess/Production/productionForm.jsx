@@ -38,7 +38,7 @@ import { ProductionApi } from "../../../Api/ProductionApi";
 
 
 
-const MAX_DESCRIPTION_LENGTH = 500;
+export const MAX_DESCRIPTION_LENGTH = 500;
 
 const formSchema = z.object({
   refOF: z.string().min(1, "La référence OF est requise"),
@@ -154,7 +154,7 @@ export default function ProductionForm() {
       const response = await OperateurApi.getAll();
       const data = response.data.data;
       return {
-        operators: data.map((op) => ({
+        operators:data.filter(op => op.Fonction === 'operateur').map(op => ({
           label: `${op.operateur} - ${op.nom_complete}`,
           value: op.operateur
         })),
@@ -162,7 +162,7 @@ export default function ProductionForm() {
           label: `${op.operateur} - ${op.nom_complete}`,
           value: op.operateur
         })),
-        inspectors: data.filter(op => op.Fonction === 'inspecteur').map(op => ({
+        inspectors: data.filter(op => op.Fonction === 'controleur').map(op => ({
           label: `${op.operateur} - ${op.nom_complete}`,
           value: op.operateur
         }))

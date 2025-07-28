@@ -35,6 +35,8 @@ import { CausseApi } from "../../../Api/causseApi";
 import { DefautApi } from "../../../Api/defautApi";
 import { OperateurApi } from "../../../Api/operateurApi";
 import { StatutApi } from "../../../Api/StatutApi";
+import { Textarea } from '@/components/ui/textarea';
+const MAX_DESCRIPTION_LENGTH=500
 
 const formSchema = z.object({
   ref_production: z.string().min(1, "La référence production est requise"),
@@ -52,6 +54,9 @@ const formSchema = z.object({
   operator: z.string().min(1, "L'opérateur est requis"),
   welder: z.string().min(1, "Le soudeur est requis"),
   inspector: z.string().min(1, "L'inspecteur est requis"),
+   description: z.string()
+      .max(MAX_DESCRIPTION_LENGTH, `La description ne doit pas dépasser ${MAX_DESCRIPTION_LENGTH} caractères`)
+      .optional(),
 });
 
 export default function PeintureEXTForm() {
@@ -123,14 +128,13 @@ return formatted;
     },
     ...queryOptions
   });
-
   const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoading: isLoadingOperateurs } = useQuery({
     queryKey: ['operateursOptions'],
     queryFn: async () => {
       const response = await OperateurApi.getAll();
       const data = response.data.data;
       return {
-        operators: data.map((op) => ({
+        operators:data.filter(op => op.Fonction === 'operateur').map(op => ({
           label: `${op.operateur} - ${op.nom_complete}`,
           value: op.operateur
         })),
@@ -138,7 +142,7 @@ return formatted;
           label: `${op.operateur} - ${op.nom_complete}`,
           value: op.operateur
         })),
-        inspectors: data.filter(op => op.Fonction === 'inspecteur').map(op => ({
+        inspectors: data.filter(op => op.Fonction === 'controleur').map(op => ({
           label: `${op.operateur} - ${op.nom_complete}`,
           value: op.operateur
         }))
@@ -160,6 +164,7 @@ return formatted;
       operator: '',
       welder: '',
       inspector: '',
+      description:''
     },
     mode: 'onBlur',
   });
@@ -195,6 +200,7 @@ return formatted;
       operateur: values.operator,
       soudeur: values.welder,
       controleur: values.inspector,
+      description:values.description
     };
     
     createPeintureEXT(payload);
@@ -467,6 +473,38 @@ return (
             )}
           />
         </div>
+        
+                  {/* Description */}
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700 dark:text-gray-300">Description du tube</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Textarea
+                              placeholder="Décrivez en détail le tube"
+                              className={cn(
+                                "min-h-[120px]",
+                                "dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                              )}
+                              {...field}
+                              value={field.value || ''}
+                            />
+                            <div className={cn(
+                              "absolute bottom-2 right-2 text-xs",
+                              "text-muted-foreground dark:text-gray-400"
+                            )}>
+                              {field.value?.length || 0}/{MAX_DESCRIPTION_LENGTH}
+                            </div>
+                          </div>
+                        </FormControl>
+                        <FormMessage className="text-red-500 dark:text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+        
 
         <div className="flex justify-center gap-4 mt-8 pt-4 border-t dark:border-gray-700">
           <Button 

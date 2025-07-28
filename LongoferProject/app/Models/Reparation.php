@@ -24,6 +24,7 @@ class Reparation extends Model
 'operateur',
 'soudeur',
 'controleur',
+'description'
   ];
   protected $hidden=[
    'created_at',

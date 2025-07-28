@@ -24,11 +24,12 @@ class Manchette_ISO extends Model
 'operateur',
 'soudeur',
 'controleur',
-	'code_Reparation'
+	'code_Reparation',
+  'description'
   ];
   protected $hidden=[
    'created_at',
    'updated_at',
-   'deleted_at'
+
   ];
 }

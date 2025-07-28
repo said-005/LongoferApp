@@ -25,10 +25,11 @@ class Sablage_Interne extends Model
 'operateur',
 'soudeur',
 'controleur',
+'description'
   ];
   protected $hidden=[
    'created_at',
    'updated_at',
-   'deleted_at'
+  
   ];
 }

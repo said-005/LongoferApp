@@ -22,7 +22,7 @@ class StoreTube_HS_ShuteRequest extends FormRequest
     public function rules(): array
     {
         return [
-        'code_tube_HS'=>'required|string|unique:tube_hs_shutes,code_tube_HS',
+        'ref_production'=>'required|string',
         'Article'=>'required|string',
         'OF'=>'required',
         'Date'=>'required|date',

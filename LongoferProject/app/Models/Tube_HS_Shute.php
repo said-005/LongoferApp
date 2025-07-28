@@ -16,7 +16,7 @@ class Tube_HS_Shute extends Model
     public $incrementing = false; // No auto-incrementing
 
     protected $fillable = [
-        'code_tube_HS',
+        'ref_production',
         'Article',
         'OF',
         'Date',

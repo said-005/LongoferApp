@@ -24,7 +24,7 @@ return new class extends Migration
                   ->references('CategorieArticle')
                   ->on('categorie_articles')
                   ->onDelete('restrict');
-                  $table->softDeletes();
+              
             $table->timestamps();
         });
     }

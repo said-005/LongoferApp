@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('machines', function (Blueprint $table) {
             $table->string('codeMachine')->primary()->unique();
             $table->string('MachineName');
-            $table->softDeletes();
+            
             $table->timestamps();
         });
     }

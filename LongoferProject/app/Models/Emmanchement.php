@@ -24,6 +24,7 @@ class Emmanchement extends Model
 'operateur',
 'soudeur',
 'controleur',
+'description'
 
   ];
   protected $hidden=[

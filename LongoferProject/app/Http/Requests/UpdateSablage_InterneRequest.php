@@ -35,6 +35,7 @@ class UpdateSablage_InterneRequest extends FormRequest
             'operateur'            => 'required|string',
             'soudeur'              => 'required|string',
             'controleur'           => 'required|string',
+            'description'       =>'nullable|string',
         ];
     }
 }

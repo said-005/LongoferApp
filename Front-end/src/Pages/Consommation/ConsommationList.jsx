@@ -19,7 +19,7 @@ export default function ConsommationList() {
     },
     select: (response) => response?.data?.data || [],
   });
-
+ 
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-6 flex flex-col items-center justify-center h-64 gap-2">

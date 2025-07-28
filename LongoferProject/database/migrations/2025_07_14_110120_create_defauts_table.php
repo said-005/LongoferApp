@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('defauts', function (Blueprint $table) {
             $table->string('codeDefaut')->primary();
             $table->text('defautDescription');
-            $table->softDeletes();
             $table->timestamps();
         });
     }

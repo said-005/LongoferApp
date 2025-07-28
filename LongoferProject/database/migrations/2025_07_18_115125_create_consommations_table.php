@@ -23,7 +23,7 @@ return new class extends Migration
             $table->foreign('ArticleOF')->references('codeArticle')->on('articles')->restrictOnDelete();
             $table->integer('Qte_Conso');
             $table->integer('Qte_Chute');
-            $table->softDeletes();
+           
             $table->timestamps();
         });
     }

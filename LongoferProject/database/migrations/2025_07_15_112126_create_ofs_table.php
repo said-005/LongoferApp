@@ -42,7 +42,7 @@ return new class extends Migration
             $table->boolean('Sablage_Int');
             $table->boolean('Revetement_Int');
             $table->boolean('Manchette_ISO');
-             $table->softDeletes();
+         
             $table->timestamps();
         });
     }

@@ -12,14 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tube_HS_shutes', function (Blueprint $table) {
-            $table->string('code_tube_HS')->primary();
+            $table->id();
+            $table->string('ref_production');
+            $table->foreign('ref_production')->references('production_code')->on('productions')->restrictOnDelete();
+    
             $table->string('Article');
                   $table->foreign('Article')->references('codeArticle')->on('articles')->restrictOnDelete();
             $table->string('OF');
                 $table->foreign('OF')->references('codeOf')->on('ofs')->restrictOnDelete();
             $table->date('Date');
            $table->integer('Qte_Chute_HS');
-            $table->softDeletes();
+       
             $table->timestamps();
         });
     }
