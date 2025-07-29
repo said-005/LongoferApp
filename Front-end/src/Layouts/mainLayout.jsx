@@ -110,7 +110,7 @@ export default function MainLayout() {
 
           {/* Content container */}
           <main className="flex-1 md:ml-64 p-4 sm:p-6 lg:p-8">
-            <div className="max-w-7xl mx-auto pb-16 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="max-w-7xl mx-auto mb-20 pb-16 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
               <Outlet />
             </div>
           </main>
