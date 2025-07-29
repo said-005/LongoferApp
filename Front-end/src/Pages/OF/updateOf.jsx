@@ -123,7 +123,7 @@ export function UpdateOf({ id }) {
     },
     onError: (error) => {
       toast.error("Erreur de mise à jour", {
-        description: error.message || "Une erreur est survenue",
+        description: error.response.data.message || "Une erreur est survenue",
       });
     }
   });

@@ -48,7 +48,7 @@ export function CategoryForm() {
     },
     onError: (error) => {
       toast.error("Erreur lors de la création", {
-        description: error.message || "Une erreur est survenue",
+        description: error.response.data.message || "Une erreur est survenue",
       });
     }
   });

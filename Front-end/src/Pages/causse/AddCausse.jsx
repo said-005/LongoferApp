@@ -19,6 +19,7 @@ import { CausseApi } from "@/api/causseApi";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { Textarea } from '@/components/ui/textarea';
 
 const formSchema = z.object({
   code_causse: z.string().min(1, {
@@ -61,7 +62,7 @@ export function CausseForm({ initialData, onSuccess }) {
     },
     onError: (error) => {
       toast.error("Erreur lors de l'envoi", {
-        description: error.message,
+        description: error.response.data.message,
         className: "bg-red-100 dark:bg-red-900/50 dark:text-red-200 border-red-200 dark:border-red-800",
       });
     },
@@ -118,32 +119,32 @@ export function CausseForm({ initialData, onSuccess }) {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="causse"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className={cn(
-                  "text-gray-700 dark:text-gray-300"
-                )}>
-                  Description
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Entrez la description"
-                    {...field}
-                    disabled={isPending}
-                    className={cn(
-                      "dark:bg-gray-800 dark:border-gray-700",
-                      "dark:text-white dark:placeholder-gray-400",
-                      "focus-visible:ring-2 focus-visible:ring-blue-500"
-                    )}
-                  />
-                </FormControl>
-                <FormMessage className="text-red-500 dark:text-red-400 text-sm" />
-              </FormItem>
-            )}/>
-          
+         <FormField
+  control={form.control}
+  name="causse"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel className={cn(
+        "text-gray-700 dark:text-gray-300"
+      )}>
+        Description
+      </FormLabel>
+      <FormControl>
+        <Textarea
+          placeholder="Entrez la description"
+          {...field}
+          disabled={isPending}
+          className={cn(
+            "dark:bg-gray-800 dark:border-gray-700",
+            "dark:text-white dark:placeholder-gray-400",
+            "focus-visible:ring-2 focus-visible:ring-blue-500"
+          )}
+        />
+      </FormControl>
+      <FormMessage className="text-red-500 dark:text-red-400 text-sm" />
+    </FormItem>
+  )}
+/>
 
           <div className="flex justify-end gap-4 pt-2">
             <Button 

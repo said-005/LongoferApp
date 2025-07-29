@@ -55,13 +55,13 @@ export function OFForm() {
   const { data: clientsData, isLoading: isClientsLoading } = useQuery({
     queryKey: ['clients'],
     queryFn: ClientApi.getAll,
-    staleTime: 1000 * 60 * 5,
+ 
   });
 
   const { data: articlesData, isLoading: isArticlesLoading } = useQuery({
     queryKey: ['articles'],
     queryFn: ArticleApi.getAll,
-    staleTime: 1000 * 60 * 5,
+   
   });
 
   const { mutate: submitOF, isPending: isSubmitting } = useMutation({
@@ -73,7 +73,7 @@ export function OFForm() {
     },
     onError: (error) => {
       toast.error("Erreur lors de la création de l'OF", {
-        description: error.message || "Veuillez réessayer",
+        description: error.response.data.message || "Veuillez réessayer",
       });
     }
   });

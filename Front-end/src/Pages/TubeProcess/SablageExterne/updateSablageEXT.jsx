@@ -116,24 +116,24 @@ return formatted;
     ...queryOptions
   });
 
-  const { data: defects = [] } = useQuery({
-    queryKey: ['defectsOptions'],
-    queryFn: async () => {
-      const res = await DefautApi.getAll();
-      return res.data.data.map(defect => ({
-        label: defect.codeDefaut,
-        value: defect.codeDefaut
-      }));
-    },
-    ...queryOptions
-  });
+const { data: defects = [], isLoading: isLoadingDefects } = useQuery({
+  queryKey: ['defectsOptions'],
+  queryFn: async () => {
+    const res = await DefautApi.getAll();
+    return res.data.data.map((defect) => ({
+      label: `${defect.codeDefaut}-${defect.defautDescription.substring(0, 30)}${defect.defautDescription.length > 30 ? '...' : ''}`, // Shows first 30 chars + ellipsis if longer
+      value: defect.codeDefaut
+    }));
+  },
+  ...queryOptions
+});
 
   const { data: causes = [] } = useQuery({
     queryKey: ['causesOptions'],
     queryFn: async () => {
       const response = await CausseApi.getAll();
       return response.data.data.map(cause => ({
-        label: cause.code_causse,
+         label: `${cause.code_causse}-${cause.causse.substring(0, 30)}${cause.causse.length > 30 ? '...' : ''}`,
         value: cause.code_causse
       }));
     },

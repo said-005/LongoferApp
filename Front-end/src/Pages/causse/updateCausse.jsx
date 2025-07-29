@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { CausseApi } from "@/api/causseApi";
 import SheetCloseComponent from "../SheetClose";
 import { cn } from "@/lib/utils";
+import { Textarea } from '@/components/ui/textarea';
 
 const FORM_SCHEMA = z.object({
   code_causse: z.string().min(1, {
@@ -165,33 +166,34 @@ export function UpdateCausse({ id, onSuccess }) {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="causse"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className={cn(
-                "text-gray-700 dark:text-gray-300"
-              )}>
-                Description
-              </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Entrez la description"
-                  {...field}
-                  disabled={isPending}
-                  aria-disabled={isPending}
-                  className={cn(
-                    "dark:bg-gray-800 dark:border-gray-700",
-                    "dark:text-white dark:placeholder-gray-400",
-                    "focus-visible:ring-2 focus-visible:ring-blue-500"
-                  )}
-                />
-              </FormControl>
-              <FormMessage className="text-red-500 dark:text-red-400 text-sm" />
-            </FormItem>
+       
+         <FormField
+  control={form.control}
+  name="causse"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel className={cn(
+        "text-gray-700 dark:text-gray-300"
+      )}>
+        Description
+      </FormLabel>
+      <FormControl>
+        <Textarea
+          placeholder="Entrez la description"
+          {...field}
+          disabled={isPending}
+          className={cn(
+            "dark:bg-gray-800 dark:border-gray-700",
+            "dark:text-white dark:placeholder-gray-400",
+            "focus-visible:ring-2 focus-visible:ring-blue-500"
           )}
         />
+      </FormControl>
+      <FormMessage className="text-red-500 dark:text-red-400 text-sm" />
+    </FormItem>
+  )}
+/>
+
 
         <div className="flex justify-end items-center flex-col gap-2  pt-2">
         

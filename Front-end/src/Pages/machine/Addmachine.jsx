@@ -53,7 +53,7 @@ export function MachineForm() {
     },
     onError: (error) => {
       toast.error("Erreur lors de la création", {
-        description: error.message || "Une erreur est survenue",
+        description: error.response.data.message || "Une erreur est survenue",
         className: "bg-red-100 dark:bg-red-900/50 dark:text-red-200 border-red-200 dark:border-red-800",
       });
     },

@@ -65,9 +65,9 @@ export function ClientForm() {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
       navigate(-1);
     },
-    onError: (error) => {
-      toast.error(error.message || "Failed to create client");
-    }
+ onError: (error) => {
+  toast.error("Failed to create client lease. Please check if the client code is already taken.");
+},
   });
 
   function onSubmit(values) {

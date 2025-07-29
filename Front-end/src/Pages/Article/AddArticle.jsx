@@ -92,7 +92,7 @@ export function ArticleForm() {
     },
     onError: (error) => {
       toast.error(ERROR_MESSAGES.ARTICLE_CREATE, {
-        description: error.message,
+        description: error.response.data.message,
       });
     },
   });

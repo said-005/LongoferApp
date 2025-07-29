@@ -47,7 +47,7 @@ export function DefautForm() {
        navigate('/defaut');
     },
     onError: (error) => {
-      toast.error(error.message || "Une erreur est survenue lors de la création du défaut");
+      toast.error( error.response.data.message|| "Une erreur est survenue lors de la création du défaut");
     },
   });
 
