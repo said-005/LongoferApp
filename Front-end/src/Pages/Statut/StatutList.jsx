@@ -59,7 +59,7 @@ export default function StatutsList() {
           </AlertDescription>
         </Alert>
       ) : (
-        <div className="rounded-lg border shadow-sm overflow-hidden">
+        <div className="overflow-hidden">
           <DataTable 
             columns={StatutColumns} 
             data={statuts} 

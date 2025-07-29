@@ -71,7 +71,7 @@ export function DataTable({
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-transparent ">
       {/* Contrôles avec fond flouté */}
       <div className="backdrop-blur-lg bg-white/30 dark:bg-gray-900/50 p-4 rounded-2xl shadow-sm border border-gray-200/30 dark:border-gray-700/30">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

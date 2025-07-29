@@ -75,7 +75,7 @@ export default function OperatorList() {
           </AlertDescription>
         </Alert>
       ) : (
-        <div className="rounded-lg border shadow-sm overflow-hidden">
+        <div className=" overflow-hidden">
           <DataTable 
             columns={OperateurColumns} 
             data={operators} 

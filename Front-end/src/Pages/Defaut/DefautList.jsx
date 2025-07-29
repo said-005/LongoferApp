@@ -58,7 +58,7 @@ export default function DefautList() {
           Erreur lors du chargement des données. Veuillez réessayer.
         </div>
       ) : (
-        <div className="rounded-lg border shadow-sm overflow-hidden">
+        <div className=" overflow-hidden">
           <DataTable 
             columns={Defautcolumns} 
             data={defautsData} 

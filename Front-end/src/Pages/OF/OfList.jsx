@@ -64,7 +64,7 @@ export default function OFList() {
           </AlertDescription>
         </Alert>
       ) : (
-        <div className="rounded-lg border shadow-sm overflow-hidden">
+        <div className=" overflow-hidden">
           <DataTable 
             columns={OFcolumns} 
             data={ofs} 

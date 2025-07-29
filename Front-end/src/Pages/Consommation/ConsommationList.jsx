@@ -66,7 +66,7 @@ export default function ConsommationList() {
         </Button>
       </div>
       
-      <div className="rounded-lg border shadow-sm overflow-hidden">
+      <div className="overflow-hidden">
         <DataTable 
           columns={ConsommationColumns} 
           data={data} 

@@ -27,10 +27,10 @@ const schemaArticle = z.object({
   articleCode: z.string().min(2, { message: "Le code article est requis (min 2 caractères)" }),
   category: z.string().min(2, { message: "La catégorie est requise" }),
   designation: z.string().min(2, { message: "La désignation est requise (min 2 caractères)" }),
-  dimension: z.number().min(1, { message: "La dimension est requise" }),
-  thickness: z.number().min(1, { message: "L'épaisseur est requise" }),
+  dimension: z.number().min(0.01, { message: "La dimension est requise" }),
+  thickness: z.number().min(0.01, { message: "L'épaisseur est requise" }),
   unit: z.string().min(1, { message: "L'unité est requise" }),
-  theoreticalWeight: z.number().min(1, { message: "Le poids théorique est requis" }),
+  theoreticalWeight: z.number().min(0.01, { message: "Le poids théorique est requis" }),
 });
 
 const unités = [
@@ -90,12 +90,11 @@ export function UpdateArticle({ id }) {
         designation: data.ArticleName,
         dimension: data.Diametre,
         thickness: data.Epaisseur,
-        unit: data.Unite_Stock,
+       unit: data.Unite_Stock?.selected || data.Unite_Stock || '',
         theoreticalWeight: data.Poids
       });
     }
   }, [articleData, form]);
-
   const { mutate: updateArticle, isPending: isUpdating } = useMutation({
     mutationFn: (values) => ArticleApi.updateArticle(id, values),
     onSuccess: () => {

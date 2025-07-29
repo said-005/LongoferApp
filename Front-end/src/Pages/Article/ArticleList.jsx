@@ -67,7 +67,7 @@ export default function ArticleList() {
           </AlertDescription>
         </Alert>
       ) : (
-          <div className="rounded-lg border shadow-sm overflow-hidden">
+          <div className=" overflow-hidden">
             <DataTable 
               columns={Articlecolumns} 
               data={articles} 

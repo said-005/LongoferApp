@@ -64,7 +64,7 @@ export default function ProductionList() {
         </Link>  
       </div>
       
-      <div className="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow-sm overflow-hidden">
+      <div className="  overflow-hidden">
         {data && data.length > 0 ? (
           <DataTable 
             columns={ProductionColumns} 

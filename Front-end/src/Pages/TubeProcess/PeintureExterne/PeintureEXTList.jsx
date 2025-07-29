@@ -62,7 +62,7 @@ export default function PeintureEXTList() {
         </Link>  
       </div>
       
-      <div className="bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700 shadow-sm overflow-x-auto">
+      <div className=" overflow-x-auto">
         {data && data.length > 0 ? (
           <div className="min-w-[1024px] md:min-w-0">
             <DataTable 

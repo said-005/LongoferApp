@@ -57,7 +57,7 @@ export default function CausseList() {
           </AlertDescription>
         </Alert>
       ) : (
-        <div className="rounded-lg border shadow-sm overflow-hidden">
+        <div className=" overflow-hidden">
           <DataTable 
             columns={Caussecolumns} 
             data={data} 

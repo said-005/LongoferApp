@@ -10,10 +10,9 @@ import { LogOut } from "lucide-react";
 export default function MainLayout() {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false); // Track if auth check is complete
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
-    // Immediate auth check (no artificial delay)
     if (!localStorage.getItem('authenticated')) {
       navigate('/login');
     } else {
@@ -33,21 +32,20 @@ export default function MainLayout() {
     navigate('/login');
   };
 
-  // Show nothing until auth check is complete
   if (!authChecked) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-gray-900 z-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500 dark:border-emerald-400"></div>
       </div>
     );
   }
   return (
     <SidebarProvider>
-      <div className="min-h-screen min-w-full flex flex-col bg-gradient-to-br from-sky-50 via-blue-100 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950">
+      <div className="min-h-screen min-w-full flex flex-col bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950">
         {/* Floating background elements */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 dark:bg-blue-800 animate-blob" />
-          <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 dark:bg-indigo-800 animate-blob animation-delay-2000" />
+          <div className="absolute top-0 left-1/4 w-72 h-72 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 dark:bg-emerald-800 animate-blob" />
+          <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 dark:bg-teal-800 animate-blob animation-delay-2000" />
           <div className="absolute bottom-1/4 left-1/2 w-72 h-72 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 dark:bg-cyan-800 animate-blob animation-delay-4000" />
         </div>
    
@@ -61,7 +59,7 @@ export default function MainLayout() {
                   alt="Longofer Logo" 
                   className={`h-10 w-auto transition-all duration-300 ${scrolled ? 'scale-90' : 'scale-100'}`} 
                 />
-                <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
+                <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">
                   Longofer
                 </span>
               </div> 
@@ -69,7 +67,7 @@ export default function MainLayout() {
               <div className="flex gap-4 items-center justify-center">
                 <Link 
                   to={'/home'} 
-                  className="relative px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 group overflow-hidden"
+                  className="relative px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 group overflow-hidden"
                 >
                   <span className="relative z-10 flex items-center">
                     Dashboard
@@ -83,7 +81,7 @@ export default function MainLayout() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-teal-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></span>
                 </Link>
                 
                 <Button 

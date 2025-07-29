@@ -62,7 +62,7 @@ export default function MachineList() {
           </AlertDescription>
         </Alert>
       ) : (
-        <div className="rounded-lg border shadow-sm overflow-hidden">
+        <div className="overflow-hidden">
           <DataTable 
             columns={Machinecolumns} 
             data={machineData} 

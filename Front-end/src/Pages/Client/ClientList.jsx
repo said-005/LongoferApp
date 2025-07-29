@@ -73,7 +73,7 @@ export default function ClientsList() {
           </AlertDescription>
         </Alert>
       ) : (
-        <div className="rounded-lg border shadow-sm overflow-hidden">
+        <div className="overflow-hidden">
           <DataTable 
             columns={ClientColumns} 
             data={clientData}

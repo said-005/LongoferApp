@@ -27,10 +27,11 @@ export function UpdateSheet({ Component, id, text = "Modifier", iconSize = 4, cl
         <Button
           variant="ghost"
           size="sm"
-          className={`flex items-center gap-1 p-1 hover:bg-gray-100 ${className}`}
+          className={`flex items-center gap-1 w-full text-left p-1 hover:bg-gray-100 ${className}`}
           onClick={() => setIsOpen(true)}
         >
           <Edit className={`h-${iconSize} w-${iconSize}`} />
+          
           <span className="text-sm w-full">Editer</span>
         </Button>
       </SheetTrigger>

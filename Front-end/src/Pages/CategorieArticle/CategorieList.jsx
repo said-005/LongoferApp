@@ -55,7 +55,7 @@ export default function CategorieList() {
           <span>Chargement des catégories...</span>
         </div>
       ) : (
-        <div className="rounded-lg border shadow-sm overflow-hidden">
+        <div className=" overflow-hidden">
           <DataTable 
             columns={CategorieColumns} 
             data={categories} 

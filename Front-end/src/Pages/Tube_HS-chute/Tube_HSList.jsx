@@ -80,7 +80,7 @@ export default function TubeHSList() {
           </AlertDescription>
         </Alert>
       ) : (
-        <div className="rounded-lg border shadow-sm overflow-hidden">
+        <div className=" overflow-hidden">
           <DataTable 
             columns={TubeSHcolumns} 
             data={tubeHSData} 
