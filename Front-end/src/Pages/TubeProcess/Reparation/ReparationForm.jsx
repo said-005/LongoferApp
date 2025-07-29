@@ -42,8 +42,7 @@ const formSchema = z.object({
   ref_production: z.string().min(1, "La référence production est requise"),
   code_reparation: z.string()
     .min(1, "Le code réparation est requis")
-    .min(2, "Le code doit contenir au moins 2 caractères")
-    .max(50, "Le code est trop long"),
+    .min(2, "Le code doit contenir au moins 2 caractères"),
   date: z.date({
     required_error: "La date est requise",
     invalid_type_error: "Format de date invalide",
@@ -66,7 +65,6 @@ export default function ReparationForm() {
   const navigate = useNavigate();
   
   const queryOptions = {
-    staleTime: 1000 * 60 * 5,
     onError: (error) => toast.error(`Erreur de chargement: ${error.message}`),
   };
 

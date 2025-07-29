@@ -43,8 +43,7 @@ import { PeintureExtApi } from "../../../Api/peinture_extApi";
 const formSchema = z.object({
   ref_production: z.string().min(1, "La référence production est requise"),
   code_Peinture_Externe: z.string()
-    .min(2, "Le code doit contenir au moins 2 caractères")
-    .max(50, "Le code est trop long"),
+    .min(2, "Le code doit contenir au moins 2 caractères"),
   date: z.date({
     required_error: "La date est requise",
     invalid_type_error: "Format de date invalide",
@@ -63,7 +62,7 @@ const formSchema = z.object({
 
 export default function UpdatePeintureExt({ id }) {
   const queryOptions = {
-    staleTime: 1000 * 60 * 5, // 5 minutes
+   
     onError: (error) => toast.error(`Erreur de chargement: ${error.message}`),
   };
 
@@ -87,7 +86,7 @@ const formatted = response.data.data.map((pro) => ({
   label: `${pro.production_code}`,
   value: pro.production_code
 }));
-console.log(formatted);  // ✅ This will show you the final array
+ // ✅ This will show you the final array
 return formatted;
     },
     ...queryOptions

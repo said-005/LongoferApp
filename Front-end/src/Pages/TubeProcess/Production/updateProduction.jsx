@@ -44,8 +44,7 @@ const MAX_DESCRIPTION_LENGTH = 500;
 const formSchema = z.object({
   refOF: z.string().min(1, "La référence OF est requise"),
   articleCode: z.string()
-    .min(2, "Le code article doit contenir au moins 2 caractères")
-    .max(50, "Le code article est trop long"),
+    .min(2, "Le code article doit contenir au moins 2 caractères"),
   refArticle: z.string().min(1, "La référence article est requise"),
   date: z.date({
     required_error: "La date est requise",
@@ -62,14 +61,13 @@ const formSchema = z.object({
     .max(MAX_DESCRIPTION_LENGTH, `La description ne doit pas dépasser ${MAX_DESCRIPTION_LENGTH} caractères`)
     .optional(),
       qte_produite: z.number()
-        .min(1, "La quantité doit être au moins 1")
-        .max(10000, "La quantité ne peut pas dépasser 10000"),
+        .min(1, "La quantité doit être au moins 1"),
 });
 
 export default function UpdateProduction({id}) {
 
   const queryOptions = {
-    staleTime: 1000 * 60 * 5,
+   
     onError: (error) => toast.error(`Erreur de chargement: ${error.message}`),
   };
   
