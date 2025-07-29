@@ -21,11 +21,11 @@ import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
-  codeMachine: z.string().min(2, {
-    message: "Le code machine doit contenir au moins 2 caractères",
+  codeMachine: z.string().min(1, {
+    message: "Le code machine doit contenir au moins 1 caractère",
   }),
-  MachineName: z.string().min(2, {
-    message: "Le nom de la machine doit contenir au moins 2 caractères",
+  MachineName: z.string().min(1, {
+    message: "Le nom de la machine doit contenir au moins 1 caractère",
   }),
 });
 

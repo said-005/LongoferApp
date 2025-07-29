@@ -28,7 +28,7 @@ import { useEffect, useMemo } from "react";
 import SheetCloseComponent from './../SheetClose';
 
 const REQUIRED_FIELD_MESSAGE = "Ce champ est requis";
-const STALE_TIME = 1000 * 60 * 5; // 5 minutes cache
+const STALE_TIME = 1; // 5 minutes cache
 
 const formSchema = z.object({
   ofNumber: z.string().min(1, REQUIRED_FIELD_MESSAGE),

@@ -69,7 +69,7 @@ export function ConsommationForm() {
   const { data: ofsData, isLoading: isOfsLoading, error: ofsError } = useQuery({
     queryKey: ['ofs'],
     queryFn: OfApi.getAll,
-    staleTime: 1000 * 60 * 5,
+   
     onError: (error) => {
       toast.error("Erreur de chargement des OFs", {
         description: error.message,
@@ -80,7 +80,6 @@ export function ConsommationForm() {
  const { data: articlesData = {}, isLoading: isArticlesLoading, error: articlesError } = useQuery({
   queryKey: ['articles'],
   queryFn: ArticleApi.getAll,
-  staleTime: 1000 * 60 * 5,
   onError: (error) => {
     toast.error("Erreur de chargement des articles", {
       description: error.message,

@@ -26,18 +26,13 @@ import { cn } from "@/lib/utils";
 // Schema validation
 const formSchema = z.object({
   fullName: z.string()
-    .min(1, "Le nom complet est requis")
-    .max(100, "Maximum 100 caractères")
-    .trim(),
+    .min(1, "Le nom complet est requis"),
   position: z.string()
-    .min(1, "La fonction est requise")
-    .max(50, "Maximum 50 caractères")
-    .trim(),
+    .min(1, "La fonction est requise"),
   machine: z.string()
     .optional(),
   code_operateur: z.string()
-    .min(1, "Le code est requis")
-    .trim(),
+    .min(1, "Le code est requis"),
 });
 
 export function UpdateOperateur({ id }) {

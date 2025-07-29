@@ -98,13 +98,13 @@ export function UpdateConsommation({id}) {
   const { data: ofsData } = useQuery({
     queryKey: ['ofs'],
     queryFn: OfApi.getAll,
-    staleTime: 1000 * 60 * 5,
+   
   });
 
  const { data: articlesData = {} } = useQuery({
   queryKey: ['articles'],
   queryFn: ArticleApi.getAll,
-  staleTime: 1000 * 60 * 5,
+ 
   onError: (error) => {
     toast.error("Erreur de chargement des articles", {
       description: error.message,
