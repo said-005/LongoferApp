@@ -1,4 +1,4 @@
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal, Trash2, ArrowUpDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
@@ -29,7 +29,18 @@ import UpdateEmmanchement from "./updateEmmanchement";
 export const EmmanchementColumns = [
   {
     accessorKey: "code_Emmanchement",
-    header: "Code Réparation",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Code Réparation
+          <ArrowUpDown className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
       <div className="font-medium uppercase text-xs sm:text-sm">
         {row.getValue("code_Emmanchement") || '-'}
@@ -38,7 +49,18 @@ export const EmmanchementColumns = [
   },
   {
     accessorKey: "date_Emmanchement",
-    header: "Date",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Date
+          <ArrowUpDown className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
       const date = row.getValue("date_Emmanchement");
       return (
@@ -50,7 +72,18 @@ export const EmmanchementColumns = [
   },
   {
     accessorKey: "ref_production",
-    header: "Référence",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Référence
+          <ArrowUpDown className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
       <div className="font-mono uppercase text-xs sm:text-sm">
         {row.getValue("ref_production") || '-'}
@@ -59,7 +92,18 @@ export const EmmanchementColumns = [
   },
   {
     accessorKey: "machine",
-    header: "Machine",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Machine
+          <ArrowUpDown className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm">
         {row.getValue("machine") || '-'}
@@ -68,7 +112,18 @@ export const EmmanchementColumns = [
   },
   {
     accessorKey: "statut",
-    header: "Statut",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Statut
+          <ArrowUpDown className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm">
         {row.getValue("statut") || '-'}
@@ -120,9 +175,9 @@ export const EmmanchementColumns = [
       </div>
     ),
   },
-   {
+  {
     accessorKey: "description",
-    header: "description",
+    header: "Description",
     cell: ({ row }) => (
       <div className="font-mono uppercase text-xs sm:text-sm">
         {row.getValue("description") || '-'}
@@ -138,7 +193,7 @@ export const EmmanchementColumns = [
       const { mutate, isPending: isDeleting } = useDeleteEmmanchement();
 
       const handleDelete = () => {
-        mutate(emmanchement.code_Emmanchement , {
+        mutate(emmanchement.code_Emmanchement, {
           onSuccess: () => {
             toast.success("Réparation supprimée avec succès");
             setDeleteDialogOpen(false);

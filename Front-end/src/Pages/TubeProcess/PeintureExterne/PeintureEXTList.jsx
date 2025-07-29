@@ -6,8 +6,12 @@ import { toast } from "sonner";
 import { PeintureExtColumns } from "./PeintureEXTColumns";
 import { ReparationApi } from "../../../Api/ReparationApi";
 import { PeintureExtApi } from './../../../Api/peinture_extApi';
+import { useState } from "react";
 
 export default function PeintureEXTList() {
+     const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   // Fetch reparation data
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['peinture_externes'],
@@ -64,6 +68,10 @@ export default function PeintureEXTList() {
             <DataTable 
               columns={PeintureExtColumns} 
               data={data||[]} 
+               sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
               className="w-full"
             />
           </div>

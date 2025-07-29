@@ -7,8 +7,12 @@ import { toast } from "sonner";
 import { ConsommaationApi } from "../../Api/consommationApi";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useState } from "react";
 
 export default function ConsommationList() {
+   const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['consommations'],
     queryFn: ConsommaationApi.getAll,
@@ -66,16 +70,10 @@ export default function ConsommationList() {
         <DataTable 
           columns={ConsommationColumns} 
           data={data} 
-          emptyState={
-            <div className="p-8 text-center space-y-2">
-              <p className="text-muted-foreground font-medium">Aucune consommation trouvée</p>
-              <Button asChild variant="outline" size="sm">
-                <Link to="/consommation/AddConsommation" className="gap-2">
-                  Ajouter votre première consommation
-                </Link>
-              </Button>
-            </div>
-          }
+          sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
         />
       </div>
     </div>

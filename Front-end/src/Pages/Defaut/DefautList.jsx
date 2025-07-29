@@ -7,8 +7,12 @@ import { toast } from "sonner";
 import { Defautcolumns } from "./defautColumns";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
 export default function DefautList() {
+   const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   const { data: defauts, isLoading, isError, error } = useQuery({
     queryKey: ['defauts'],
     queryFn: DefautApi.getAll,
@@ -58,16 +62,10 @@ export default function DefautList() {
           <DataTable 
             columns={Defautcolumns} 
             data={defautsData} 
-            emptyState={
-              <div className="p-8 text-center space-y-2">
-                <p className="text-muted-foreground font-medium">Aucun défaut enregistré</p>
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/defaut/AddDefaut" className="gap-2">
-                    Ajouter votre premier défaut
-                  </Link>
-                </Button>
-              </div>
-            }
+          sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
           />
         </div>
       )}

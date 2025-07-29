@@ -6,8 +6,12 @@ import { toast } from "sonner";
 import { EmmanchementColumns } from "./EmmanchementColumns";
 import { ReparationApi } from "../../../Api/ReparationApi";
 import { EmmanchementApi } from "../../../Api/Emmanchement";
+import { useState } from "react";
 
 export default function EmmanchementList() {
+     const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   // Fetch reparation data
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['emmanchements'],
@@ -64,6 +68,10 @@ export default function EmmanchementList() {
             <DataTable 
               columns={EmmanchementColumns} 
               data={data||[]} 
+               sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
               className="w-full"
             />
           </div>

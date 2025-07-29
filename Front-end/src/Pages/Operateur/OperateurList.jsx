@@ -7,8 +7,12 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { OperateurApi } from '../../Api/operateurApi';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useState } from 'react';
 
 export default function OperatorList() {
+    const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError, error } = useQuery({
@@ -75,17 +79,10 @@ export default function OperatorList() {
           <DataTable 
             columns={OperateurColumns} 
             data={operators} 
-            emptyState={
-              <div className="p-8 text-center space-y-2">
-                <p className="text-muted-foreground font-medium">Aucun opérateur trouvé</p>
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/operateur/AddOperateur" className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Ajouter votre premier opérateur
-                  </Link>
-                </Button>
-              </div>
-            }
+             sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
           />
         </div>
       )}

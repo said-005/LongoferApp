@@ -1,4 +1,4 @@
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,38 +23,84 @@ import { UpdateConsommation } from "./updateConsommation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useDeleteConsommation } from "./deleteConsommationHook";
+import { Input } from "@/components/ui/input";
 
 export const ConsommationColumns = [
   {
     accessorKey: "ArticleMatiere",
-    header: "Article Matière",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="px-0 hover:bg-transparent"
+      >
+        Article Matière
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="font-medium capitalize">
         {row.getValue("ArticleMatiere")}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return String(row.getValue(id)).toLowerCase().includes(value.toLowerCase());
+    },
   },
   {
     accessorKey: "Date",
-    header: "Date",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="px-0 hover:bg-transparent whitespace-nowrap"
+      >
+        Date
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="whitespace-nowrap">
         {new Date(row.getValue("Date")).toLocaleDateString()}
       </div>
     ),
+    sortingFn: (rowA, rowB, columnId) => {
+      return new Date(rowA.getValue(columnId)) - new Date(rowB.getValue(columnId));
+    },
   },
   {
     accessorKey: "OF",
-    header: "OF",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="px-0 hover:bg-transparent"
+      >
+        OF
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="font-mono uppercase">
         {row.getValue("OF")}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return String(row.getValue(id)).toLowerCase().includes(value.toLowerCase());
+    },
   },
   {
     accessorKey: "ArticleOF",
-    header: "Article OF",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="px-0 hover:bg-transparent"
+      >
+        Article OF
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="font-mono uppercase">
         {row.getValue("ArticleOF")}
@@ -63,7 +109,16 @@ export const ConsommationColumns = [
   },
   {
     accessorKey: "Num_LotOF",
-    header: "N° Lot",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="px-0 hover:bg-transparent"
+      >
+        N° Lot
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="font-mono">
         {row.getValue("Num_LotOF")}
@@ -72,21 +127,49 @@ export const ConsommationColumns = [
   },
   {
     accessorKey: "Qte_Conso",
-    header: "Qté Consommée",
+    header: ({ column }) => (
+      <div className="text-right">
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="hover:bg-transparent"
+        >
+          Qté Consommée
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+    ),
     cell: ({ row }) => (
       <div className="text-right font-medium">
         {parseFloat(row.getValue("Qte_Conso")).toFixed(2)}
       </div>
     ),
+    sortingFn: (rowA, rowB, columnId) => {
+      return parseFloat(rowA.getValue(columnId)) - parseFloat(rowB.getValue(columnId));
+    },
   },
   {
     accessorKey: "Qte_Chute",
-    header: "Qté Chute",
+    header: ({ column }) => (
+      <div className="text-right">
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="hover:bg-transparent"
+        >
+          Qté Chute
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+    ),
     cell: ({ row }) => (
       <div className="text-right font-medium">
         {parseFloat(row.getValue("Qte_Chute")).toFixed(2)}
       </div>
     ),
+    sortingFn: (rowA, rowB, columnId) => {
+      return parseFloat(rowA.getValue(columnId)) - parseFloat(rowB.getValue(columnId));
+    },
   },
   {
     accessorKey: 'Actions',
@@ -94,7 +177,7 @@ export const ConsommationColumns = [
     cell: ({ row }) => {
       const consommation = row.original;
       const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-      const { mutate: deleteConsommation, isLoading: isDeleting } = useDeleteConsommation();
+      const { mutate: deleteConsommation, isPending: isDeleting } = useDeleteConsommation();
 
       const handleDelete = () => {
         deleteConsommation(consommation.id, {
@@ -162,9 +245,9 @@ export const ConsommationColumns = [
                   disabled={isDeleting}
                 >
                   {isDeleting ? (
-                    <>
-                      <span className="animate-pulse">Suppression en cours...</span>
-                    </>
+                    <span className="flex items-center gap-2">
+                      <span className="animate-pulse">Suppression...</span>
+                    </span>
                   ) : "Confirmer la suppression"}
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -173,5 +256,6 @@ export const ConsommationColumns = [
         </>
       );
     },
+    
   }
 ];

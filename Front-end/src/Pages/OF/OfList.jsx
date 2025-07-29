@@ -1,14 +1,18 @@
 import { DataTable } from "../../components/tubeList/data-table";
 import { Link } from 'react-router-dom';
-import { OFcolumns } from "./OFcolumns";
+import  OFcolumns  from "./OFcolumns";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { OfApi } from './../../Api/ofApi';
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useState } from "react";
 
 export default function OFList() {
+    const [sorting, setSorting] = useState([]);
+    const [globalFilter, setGlobalFilter] = useState('');
+    
   const { data: ofData, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['ofs'],
     queryFn: OfApi.getAll,
@@ -64,17 +68,10 @@ export default function OFList() {
           <DataTable 
             columns={OFcolumns} 
             data={ofs} 
-            emptyState={
-              <div className="p-8 text-center space-y-2">
-                <p className="text-muted-foreground font-medium">Aucun OF trouvé</p>
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/Of/AddOf" className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Créer votre premier OF
-                  </Link>
-                </Button>
-              </div>
-            }
+           sorting={sorting}
+            onSortingChange={setSorting}
+            globalFilter={globalFilter}
+            onGlobalFilterChange={setGlobalFilter}
           />
         </div>
       )}

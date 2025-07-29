@@ -1,5 +1,5 @@
 import { DataTable } from "../../components/tubeList/data-table";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Search } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { Articlecolumns } from "./ArticleColumns";
 import { useQuery } from '@tanstack/react-query';
@@ -7,8 +7,13 @@ import { ArticleApi } from "../../Api/ArticleApi";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 export default function ArticleList() {
+  const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['articles'],
     queryFn: ArticleApi.getAll,
@@ -62,23 +67,17 @@ export default function ArticleList() {
           </AlertDescription>
         </Alert>
       ) : (
-        <div className="rounded-lg border shadow-sm overflow-hidden">
-          <DataTable 
-            columns={Articlecolumns} 
-            data={articles} 
-            emptyState={
-              <div className="p-8 text-center space-y-2">
-                <p className="text-muted-foreground font-medium">No articles found</p>
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/article/AddArticle" className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add your first article
-                  </Link>
-                </Button>
-              </div>
-            }
-          />
-        </div>
+          <div className="rounded-lg border shadow-sm overflow-hidden">
+            <DataTable 
+              columns={Articlecolumns} 
+              data={articles} 
+              sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
+            />
+          </div>
+        
       )}
     </div>
   );

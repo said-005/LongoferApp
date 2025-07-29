@@ -1,4 +1,4 @@
-import { MoreHorizontal, Sheet, Trash } from "lucide-react";
+import { MoreHorizontal, Sheet, Trash, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -27,31 +27,52 @@ import { useState } from "react";
 export const StatutColumns = [
   {
     accessorKey: "Statut",
-    header: " tube Statut",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0 hover:bg-transparent"
+      >
+        Statut
+        {column.getIsSorted() === "asc" ? (
+          <ArrowUp className="ml-2 h-4 w-4" />
+        ) : column.getIsSorted() === "desc" ? (
+          <ArrowDown className="ml-2 h-4 w-4" />
+        ) : (
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        )}
+      </Button>
+    ),
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("Statut")}</div>
+    ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id).toLowerCase().includes(value.toLowerCase());
+    },
   },
   {
-    accessorKey: 'Actions',
-    header: 'Actions',
+    id: "actions",
+    header: "Actions",
     cell: ({ row }) => {
       const statut = row.original;
       const { mutate: deleteOperateur, isPending } = useDeleteStatut();
       const [open, setOpen] = useState(false);
+
       const handleDelete = () => {
         toast.promise(
           () => new Promise((resolve, reject) => {
             deleteOperateur(statut.Statut, {
-              onSuccess: resolve,
+              onSuccess: () => {
+                resolve();
+                setOpen(false);
+              },
               onError: reject
             });
           }),
           {
             loading: "Suppression en cours...",
-            success: () => {
-              return "Opérateur supprimé avec succès";
-            },
-            error: (err) => {
-              return err.message || "Erreur lors de la suppression";
-            }
+            success: "Statut supprimé avec succès",
+            error: (err) => err.message || "Erreur lors de la suppression"
           }
         );
       };
@@ -73,8 +94,9 @@ export const StatutColumns = [
               <DropdownMenuItem asChild>
                 <UpdateSheet 
                   Component={UpdateStatut}
-                  text="update Statut "
+                  text="Modifier le statut"
                   id={statut.Statut}
+                  className="w-full"
                 />
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -82,7 +104,7 @@ export const StatutColumns = [
                 className="text-red-600 focus:text-red-600 cursor-pointer" 
                 onClick={() => setOpen(true)}
               >
-                <Trash className="w-4 "/>
+                <Trash className="w-4 h-4 mr-2" />
                 Supprimer
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -91,25 +113,32 @@ export const StatutColumns = [
           <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Cette action est irréversible. Vous êtes sur le point de supprimer le statut "{statut.Statut}".
+                  Cette action est irréversible. Vous êtes sur le point de supprimer le statut : 
+                  <span className="font-semibold"> "{statut.Statut}"</span>.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel disabled={isPending}>Annuler</AlertDialogCancel>
                 <AlertDialogAction 
-                  className="bg-red-600 hover:bg-red-700" 
+                  className="bg-red-600 hover:bg-red-700 focus-visible:ring-red-600" 
                   onClick={handleDelete}
                   disabled={isPending}
                 >
-                  {isPending ? "Suppression..." : "Supprimer"}
+                  {isPending ? (
+                    <>
+                      <Trash className="w-4 h-4 mr-2 animate-pulse" />
+                      Suppression...
+                    </>
+                  ) : "Confirmer"}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         </>
-      )
+      );
     },
   }
 ];
+

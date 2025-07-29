@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { MoreHorizontal, Copy, Edit, Trash2 } from "lucide-react";
+import { MoreHorizontal, Copy, Edit, Trash2, ArrowUpDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { Input } from "@/components/ui/input";
 import { UpdateSheet } from "../Shette";
 import {
   Dialog,
@@ -24,7 +24,6 @@ import {
 import { useDeleteCausse } from "./deleteCausseHook";
 import { UpdateCausse } from "./updateCausse";
 
-
 const handleCopy = (text) => {
   navigator.clipboard.writeText(text)
     .then(() => toast.success("Copié dans le presse-papiers"))
@@ -34,29 +33,53 @@ const handleCopy = (text) => {
 export const Caussecolumns = [
   {
     accessorKey: "code_causse",
-    header: "Code Causse",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="px-0 hover:bg-transparent"
+      >
+        Code Causse
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="font-medium whitespace-nowrap">
         {row.getValue("code_causse")}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return String(row.getValue(id)).toLowerCase().includes(value.toLowerCase());
+    },
   },
   {
     accessorKey: "causse",
-    header: "Causse",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="px-0 hover:bg-transparent"
+      >
+        Causse
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="whitespace-nowrap">
         {row.getValue("causse")}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return String(row.getValue(id)).toLowerCase().includes(value.toLowerCase());
+    },
   },
- 
   {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
       const causse = row.original;
-      const { mutate:deleteCausse, isDeleting } = useDeleteCausse()
+      const { mutate: deleteCausse, isPending: isDeleting } = useDeleteCausse();
+      
       const handleDelete = async () => {
         try {
           await deleteCausse(causse.code_causse);

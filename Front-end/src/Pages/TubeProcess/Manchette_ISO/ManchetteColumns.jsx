@@ -1,4 +1,4 @@
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal, Trash2, ArrowUpDown, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,10 +18,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
 import { useState } from "react";
 import { toast } from "sonner";
-
 import { useDeleteManchette } from "./deleteManchetteHook";
 import { UpdateSheet } from "../../Shette";
 import UpdateManchette from "./updateManchette";
@@ -29,16 +35,41 @@ import UpdateManchette from "./updateManchette";
 export const ManchetteColumns = [
   {
     accessorKey: "code_Manchette",
-    header: "Code Manchette",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0 text-xs sm:text-sm"
+        >
+          Code Manchette
+          <ArrowUpDown className="ml-1 h-3 w-3 sm:ml-2 sm:h-4 sm:w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
       <div className="font-medium uppercase text-xs sm:text-sm">
         {row.getValue("code_Manchette") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toLowerCase().includes(value.toLowerCase());
+    },
   },
   {
     accessorKey: "date_Manchette",
-    header: "Date",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0 text-xs sm:text-sm"
+        >
+          Date
+          <ArrowUpDown className="ml-1 h-3 w-3 sm:ml-2 sm:h-4 sm:w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
       const date = row.getValue("date_Manchette");
       return (
@@ -47,87 +78,172 @@ export const ManchetteColumns = [
         </div>
       );
     },
+    sortingFn: (rowA, rowB, columnId) => {
+      const dateA = new Date(rowA.getValue(columnId));
+      const dateB = new Date(rowB.getValue(columnId));
+      return dateA - dateB;
+    },
   },
   {
     accessorKey: "ref_production",
-    header: "Référence",
+    header: ({ column }) => {
+      return (
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="px-0 text-xs sm:text-sm"
+          >
+            Référence
+            <ArrowUpDown className="ml-1 h-3 w-3 sm:ml-2 sm:h-4 sm:w-4" />
+          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Filter className="ml-1 h-3 w-3 sm:ml-2 sm:h-4 sm:w-4 text-muted-foreground" />
+            </TooltipTrigger>
+            <TooltipContent className="w-40">
+              <Input
+                type="text"
+                placeholder="Filtrer référence..."
+                onChange={(e) => column.setFilterValue(e.target.value)}
+                className="h-7 text-xs sm:text-sm"
+              />
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      );
+    },
     cell: ({ row }) => (
       <div className="font-mono uppercase text-xs sm:text-sm">
         {row.getValue("ref_production") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toLowerCase().includes(value.toLowerCase());
+    },
   },
   {
     accessorKey: "machine",
-    header: "Machine",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0 text-xs sm:text-sm"
+        >
+          Machine
+          <ArrowUpDown className="ml-1 h-3 w-3 sm:ml-2 sm:h-4 sm:w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm">
         {row.getValue("machine") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "statut",
-    header: "Statut",
-    cell: ({ row }) => (
-      <div className="capitalize text-xs sm:text-sm">
-        {row.getValue("statut") || '-'}
-      </div>
-    ),
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0 text-xs sm:text-sm"
+        >
+          Statut
+          <ArrowUpDown className="ml-1 h-3 w-3 sm:ml-2 sm:h-4 sm:w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const statut = row.getValue("statut");
+      const variant = statut === "terminé" ? "default" : 
+                     statut === "en cours" ? "secondary" : "outline";
+      return (
+        <Badge variant={variant} className="text-xs sm:text-sm capitalize">
+          {statut || '-'}
+        </Badge>
+      );
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "defaut",
-    header: "Défaut",
+    header: () => <span className="text-xs sm:text-sm">Défaut</span>,
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm hidden md:block">
         {row.getValue("defaut") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "causse",
-    header: "Cause",
+    header: () => <span className="text-xs sm:text-sm">Cause</span>,
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm hidden lg:block">
         {row.getValue("causse") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "soudeur",
-    header: "Soudeur",
+    header: () => <span className="text-xs sm:text-sm">Soudeur</span>,
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm hidden xl:block">
         {row.getValue("soudeur") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "operateur",
-    header: "Opérateur",
+    header: () => <span className="text-xs sm:text-sm">Opérateur</span>,
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm hidden 2xl:block">
         {row.getValue("operateur") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "controleur",
-    header: "Contrôleur",
+    header: () => <span className="text-xs sm:text-sm">Contrôleur</span>,
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm hidden 2xl:block">
         {row.getValue("controleur") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
-   {
+  {
     accessorKey: "description",
-    header: "description",
+    header: () => <span className="text-xs sm:text-sm">Description</span>,
     cell: ({ row }) => (
       <div className="font-mono uppercase text-xs sm:text-sm">
         {row.getValue("description") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toLowerCase().includes(value.toLowerCase());
+    },
   },
   {
     accessorKey: 'Actions',
@@ -138,9 +254,9 @@ export const ManchetteColumns = [
       const { mutate, isPending: isDeleting } = useDeleteManchette();
 
       const handleDelete = () => {
-        mutate(manchette.code_Manchette , {
+        mutate(manchette.code_Manchette, {
           onSuccess: () => {
-            toast.success("Réparation supprimée avec succès");
+            toast.success("Manchette supprimée avec succès");
             setDeleteDialogOpen(false);
           },
           onError: (error) => {
@@ -172,6 +288,7 @@ export const ManchetteColumns = [
                   Component={UpdateManchette} 
                   id={manchette.code_Manchette} 
                   text="Modifier les informations"
+                  data={manchette}
                 />
               </DropdownMenuItem>
               <DropdownMenuSeparator />

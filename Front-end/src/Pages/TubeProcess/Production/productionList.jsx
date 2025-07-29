@@ -9,8 +9,12 @@ import { toast } from "sonner";
 
 import { ProductionApi } from "../../../Api/ProductionApi";
 import { ProductionColumns } from "./productionColumns";
+import { useState } from "react";
 
 export default function ProductionList() {
+   const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   // Fetch consumption data
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['productions'],
@@ -65,6 +69,10 @@ export default function ProductionList() {
           <DataTable 
             columns={ProductionColumns} 
             data={data||[]} 
+            sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
             className="w-full"
           />
         ) : (

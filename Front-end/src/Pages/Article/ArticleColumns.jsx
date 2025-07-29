@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { MoreHorizontal, Copy, Edit, Trash2 } from "lucide-react";
+import { MoreHorizontal, Copy, Edit, Trash2, EyeOff, ArrowUpDown  } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,6 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { UpdateArticle } from "./updateArticals";
 import { UpdateSheet } from "../Shette";
@@ -23,7 +24,6 @@ import {
 } from "@/components/ui/dialog";
 import { useDeleteArticle } from "./delteArticleHook";
 
-
 const handleCopy = (text) => {
   navigator.clipboard.writeText(text)
     .then(() => toast.success("Copié dans le presse-papiers"))
@@ -33,21 +33,47 @@ const handleCopy = (text) => {
 export const Articlecolumns = [
   {
     accessorKey: "codeArticle",
-    header: "Code Article",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Code Article
+          <ArrowUpDown  className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => (
       <div className="font-medium whitespace-nowrap">
         {row.getValue("codeArticle")}
       </div>
     ),
+    enableHiding: false,
   },
   {
     accessorKey: "categorie",
-    header: "Catégorie",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Catégorie
+          <ArrowUpDown  className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => (
       <div className="whitespace-nowrap">
         {row.getValue("categorie")}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id))
+    },
   },
   {
     accessorKey: "ArticleName",
@@ -60,7 +86,18 @@ export const Articlecolumns = [
   },
   {
     accessorKey: "Diametre",
-    header: "Diamètre",
+    header: ({ column }) => (
+      <div className="text-center">
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Diamètre
+          <ArrowUpDown  className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+    ),
     cell: ({ row }) => (
       <div className="text-center">
         {row.getValue("Diametre")}
@@ -69,7 +106,18 @@ export const Articlecolumns = [
   },
   {
     accessorKey: "Epaisseur",
-    header: "Épaisseur",
+    header: ({ column }) => (
+      <div className="text-center">
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Épaisseur
+          <ArrowUpDown  className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+    ),
     cell: ({ row }) => (
       <div className="text-center">
         {row.getValue("Epaisseur")}
@@ -78,7 +126,18 @@ export const Articlecolumns = [
   },
   {
     accessorKey: "Poids",
-    header: "Poids",
+    header: ({ column }) => (
+      <div className="text-center">
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Poids
+          <ArrowUpDown  className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+    ),
     cell: ({ row }) => (
       <div className="text-center">
         {row.getValue("Poids")}
@@ -183,5 +242,6 @@ export const Articlecolumns = [
         </DropdownMenu>
       );
     },
+    enableHiding: false,
   }
 ];

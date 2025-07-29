@@ -1,14 +1,19 @@
+import { useState } from 'react';
 import { DataTable } from "../../components/tubeList/data-table";
 import { Link } from 'react-router-dom';
-import { ClientColumns } from "./ClientColumns";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ClientApi } from "../../Api/ClientApi";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ClientColumns } from "./ClientColumns";
+import { Input } from "@/components/ui/input"; // Add this import
 
 export default function ClientsList() {
+  const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   const { 
     data: clients, 
     isLoading, 
@@ -45,6 +50,8 @@ export default function ClientsList() {
         </Button>
       </div>
       
+   
+      
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-64 gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -69,18 +76,12 @@ export default function ClientsList() {
         <div className="rounded-lg border shadow-sm overflow-hidden">
           <DataTable 
             columns={ClientColumns} 
-            data={clientData} 
-            emptyState={
-              <div className="p-8 text-center space-y-2">
-                <p className="text-muted-foreground font-medium">No clients found</p>
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/Client/AddClient" className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add your first client
-                  </Link>
-                </Button>
-              </div>
-            }
+            data={clientData}
+            sorting={sorting}
+            onSortingChange={setSorting}
+            globalFilter={globalFilter}
+            onGlobalFilterChange={setGlobalFilter}
+            
           />
         </div>
       )}

@@ -1,4 +1,4 @@
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { ArrowDownUp, MoreHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,25 +21,45 @@ import {
 
 import { useState } from "react";
 import { toast } from "sonner";
-
 import { useDeleteSablage_int } from "./deleteSablageINTHook";
 import { UpdateSheet } from "../../Shette";
-
 import UpdateSablageInt from "./updateSablageINT.jsx";
 
 export const SablageIntColumns = [
   {
     accessorKey: "code_Sablage_Interne",
-    header: "Code Sablage Interne",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0 hover:bg-transparent"
+      >
+        Code Sablage Interne
+     <ArrowDownUp/>
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="font-medium uppercase text-xs sm:text-sm">
         {row.getValue("code_Sablage_Interne") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toString().toLowerCase().includes(value.toLowerCase())
+    },
   },
   {
     accessorKey: "date_Sablage_Interne",
-    header: "Date",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0 hover:bg-transparent"
+      >
+        Date
+        <ArrowDownUp/>
+        
+      </Button>
+    ),
     cell: ({ row }) => {
       const date = row.getValue("date_Sablage_Interne");
       return (
@@ -48,87 +68,196 @@ export const SablageIntColumns = [
         </div>
       );
     },
+    sortingFn: 'datetime',
   },
   {
     accessorKey: "ref_production",
-    header: "Référence",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0 hover:bg-transparent"
+      >
+        Référence
+        <ArrowDownUp/>
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="font-mono uppercase text-xs sm:text-sm">
         {row.getValue("ref_production") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toString().toLowerCase().includes(value.toLowerCase())
+    },
   },
   {
     accessorKey: "machine",
-    header: "Machine",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0 hover:bg-transparent"
+      >
+        Machine
+         <ArrowDownUp/>
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm">
         {row.getValue("machine") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toString().toLowerCase().includes(value.toLowerCase())
+    },
   },
   {
     accessorKey: "statut",
-    header: "Statut",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0 hover:bg-transparent"
+      >
+        Statut
+        <ArrowDownUp/>
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm">
         {row.getValue("statut") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toString().toLowerCase().includes(value.toLowerCase())
+    },
   },
   {
     accessorKey: "defaut",
-    header: "Défaut",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0 hover:bg-transparent hidden md:flex"
+      >
+        Défaut
+        <ArrowDownUp/>
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm hidden md:block">
         {row.getValue("defaut") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toString().toLowerCase().includes(value.toLowerCase())
+    },
   },
   {
     accessorKey: "causse",
-    header: "Cause",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0 hover:bg-transparent hidden lg:flex"
+      >
+        Cause
+ <ArrowDownUp/>
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm hidden lg:block">
         {row.getValue("causse") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toString().toLowerCase().includes(value.toLowerCase())
+    },
   },
   {
     accessorKey: "soudeur",
-    header: "Soudeur",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0 hover:bg-transparent hidden xl:flex"
+      >
+        Soudeur
+        <ArrowDownUp/>
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm hidden xl:block">
         {row.getValue("soudeur") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toString().toLowerCase().includes(value.toLowerCase())
+    },
   },
   {
     accessorKey: "operateur",
-    header: "Opérateur",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0 hover:bg-transparent hidden 2xl:flex"
+      >
+        Opérateur
+         <ArrowDownUp/>
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm hidden 2xl:block">
         {row.getValue("operateur") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toString().toLowerCase().includes(value.toLowerCase())
+    },
   },
   {
     accessorKey: "controleur",
-    header: "Contrôleur",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0 hover:bg-transparent hidden 2xl:flex"
+      >
+        Contrôleur
+        <ArrowDownUp/>
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm hidden 2xl:block">
         {row.getValue("controleur") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toString().toLowerCase().includes(value.toLowerCase())
+    },
   },
-     {
+  {
     accessorKey: "description",
-    header: "description",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0 hover:bg-transparent"
+      >
+        Description
+         <ArrowDownUp/>
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="font-mono uppercase text-xs sm:text-sm">
         {row.getValue("description") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toString().toLowerCase().includes(value.toLowerCase())
+    },
   },
   {
     accessorKey: 'Actions',

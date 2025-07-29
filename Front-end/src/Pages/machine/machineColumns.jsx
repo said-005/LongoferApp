@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { MoreHorizontal, Copy, Edit, Trash2 } from "lucide-react";
+import { MoreHorizontal, Copy, Edit, Trash2,ArrowUpDown ,ArrowUp ,ArrowDown  } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,7 +23,6 @@ import {
 import { useDeleteMachine } from './deleteMachineHokk';
 import { UpdateMachine } from "./updateMachine";
 
-
 const handleCopy = (text) => {
   navigator.clipboard.writeText(text)
     .then(() => toast.success("Copié dans le presse-papiers"))
@@ -33,39 +32,72 @@ const handleCopy = (text) => {
 export const Machinecolumns = [
   {
     accessorKey: "codeMachine",
-    header: "Code Machine",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0"
+      >
+        Code Machine
+        {column.getIsSorted() === "asc" ? (
+          <ArrowUp className="ml-2 h-4 w-4" />
+        ) : column.getIsSorted() === "desc" ? (
+          <ArrowDown className="ml-2 h-4 w-4" />
+        ) : (
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        )}
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="font-medium whitespace-nowrap">
         {row.getValue("codeMachine")}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id).toLowerCase().includes(value.toLowerCase());
+    },
   },
   {
     accessorKey: "MachineName",
-    header: "le nom de machine",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="p-0"
+      >
+        Nom de la machine
+        {column.getIsSorted() === "asc" ? (
+          <ArrowUp className="ml-2 h-4 w-4" />
+        ) : column.getIsSorted() === "desc" ? (
+          <ArrowDown className="ml-2 h-4 w-4" />
+        ) : (
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        )}
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="whitespace-nowrap">
         {row.getValue("MachineName")}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id).toLowerCase().includes(value.toLowerCase());
+    },
   },
- 
-  
-  
   {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
-      const machine= row.original;
-      const { mutate:deleteMachine, isDeleting } = useDeleteMachine();
+      const machine = row.original;
+      const { mutate: deleteMachine, isDeleting } = useDeleteMachine();
 
       const handleDelete = async () => {
         try {
           await deleteMachine(machine.codeMachine);
-          toast.success("machine supprimé avec succès");
+          toast.success("Machine supprimée avec succès");
         } catch (error) {
           toast.error("Échec de la suppression", {
-            description: error.response.data.message,
+            description: error.response?.data?.message || "Une erreur est survenue",
           });
         }
       };
@@ -95,7 +127,7 @@ export const Machinecolumns = [
             <UpdateSheet 
               id={machine.codeMachine} 
               Component={UpdateMachine} 
-              text="Modifier le machine"
+              text="Modifier la machine"
             />
             
             <DropdownMenuSeparator />
@@ -114,7 +146,7 @@ export const Machinecolumns = [
                 <DialogHeader>
                   <DialogTitle>Confirmer la suppression</DialogTitle>
                   <DialogDescription>
-                    Êtes-vous sûr de vouloir supprimer la machine {machine.codeArticle} ? 
+                    Êtes-vous sûr de vouloir supprimer la machine {machine.codeMachine} ? 
                     Cette action est irréversible.
                   </DialogDescription>
                 </DialogHeader>

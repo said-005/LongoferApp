@@ -1,4 +1,4 @@
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal, Trash2, ArrowUpDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,6 +18,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
 
 import { useState } from "react";
 import { toast } from "sonner";
@@ -29,7 +30,18 @@ import UpdatePeintureExt from "./updatePeintureEXT";
 export const PeintureExtColumns = [
   {
     accessorKey: "code_Peinture_Externe",
-    header: "Code Peinture Externe",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Code Peinture Externe
+          <ArrowUpDown className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
       <div className="font-medium uppercase text-xs sm:text-sm">
         {row.getValue("code_Peinture_Externe") || '-'}
@@ -38,7 +50,18 @@ export const PeintureExtColumns = [
   },
   {
     accessorKey: "date_Peinture_Externe",
-    header: "Date",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Date
+          <ArrowUpDown className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
       const date = row.getValue("date_Peinture_Externe");
       return (
@@ -47,33 +70,82 @@ export const PeintureExtColumns = [
         </div>
       );
     },
+    filterFn: (row, id, value) => {
+      const date = row.getValue(id);
+      if (!date) return false;
+      const dateObj = new Date(date);
+      const filterDate = new Date(value);
+      return dateObj.toDateString() === filterDate.toDateString();
+    },
   },
   {
     accessorKey: "ref_production",
-    header: "Référence",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Référence
+          <ArrowUpDown className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
       <div className="font-mono uppercase text-xs sm:text-sm">
         {row.getValue("ref_production") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toLowerCase().includes(value.toLowerCase());
+    },
   },
   {
     accessorKey: "machine",
-    header: "Machine",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Machine
+          <ArrowUpDown className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm">
         {row.getValue("machine") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "statut",
-    header: "Statut",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Statut
+          <ArrowUpDown className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
       <div className="capitalize text-xs sm:text-sm">
         {row.getValue("statut") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "defaut",
@@ -120,9 +192,9 @@ export const PeintureExtColumns = [
       </div>
     ),
   },
-   {
+  {
     accessorKey: "description",
-    header: "description",
+    header: "Description",
     cell: ({ row }) => (
       <div className="font-mono uppercase text-xs sm:text-sm">
         {row.getValue("description") || '-'}
@@ -138,7 +210,7 @@ export const PeintureExtColumns = [
       const { mutate, isPending: isDeleting } = useDeletePeinture_ext();
 
       const handleDelete = () => {
-        mutate(peinture_ext.code_Peinture_Externe , {
+        mutate(peinture_ext.code_Peinture_Externe, {
           onSuccess: () => {
             toast.success("Réparation supprimée avec succès");
             setDeleteDialogOpen(false);

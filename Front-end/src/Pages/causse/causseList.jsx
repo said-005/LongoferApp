@@ -7,8 +7,12 @@ import { Caussecolumns } from "./causseColumns";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export default function CausseList() {
+    const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['causses'],
     queryFn: CausseApi.getAll,
@@ -57,17 +61,10 @@ export default function CausseList() {
           <DataTable 
             columns={Caussecolumns} 
             data={data} 
-            emptyState={
-              <div className="p-8 text-center space-y-2">
-                <p className="text-muted-foreground font-medium">No causses found</p>
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/causse/AddCausse" className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add your first causse
-                  </Link>
-                </Button>
-              </div>
-            }
+                     sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
           />
         </div>
       )}

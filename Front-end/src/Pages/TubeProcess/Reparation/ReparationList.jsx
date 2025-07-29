@@ -5,8 +5,12 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { ReparationColumns } from "./ReparationColumns";
 import { ReparationApi } from "../../../Api/ReparationApi";
+import { useState } from "react";
 
 export default function ReparationList() {
+   const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   // Fetch reparation data
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['reparations'],
@@ -63,6 +67,10 @@ export default function ReparationList() {
             <DataTable 
               columns={ReparationColumns} 
               data={data||[]} 
+                sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
               className="w-full"
             />
           </div>

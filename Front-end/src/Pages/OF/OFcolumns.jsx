@@ -1,4 +1,4 @@
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal, Trash2, ArrowUpDown, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -6,7 +6,8 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { UpdateOf } from "./updateOf";
@@ -48,87 +49,149 @@ const renderDateCell = (dateString) => (
   </div>
 );
 
-export const OFcolumns = [
+const OFcolumns = [
   {
     accessorKey: "codeOf",
-    header: "N° OF",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="-ml-4 hover:bg-transparent px-0"
+      >
+        N° OF
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="font-bold uppercase text-foreground">
         {row.getValue("codeOf")}
       </div>
     ),
+    filterFn: "includesString",
+    sortingFn: "text",
   },
   {
     accessorKey: "client",
-    header: "Client",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="-ml-4 hover:bg-transparent px-0"
+      >
+        Client
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="font-medium text-foreground">
         {row.getValue("client")}
       </div>
     ),
+    filterFn: "includesString",
+    sortingFn: "text",
   },
   {
     accessorKey: "Date_OF",
-    header: "Date OF",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="-ml-4 hover:bg-transparent px-0"
+      >
+        Date OF
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => renderDateCell(row.getValue("Date_OF")),
+    sortingFn: "datetime",
   },
   {
     accessorKey: "date_Prevue_Livraison",
-    header: "Livraison Prévue",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="-ml-4 hover:bg-transparent px-0"
+      >
+        Livraison Prévue
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => renderDateCell(row.getValue("date_Prevue_Livraison")),
+    sortingFn: "datetime",
   },
   {
     accessorKey: "Article_1",
     header: "Article 1",
     cell: ({ row }) => renderArticleCell(row.getValue("Article_1")),
+    filterFn: "includesString",
+    enableSorting: false,
   },
   {
     accessorKey: "Article_2",
     header: "Article 2",
     cell: ({ row }) => renderArticleCell(row.getValue("Article_2")),
+    filterFn: "includesString",
+    enableSorting: false,
   },
   {
     accessorKey: "Article_3",
     header: "Article 3",
     cell: ({ row }) => renderArticleCell(row.getValue("Article_3")),
+    filterFn: "includesString",
+    enableSorting: false,
   },
   {
     accessorKey: "Article_4",
     header: "Article 4",
     cell: ({ row }) => renderArticleCell(row.getValue("Article_4")),
+    filterFn: "includesString",
+    enableSorting: false,
   },
   {
     accessorKey: "Article_5",
     header: "Article 5",
     cell: ({ row }) => renderArticleCell(row.getValue("Article_5")),
+    filterFn: "includesString",
+    enableSorting: false,
   },
   {
     accessorKey: "Revetement_Ext",
     header: "Revêtement Ext",
     cell: ({ row }) => renderBooleanBadge(row.getValue("Revetement_Ext")),
+    filterFn: "equals",
+    enableSorting: false,
   },
   {
     accessorKey: "Sablage_Ext",
     header: "Sablage Ext",
     cell: ({ row }) => renderBooleanBadge(row.getValue("Sablage_Ext")),
+    filterFn: "equals",
+    enableSorting: false,
   },
   {
     accessorKey: "Sablage_Int",
     header: "Sablage Int",
     cell: ({ row }) => renderBooleanBadge(row.getValue("Sablage_Int")),
+    filterFn: "equals",
+    enableSorting: false,
   },
   {
     accessorKey: "Revetement_Int",
     header: "Revêtement Int",
     cell: ({ row }) => renderBooleanBadge(row.getValue("Revetement_Int")),
+    filterFn: "equals",
+    enableSorting: false,
   },
   {
     accessorKey: "Manchette_ISO",
     header: "Manchette ISO",
     cell: ({ row }) => renderBooleanBadge(row.getValue("Manchette_ISO")),
+    filterFn: "equals",
+    enableSorting: false,
   },
   {
-    accessorKey: 'Actions',
+    accessorKey: 'actions',
     header: 'Actions',
     cell: ({ row }) => {
       const of = row.original;
@@ -194,5 +257,39 @@ export const OFcolumns = [
         </>
       );
     },
+    enableSorting: false,
+    enableHiding: false,
   }
 ];
+
+export function ColumnVisibility({ table }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="ml-auto">
+          <EyeOff className="mr-2 h-4 w-4" />
+          Colonnes
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {table
+          .getAllColumns()
+          .filter((column) => column.getCanHide())
+          .map((column) => {
+            return (
+              <DropdownMenuCheckboxItem
+                key={column.id}
+                className="capitalize"
+                checked={column.getIsVisible()}
+                onCheckedChange={(value) => column.toggleVisibility(!!value)}
+              >
+                {column.id}
+              </DropdownMenuCheckboxItem>
+            );
+          })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+export default OFcolumns;

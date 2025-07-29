@@ -31,7 +31,7 @@ export function UpdateSheet({ Component, id, text = "Modifier", iconSize = 4, cl
           onClick={() => setIsOpen(true)}
         >
           <Edit className={`h-${iconSize} w-${iconSize}`} />
-          <span className="text-sm">Editer</span>
+          <span className="text-sm w-full">Editer</span>
         </Button>
       </SheetTrigger>
       <SheetContent className="sm:max-w-md flex flex-col">

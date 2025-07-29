@@ -6,8 +6,12 @@ import { toast } from "sonner";
 import { CategorieApi } from './../../Api/CategorieApi';
 import { CategorieColumns } from "./CategorieColumns";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
 export default function CategorieList() {
+   const [sorting, setSorting] = useState([]);
+    const [globalFilter, setGlobalFilter] = useState('');
+    
   const { 
     data: categoriesResponse, 
     isError, 
@@ -55,16 +59,10 @@ export default function CategorieList() {
           <DataTable 
             columns={CategorieColumns} 
             data={categories} 
-            emptyState={
-              <div className="p-8 text-center space-y-2">
-                <p className="text-muted-foreground font-medium">Aucune catégorie trouvée</p>
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/Categorie/AddCategorie" className="gap-2">
-                    Ajouter votre première catégorie
-                  </Link>
-                </Button>
-              </div>
-            }
+            sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
           />
         </div>
       )}

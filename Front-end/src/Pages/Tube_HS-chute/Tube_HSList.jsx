@@ -7,8 +7,12 @@ import { TubeHSApi } from "../../Api/TubeHSApi";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useState } from "react";
 
 export default function TubeHSList() {
+     const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   const { 
     data: tubeHSData = [],
     isLoading, 
@@ -80,17 +84,10 @@ export default function TubeHSList() {
           <DataTable 
             columns={TubeSHcolumns} 
             data={tubeHSData} 
-            emptyState={
-              <div className="p-8 text-center space-y-2">
-                <p className="text-muted-foreground font-medium">Aucune entrée trouvée</p>
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/TubeHS/AddTubeHS" className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Ajouter votre première entrée
-                  </Link>
-                </Button>
-              </div>
-            }
+           sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
           />
         </div>
       )}

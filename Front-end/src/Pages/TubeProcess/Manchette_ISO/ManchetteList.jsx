@@ -5,8 +5,12 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { ManchetteColumns } from "./ManchetteColumns";
 import { ManchetteApi } from "../../../Api/Manchette";
+import { useState } from "react";
 
 export default function ManchetteList() {
+   const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   // Fetch reparation data
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['manchettes'],
@@ -63,6 +67,10 @@ export default function ManchetteList() {
             <DataTable 
               columns={ManchetteColumns} 
               data={data||[]} 
+               sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
               className="w-full"
             />
           </div>

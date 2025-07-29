@@ -6,8 +6,12 @@ import { toast } from "sonner";
 import {  SablageExtColumns } from "./SablageEXTColumns";
 import { ReparationApi } from "../../../Api/ReparationApi";
 import { SablageEXTApi } from "../../../Api/Sablage_Ext";
+import { useState } from "react";
 
 export default function SablageEXTList() {
+     const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   // Fetch reparation data
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['sablage_externes'],
@@ -64,6 +68,10 @@ export default function SablageEXTList() {
             <DataTable 
               columns={SablageExtColumns} 
               data={data||[]} 
+               sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
               className="w-full"
             />
           </div>

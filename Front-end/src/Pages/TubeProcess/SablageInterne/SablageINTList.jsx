@@ -6,8 +6,12 @@ import { toast } from "sonner";
 import {  SablageIntColumns } from "./SablageINTColumns";
 import { ReparationApi } from "../../../Api/ReparationApi";
 import { SablageIntApi } from "../../../Api/SablageIntApi";
+import { useState } from "react";
 
 export default function SablageINTList() {
+     const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   // Fetch reparation data
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['sablage_internes'],
@@ -64,6 +68,10 @@ export default function SablageINTList() {
             <DataTable 
               columns={SablageIntColumns} 
               data={data||[]} 
+               sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
               className="w-full"
             />
           </div>

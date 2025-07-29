@@ -1,4 +1,4 @@
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal, Trash2, ArrowUpDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,15 +22,31 @@ import { UpdateCategorie } from "./updateCategorie";
 import { toast } from "sonner";
 import { UpdateSheet } from './../Shette';
 import { useDeleteCategorie } from "./deleteCategorieHook";
+import { Input } from "@/components/ui/input";
+
 export const CategorieColumns = [
   {
     accessorKey: "CategorieArticle",
-    header: "Articel categorie",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0 hover:bg-transparent"
+        >
+          Article Categorie
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => (
       <div className="font-medium capitalize">
         {row.getValue("CategorieArticle")}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id).toLowerCase().includes(value.toLowerCase())
+    },
   },
   {
     accessorKey: 'Actions',
@@ -41,7 +57,7 @@ export const CategorieColumns = [
 
       const handleDelete = async () => {
         try {
-          await deleteCategorie(categorie.CategorieArticle );
+          await deleteCategorie(categorie.CategorieArticle);
           toast.success("Catégorie supprimée avec succès");
         } catch (error) {
           toast.error("Échec de la suppression", {
@@ -81,7 +97,7 @@ export const CategorieColumns = [
                 <DialogHeader>
                   <DialogTitle>Confirmer la suppression</DialogTitle>
                   <DialogDescription>
-                    Êtes-vous sûr de vouloir supprimer la catégorie "{categorie.Categorie}" ?
+                    Êtes-vous sûr de vouloir supprimer la catégorie "{categorie.CategorieArticle}" ?
                     Cette action est irréversible.
                   </DialogDescription>
                 </DialogHeader>
@@ -108,5 +124,6 @@ export const CategorieColumns = [
         </DropdownMenu>
       );
     },
+   
   }
 ];

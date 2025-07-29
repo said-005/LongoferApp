@@ -1,4 +1,4 @@
-import { MoreHorizontal, Loader2, Plus, Copy, Edit, Trash2 } from "lucide-react";
+import { MoreHorizontal, Loader2, Copy, Edit, Trash2, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -44,21 +44,43 @@ const handleCopy = (text) => {
 export const ClientColumns = [
   {
     accessorKey: "codeClient",
-    header: "Client Code",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="-ml-4 hover:bg-transparent px-0"
+      >
+        Client Code
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="font-medium uppercase">
         {row.getValue("codeClient")}
       </div>
     ),
+    filterFn: "includesString",
+    sortingFn: "text",
   },
   {
     accessorKey: "Client",
-    header: "Client Name",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="-ml-4 hover:bg-transparent px-0"
+      >
+        Client Name
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => (
       <div className="font-medium">
         {row.getValue("Client")}
       </div>
     ),
+    filterFn: "includesString",
+    sortingFn: "text",
   },
   {
     accessorKey: "address",
@@ -68,6 +90,8 @@ export const ClientColumns = [
         {row.getValue("address") || "-"}
       </div>
     ),
+    filterFn: "includesString",
+    enableSorting: false,
   },
   {
     accessorKey: "tele",
@@ -77,10 +101,24 @@ export const ClientColumns = [
         {row.getValue("tele") || "-"}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      const phone = row.getValue(id) || "";
+      return phone.toString().includes(value);
+    },
+    enableSorting: false,
   },
   {
     accessorKey: "email",
-    header: "Email",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="-ml-4 hover:bg-transparent px-0"
+      >
+        Email
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
     cell: ({ row }) => {
       const email = row.getValue("email");
       return email ? (
@@ -94,6 +132,8 @@ export const ClientColumns = [
         <span className="text-sm text-gray-400">-</span>
       );
     },
+    filterFn: "includesString",
+    sortingFn: "text",
   },
   {
     accessorKey: "actions",
@@ -103,8 +143,6 @@ export const ClientColumns = [
       const { mutate:deleteClient, isPending } = useDeleteClient();
       const handleDelete = () => {
          deleteClient(client.codeClient)
-         
-
       };
 
       return (
@@ -130,48 +168,45 @@ export const ClientColumns = [
                 Copy Client Code
               </DropdownMenuItem>
               
-         <Sheet>
-  <SheetTrigger asChild>
-    <DropdownMenuItem 
-      onSelect={(e) => e.preventDefault()}
-      className="cursor-pointer"
-    >
-      <Edit className="mr-2 h-4 w-4" />
-      Edit Client
-    </DropdownMenuItem>
-  </SheetTrigger>
-  <SheetContent 
-    className="overflow-y-auto w-full sm:max-w-md lg:max-w-lg xl:max-w-xl"
-    onInteractOutside={(e) => {
-      // Prevent closing when clicking on toast notifications
-      if (e.target?.closest('.toast')) {
-        e.preventDefault();
-      }
-    }}
-  >
-    <div className="h-full flex flex-col">
-      <SheetHeader className="mb-4">
-        <SheetTitle>Edit Client</SheetTitle>
-        <SheetDescription>
-          Update client information below
-        </SheetDescription>
-      </SheetHeader>
-      
-      <div className="flex-1 overflow-y-auto">
-        <UpdateClient 
-         key={client.codeClient}
-          codeClient={client.codeClient} 
-          onSuccess={() => {
-            toast.success("Client updated successfully");
-            // The sheet will close automatically after successful update
-          }}
-          onCancel={() => {
-          }}
-        />
-      </div>
-    </div>
-  </SheetContent>
-</Sheet>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <DropdownMenuItem 
+                    onSelect={(e) => e.preventDefault()}
+                    className="cursor-pointer"
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit Client
+                  </DropdownMenuItem>
+                </SheetTrigger>
+                <SheetContent 
+                  className="overflow-y-auto w-full sm:max-w-md lg:max-w-lg xl:max-w-xl"
+                  onInteractOutside={(e) => {
+                    if (e.target?.closest('.toast')) {
+                      e.preventDefault();
+                    }
+                  }}
+                >
+                  <div className="h-full flex flex-col">
+                    <SheetHeader className="mb-4">
+                      <SheetTitle>Edit Client</SheetTitle>
+                      <SheetDescription>
+                        Update client information below
+                      </SheetDescription>
+                    </SheetHeader>
+                    
+                    <div className="flex-1 overflow-y-auto">
+                      <UpdateClient 
+                        key={client.codeClient}
+                        codeClient={client.codeClient} 
+                        onSuccess={() => {
+                          toast.success("Client updated successfully");
+                        }}
+                        onCancel={() => {}}
+                      />
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
 
               <DropdownMenuSeparator />
               
@@ -196,20 +231,20 @@ export const ClientColumns = [
                     <DialogClose asChild>
                       <Button variant="outline">Cancel</Button>
                     </DialogClose>
-                   <Button
-  variant="destructive"
-  disabled={isPending}
-  onClick={handleDelete} // Just pass the function reference
->
-  {isPending ? (
-    <>
-      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-      Deleting...
-    </>
-  ) : (
-    "Delete"
-  )}
-</Button>
+                    <Button
+                      variant="destructive"
+                      disabled={isPending}
+                      onClick={handleDelete}
+                    >
+                      {isPending ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Deleting...
+                        </>
+                      ) : (
+                        "Delete"
+                      )}
+                    </Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>

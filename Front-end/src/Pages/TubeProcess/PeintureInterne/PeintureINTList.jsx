@@ -6,8 +6,12 @@ import { toast } from "sonner";
 import { PeintureINTColumns } from "./PeintureINTColumns";
 import { ReparationApi } from "../../../Api/ReparationApi";
 import { PeintureIntApi } from "../../../Api/peinture_intApi";
+import { useState } from "react";
 
 export default function PeintureINTList() {
+     const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   // Fetch reparation data
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['peinture_internes'],
@@ -64,6 +68,10 @@ export default function PeintureINTList() {
             <DataTable 
               columns={PeintureINTColumns} 
               data={data||[]} 
+               sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
               className="w-full"
             />
           </div>

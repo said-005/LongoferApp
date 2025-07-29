@@ -1,4 +1,4 @@
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal, Trash2, ArrowUpDown, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,6 +18,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import { useState } from "react";
 import { toast } from "sonner";
@@ -28,16 +34,41 @@ import { UpdateSheet } from "../../Shette";
 export const ProductionColumns = [
   {
     accessorKey: "production_code",
-    header: "Production Code",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0"
+        >
+          Production Code
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
       <div className="font-medium uppercase">
         {row.getValue("production_code") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toLowerCase().includes(value.toLowerCase());
+    },
   },
   {
     accessorKey: "date_production",
-    header: "Date",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0"
+        >
+          Date
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
       const date = row.getValue("date_production");
       return (
@@ -46,35 +77,93 @@ export const ProductionColumns = [
         </div>
       );
     },
+    sortingFn: (rowA, rowB, columnId) => {
+      const dateA = new Date(rowA.getValue(columnId));
+      const dateB = new Date(rowB.getValue(columnId));
+      return dateA - dateB;
+    },
   },
   {
     accessorKey: "Num_OF",
-    header: "OF",
+    header: ({ column }) => {
+      return (
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="px-0"
+          >
+            OF
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Filter className="ml-2 h-4 w-4 text-muted-foreground" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <Input
+                type="text"
+                placeholder="Filter OF..."
+                onChange={(e) => column.setFilterValue(e.target.value)}
+                className="h-8"
+              />
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      );
+    },
     cell: ({ row }) => (
       <div className="font-mono uppercase">
         {row.getValue("Num_OF") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toLowerCase().includes(value.toLowerCase());
+    },
   },
   {
     accessorKey: "ref_article",
-    header: "Reference Article",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0"
+        >
+          Reference Article
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
       <div className="font-mono uppercase">
         {row.getValue("ref_article") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toLowerCase().includes(value.toLowerCase());
+    },
   },
   {
     accessorKey: "qte_produite",
-    header: "Quantity Produced",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0"
+        >
+          Quantity Produced
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
       <div className="font-mono">
         {Number(row.getValue("qte_produite")) || 0}
       </div>
     ),
   },
-  // Changed from number formatting to direct display for text fields
   {
     accessorKey: "machine",
     header: "Machine",
@@ -83,6 +172,9 @@ export const ProductionColumns = [
         {row.getValue("machine") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "statut",
@@ -92,6 +184,9 @@ export const ProductionColumns = [
         {row.getValue("statut") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "defaut",
@@ -101,6 +196,9 @@ export const ProductionColumns = [
         {row.getValue("defaut") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "causse",
@@ -110,6 +208,9 @@ export const ProductionColumns = [
         {row.getValue("causse") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "soudeur",
@@ -119,6 +220,9 @@ export const ProductionColumns = [
         {row.getValue("soudeur") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "operateur",
@@ -128,17 +232,23 @@ export const ProductionColumns = [
         {row.getValue("operateur") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
   {
     accessorKey: "controleur",
-    header: "controleur ",
+    header: "controleur",
     cell: ({ row }) => (
       <div className="capitalize">
         {row.getValue("controleur") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
-     {
+  {
     accessorKey: "description",
     header: "description",
     cell: ({ row }) => (
@@ -146,6 +256,9 @@ export const ProductionColumns = [
         {row.getValue("description") || '-'}
       </div>
     ),
+    filterFn: (row, id, value) => {
+      return row.getValue(id)?.toLowerCase().includes(value.toLowerCase());
+    },
   },
   {
     accessorKey: 'Actions',
@@ -190,7 +303,7 @@ export const ProductionColumns = [
                   Component={UpdateProduction} 
                   text="Edit Production" 
                   id={production.production_code}
-                  data={production} // Pass full production data to edit form
+                  data={production}
                 />
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -199,7 +312,7 @@ export const ProductionColumns = [
                 onClick={() => setDeleteDialogOpen(true)}
                 disabled={isDeleting}
               >
-                <Trash2/>
+                <Trash2 className="mr-2 h-4 w-4" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -238,5 +351,6 @@ export const ProductionColumns = [
         </>
       );
     },
+    
   }
 ];

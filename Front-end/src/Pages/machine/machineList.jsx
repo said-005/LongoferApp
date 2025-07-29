@@ -7,8 +7,12 @@ import { MachineApi } from "../../Api/machineApi";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useState } from "react";
 
 export default function MachineList() {
+   const [sorting, setSorting] = useState([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  
   const { 
     data: machineData, 
     isLoading, 
@@ -62,17 +66,10 @@ export default function MachineList() {
           <DataTable 
             columns={Machinecolumns} 
             data={machineData} 
-            emptyState={
-              <div className="p-8 text-center space-y-2">
-                <p className="text-muted-foreground font-medium">No machines found</p>
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/machine/AddMachine" className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add your first machine
-                  </Link>
-                </Button>
-              </div>
-            }
+             sorting={sorting}
+              onSortingChange={setSorting}
+              globalFilter={globalFilter}
+              onGlobalFilterChange={setGlobalFilter}
           />
         </div>
       )}
