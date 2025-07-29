@@ -100,24 +100,34 @@ export function UpdateConsommation({id}) {
     queryFn: OfApi.getAll,
    
   });
-
- const { data: articlesData = {} } = useQuery({
+const { data: articlesData = {}, isLoading: isArticlesLoading, error: articlesError } = useQuery({
   queryKey: ['articles'],
   queryFn: ArticleApi.getAll,
- 
   onError: (error) => {
     toast.error("Erreur de chargement des articles", {
       description: error.message,
     });
   },
   select: (data) => {
-   
-    const rawMaterials = data.data.data.filter(article => 
-      article.categorie === 'matière première' || 
-      article.categorie === 'matiere premiere'
-    );
+    // Normalization function for consistent comparison
+    const normalizeString = (str) => 
+      str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+    
+    // Process raw materials (handles both "matière première" and "matiere premiere")
+    const rawMaterials = data.data.data.filter(article => {
+      const normalizedCategory = normalizeString(article.categorie);
+      return (
+        normalizedCategory === normalizeString('matière première') || 
+        normalizedCategory === normalizeString('matiere premiere')
+      );
+    });
+    
+    // Process finished products
     const finishedProducts = data.data.data.filter(article => 
-      article.categorie === 'produit fini'
+      normalizeString(article.categorie) === normalizeString('produit fini')
     );
     
     return {
