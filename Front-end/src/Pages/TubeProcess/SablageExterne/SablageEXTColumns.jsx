@@ -36,7 +36,7 @@ export const SablageExtColumns = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="p-0 hover:bg-transparent"
         >
-          Code Sablage Externe
+          Référence Sablage Externe
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );

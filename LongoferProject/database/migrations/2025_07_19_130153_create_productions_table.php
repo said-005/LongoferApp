@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('productions', function (Blueprint $table) {
-            $table->string('production_code')->primary()->unique();
+            $table->string('production_code')->primary();
             $table->string('Num_OF');
             $table->foreign('Num_OF')->references('codeOf')->on('ofs')->restrictOnDelete();
                

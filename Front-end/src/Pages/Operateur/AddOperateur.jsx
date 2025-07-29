@@ -27,9 +27,12 @@ const formSchema = z.object({
     .min(1, "Le nom complet est requis"),
   position: z.string()
     .min(1, "La fonction est requise"),
-  machine: z.string().optional(),
+  machine: z.string()
+    .optional()
+    .transform(val => val === "" ? undefined : val),
   code_operateur: z.string()
-    .min(1, "Le code est requis").trim(),
+    .min(1, "Le code est requis")
+    .trim(),
 });
 
 export function OperateurForm() {

@@ -25,7 +25,7 @@ class StoreOperateurRequest extends FormRequest
             'operateur'=>'required|string|unique:operateurs,operateur',
             'nom_complete'=>'required|string',
             'Fonction'=>'string',
-            'Machine'=>'string'
+            'Machine'=>'nullable|string'
         ];
     }
 }

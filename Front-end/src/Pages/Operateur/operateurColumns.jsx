@@ -114,7 +114,7 @@ export const OperateurColumns = [
       return (
         <div className="whitespace-nowrap">
           {machine 
-            ? `${machine.MachineName} (${machine.codeMachine})`
+            ? `${machine.MachineName} -- (${machine.codeMachine})`
             : "Non affectée"}
         </div>
       );

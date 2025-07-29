@@ -42,7 +42,7 @@ export const ManchetteColumns = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="px-0 text-xs sm:text-sm"
         >
-          Code Manchette
+          Référence Manchette
           <ArrowUpDown className="ml-1 h-3 w-3 sm:ml-2 sm:h-4 sm:w-4" />
         </Button>
       );

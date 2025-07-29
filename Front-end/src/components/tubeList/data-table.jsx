@@ -183,9 +183,7 @@ export function DataTable({
                         <p className="text-gray-500 dark:text-gray-400 text-sm">
                           {emptyState || "Aucun résultat trouvé"}
                         </p>
-                        <Button variant="outline" size="sm" className="mt-2">
-                          Réinitialiser les filtres
-                        </Button>
+                        
                       </div>
                     </TableCell>
                   </TableRow>

@@ -30,9 +30,11 @@ const formSchema = z.object({
   position: z.string()
     .min(1, "La fonction est requise"),
   machine: z.string()
-    .optional(),
+    .optional()
+    .transform(val => val === "" ? undefined : val),
   code_operateur: z.string()
-    .min(1, "Le code est requis"),
+    .min(1, "Le code est requis")
+    .trim(),
 });
 
 export function UpdateOperateur({ id }) {

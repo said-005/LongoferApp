@@ -34,7 +34,7 @@ export const SablageIntColumns = [
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         className="p-0 hover:bg-transparent"
       >
-        Code Sablage Interne
+        Référence Sablage Interne
      <ArrowDownUp/>
       </Button>
     ),

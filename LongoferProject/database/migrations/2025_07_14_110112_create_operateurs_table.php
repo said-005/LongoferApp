@@ -17,7 +17,7 @@ return new class extends Migration
     $table->string('Fonction');
 
     // Make sure this exactly matches machines.codeMachine
-    $table->string('Machine');
+    $table->string('Machine')->nullable();
 
     $table->foreign('Machine')
           ->references('codeMachine')

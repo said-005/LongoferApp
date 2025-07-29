@@ -36,7 +36,7 @@ export const PeintureINTColumns = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="p-0 hover:bg-transparent"
         >
-          Code Peinture interne
+          Référence Peinture interne
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );

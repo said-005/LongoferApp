@@ -126,28 +126,49 @@ console.log(productions)
     },
     ...queryOptions
   });
-  const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoading: isLoadingOperateurs } = useQuery({
-    queryKey: ['operateursOptions'],
-    queryFn: async () => {
-      const response = await OperateurApi.getAll();
-      const data = response.data.data;
-      return {
-        operators:data.filter(op => op.Fonction === 'operateur').map(op => ({
+const normalizeString = (str) => 
+  str
+    .normalize("NFD") // Decomposes accents (é → e + ´)
+    .replace(/[\u0300-\u036f]/g, "") // Removes accent marks
+    .toLowerCase(); // Converts to lowercase for case-insensitive comparison
+
+const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoadingOperateurs } = useQuery({
+  queryKey: ['operateursOptions'],
+  queryFn: async () => {
+    const response = await OperateurApi.getAll();
+    const data = response.data.data;
+
+    return {
+      // 1. Opérateurs (matches "opérateur", "operateur", "OPÉRATEUR", etc.)
+      operators: data
+        .filter(op => normalizeString(op.Fonction) === normalizeString('opérateur'))
+        .sort((a, b) => a.nom_complete.localeCompare(b.nom_complete, 'fr'))
+        .map(op => ({
           label: `${op.operateur} - ${op.nom_complete}`,
           value: op.operateur
         })),
-        welders: data.filter(op => op.Fonction === 'soudeur').map(op => ({
+
+      // 2. Soudeurs (matches "soudeur", "SOUDEUR", etc. - usually no accent)
+      welders: data
+        .filter(op => normalizeString(op.Fonction) === normalizeString('soudeur'))
+        .sort((a, b) => a.nom_complete.localeCompare(b.nom_complete, 'fr'))
+        .map(op => ({
           label: `${op.operateur} - ${op.nom_complete}`,
           value: op.operateur
         })),
-        inspectors: data.filter(op => op.Fonction === 'controleur').map(op => ({
+
+      // 3. Contrôleurs (matches "controleur", "contrôleur", "CONTROLEUR", etc.)
+      inspectors: data
+        .filter(op => normalizeString(op.Fonction) === normalizeString('contrôleur'))
+        .sort((a, b) => a.nom_complete.localeCompare(b.nom_complete, 'fr'))
+        .map(op => ({
           label: `${op.operateur} - ${op.nom_complete}`,
           value: op.operateur
         }))
-      };
-    },
-    ...queryOptions
-  });
+    };
+  },
+  ...queryOptions
+});
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -252,7 +273,7 @@ return (
                 <FormLabel className="dark:text-gray-300">Référence Sablage Interne</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Entrez le code de sablage interne"
+                    placeholder="Entrez une Référence de sablage interne"
                     {...field}
                     className="dark:bg-gray-800 dark:text-white dark:border-gray-700"
                   />

@@ -25,7 +25,7 @@ class UpdateOperateurRequest extends FormRequest
             'operateur'=>'required|string|unique:operateurs,operateur,' . $this->route('Operateur') . ',operateur',
             'nom_complete'=>'required|string',
             'Fonction'=>'string',
-            'Machine'=>'string'
+            'Machine'=>'nullable|string'
         ];
     }
 }
