@@ -7,13 +7,14 @@ import { PeintureINTColumns } from "./PeintureINTColumns";
 import { ReparationApi } from "../../../Api/ReparationApi";
 import { PeintureIntApi } from "../../../Api/peinture_intApi";
 import { useState } from "react";
-
+import { configurationQuery } from "../../../configurationQueryClient/configuration";
+import { Button } from "@/components/ui/button"
 export default function PeintureINTList() {
      const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState('');
   
   // Fetch reparation data
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, error,refetch } = useQuery({
     queryKey: ['peinture_internes'],
     queryFn: PeintureIntApi.getAll,
     onError: (error) => {
@@ -22,6 +23,7 @@ export default function PeintureINTList() {
       });
     },
     select: (response) => response?.data?.data || [],
+    ...configurationQuery
   });
 
   if (isLoading) {
@@ -32,13 +34,16 @@ export default function PeintureINTList() {
     );
   }
 
-  if (isError) {
+ if (isError) {
     return (
-      <div className="container mx-auto px-4 py-6 md:mt-20">
+      <div className="container mx-auto px-4 py-6 mt-20">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-600">
           <p>Erreur lors du chargement des données</p>
-          <p className="text-sm mt-1">{error.message}</p>
+          <p className="text-sm mt-1">{error.response?.data?.message || "Une erreur inconnue est survenue"}</p>
         </div>
+        <Button onClick={() => refetch()} className="mt-4">
+          Réessayer
+        </Button>
       </div>
     );
   }

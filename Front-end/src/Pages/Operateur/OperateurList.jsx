@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { OperateurApi } from '../../Api/operateurApi';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useState } from 'react';
+import { configurationQuery } from '../../configurationQueryClient/configuration';
 
 export default function OperatorList() {
     const [sorting, setSorting] = useState([]);
@@ -18,7 +19,8 @@ export default function OperatorList() {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['operateurs'],
     queryFn: OperateurApi.getAll,
-    refetchOnWindowFocus: true
+    refetchOnWindowFocus: true,
+    ...configurationQuery
   });
 
   const handleRefresh = async () => {
@@ -64,7 +66,7 @@ export default function OperatorList() {
         <Alert variant="destructive">
           <AlertTitle>Erreur de chargement</AlertTitle>
           <AlertDescription>
-            {error?.message || 'Impossible de charger les données'}
+            {error?.response.data.message || 'Impossible de charger les données'}
             <Button 
               variant="outline" 
               className="mt-2"

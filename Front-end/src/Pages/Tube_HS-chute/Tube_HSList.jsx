@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useState } from "react";
+import { configurationQuery } from './../../configurationQueryClient/configuration';
 
 export default function TubeHSList() {
      const [sorting, setSorting] = useState([]);
@@ -31,7 +32,8 @@ export default function TubeHSList() {
       toast.error("Erreur de chargement des tubes HS", {
         description: error.message,
       });
-    }
+    },
+    ...configurationQuery
   });
 
   return (
@@ -68,7 +70,7 @@ export default function TubeHSList() {
         <Alert variant="destructive">
           <AlertTitle>Erreur de chargement</AlertTitle>
           <AlertDescription>
-            {error.message}
+            {error.response.data.message}
             <Button 
               variant="outline" 
               size="sm" 

@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ClientColumns } from "./ClientColumns";
-import { Input } from "@/components/ui/input"; // Add this import
+import { Input } from "@/components/ui/input"; // Ajout de cette importation
+import { configurationQuery } from '../../configurationQueryClient/configuration';
 
-export default function ClientsList() {
+export default function ListeClients() {
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState('');
   
@@ -25,10 +26,11 @@ export default function ClientsList() {
     queryFn: ClientApi.getAll,
     staleTime: 1000 * 60 * 5,
     onError: (error) => {
-      toast.error("Error loading clients", {
-        description: error.message || "Please try again later",
+      toast.error("Erreur lors du chargement des clients", {
+        description: error.message || "Veuillez réessayer plus tard",
       });
-    }
+    },
+    ...configurationQuery
   });
 
   const clientData = clients?.data?.data || [];
@@ -37,15 +39,15 @@ export default function ClientsList() {
     <div className="container mx-auto px-4 py-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Clients Management</h1>
+          <h1 className="text-2xl font-bold">Gestion des Clients</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {clientData.length} {clientData.length === 1 ? 'client' : 'clients'} in database
+            {clientData.length} {clientData.length === 1 ? 'client' : 'clients'} dans la base de données
           </p>
         </div>
         <Button asChild>
           <Link to="/Client/AddClient" className="inline-flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            <span>Add New Client</span>
+            <span>Ajouter un Client</span>
           </Link>
         </Button>
       </div>
@@ -55,20 +57,20 @@ export default function ClientsList() {
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-64 gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          <span className="text-muted-foreground">Loading clients...</span>
+          <span className="text-muted-foreground">Chargement des clients...</span>
         </div>
       ) : isError ? (
         <Alert variant="destructive">
-          <AlertTitle>Failed to load clients data</AlertTitle>
+          <AlertTitle>Échec du chargement des données clients</AlertTitle>
           <AlertDescription>
-            {error.message || "Unknown error"}
+            {error.response.data.message || "Erreur inconnue"}
             <Button 
               variant="outline" 
               size="sm" 
               className="mt-2"
               onClick={() => refetch()}
             >
-              Retry
+              Réessayer
             </Button>
           </AlertDescription>
         </Alert>
