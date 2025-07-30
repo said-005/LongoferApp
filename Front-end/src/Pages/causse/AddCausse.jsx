@@ -43,16 +43,11 @@ export function CausseForm({ initialData, onSuccess }) {
   });
 
   const { mutate: submitCausse, isPending } = useMutation({
-    mutationFn: (values) => {
-      return initialData
-        ? CausseApi.updateCausse(values)
-        : CausseApi.createCausse(values);
-    },
+    mutationFn: (values) => CausseApi.createCausse(values),
     onSuccess: (data) => {
-      toast.success(
-        initialData ? "Cause mise à jour" : "Cause créée avec succès",
+      toast.success( "Cause cree aves success",
         {
-          description: `Code: ${data.code_causse}`,
+          description: `Code: ${data.data.data.code_causse}`,
           className: "bg-green-100 dark:bg-green-900/50 dark:text-green-200 border-green-200 dark:border-green-800",
         }
       );
