@@ -328,7 +328,6 @@ export default function TableauDeBord() {
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
         <AlertCircle className="w-12 h-12 text-red-500" />
         <h2 className="text-xl font-semibold">Échec du chargement du tableau de bord</h2>
-        <p className="text-muted-foreground">{error.message}</p>
         <Button onClick={() => window.location.reload()} variant="outline">
           Réessayer
         </Button>

@@ -30,6 +30,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [serverError, setServerError] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -41,10 +42,20 @@ export default function LoginPage() {
 
   const { mutate: login, isPending: isSubmitting } = useMutation({
     mutationFn: async (data) => {
-      return LoginApi.login(data);
+      try {
+        await LoginApi.getSCRFtoken();
+        return await LoginApi.login(data);
+      } catch (error) {
+        // Handle CSRF token failure
+        if (error.message === "Network Error" || error.response?.status === 0) {
+          setServerError(true);
+          throw new Error("Le serveur est indisponible. Veuillez réessayer plus tard.");
+        }
+        throw error;
+      }
     },
     onSuccess: (data) => {
-      console.log(data);
+      setServerError(false);
       localStorage.setItem('authenticated', true);
       toast.success("Connexion réussie", {
         description: "Vous avez été connecté avec succès",
@@ -53,31 +64,90 @@ export default function LoginPage() {
       navigate('/home');
     },
     onError: (error) => {
+      let errorMessage = "Une erreur inattendue s'est produite";
+      
+      if (error.message === "Le serveur est indisponible. Veuillez réessayer plus tard.") {
+        errorMessage = error.message;
+      } else if (error.response) {
+        // Server responded with error status (4xx, 5xx)
+        switch (error.response.status) {
+          case 401:
+            errorMessage = "Identifiants invalides. Veuillez réessayer.";
+            break;
+          case 403:
+            errorMessage = "Accès refusé. Vérifiez vos autorisations.";
+            break;
+          case 500:
+            errorMessage = "Erreur interne du serveur. Veuillez contacter l'administrateur.";
+            setServerError(true);
+            break;
+          case 503:
+            errorMessage = "Service temporairement indisponible. Veuillez réessayer plus tard.";
+            setServerError(true);
+            break;
+          default:
+            errorMessage = error.response.data?.message || "Erreur lors de la connexion";
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage = "Pas de réponse du serveur. Vérifiez votre connexion internet.";
+        setServerError(true);
+      } else {
+        // Something happened in setting up the request
+        errorMessage = "Erreur de configuration de la requête";
+      }
+
       toast.error("Échec de la connexion", {
-        description: error.response?.data?.message || "Identifiants invalides. Veuillez réessayer.",
+        description: errorMessage,
+        action: serverError ? {
+          label: "Réessayer",
+          onClick: () => window.location.reload(),
+        } : undefined,
       });
     }
   });
 
   const onSubmit = async (values) => {
-    await LoginApi.getSCRFtoken();
     login(values);
   };
 
+  if (serverError) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center space-y-1">
+            <h1 className="text-3xl font-bold text-destructive">Erreur du serveur</h1>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="text-muted-foreground mb-4">
+              Le serveur est actuellement indisponible. Veuillez réessayer plus tard.
+            </p>
+            <Button 
+              onClick={() => window.location.reload()}
+              variant="outline"
+            >
+              Réessayer
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background to-muted p-4 relative overflow-hidden">
-      {/* Éléments d'arrière-plan */}
+      {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 dark:bg-blue-800" />
         <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 dark:opacity-10 dark:bg-indigo-800" />
       </div>
 
-      {/* Bouton de thème */}
+      {/* Theme toggle button */}
       <div className="absolute top-4 right-4">
         <ModeToggle />
       </div>
       
-      {/* Carte de connexion */}
+      {/* Login card */}
       <Card className="w-full max-w-md relative z-10 border-0 shadow-xl">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-lg opacity-60 -z-10" />
         <CardHeader className="text-center space-y-1">

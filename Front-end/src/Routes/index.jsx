@@ -2,7 +2,6 @@ import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../Layouts/mainLayout";
 import LoginPage from "../Pages/Login/login";
 import NotFound from "../Pages/NoteFound";
-import NotFound2 from "../Pages/notFound2";
 
 // Client routes
 import { ClientForm } from "../Pages/Client/AddClientForm";
