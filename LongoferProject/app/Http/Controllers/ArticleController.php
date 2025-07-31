@@ -19,7 +19,7 @@ class ArticleController extends Controller
     public function index(): JsonResponse|AnonymousResourceCollection
     {
         try {
-            $articles = Articles::all();
+            $articles = Articles::orderBy('created_at', 'desc')->get();
             return ArticleResource::collection($articles);
         } catch (\Exception $e) {
             Log::error('Failed to fetch articles: ' . $e->getMessage());

@@ -1,5 +1,6 @@
+import { useRef } from 'react';
 import { toast } from "sonner";
-import { MoreHorizontal, Copy, Edit, Trash2, EyeOff, ArrowUpDown  } from "lucide-react";
+import { MoreHorizontal, Copy, Edit, Trash2, EyeOff, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,7 +9,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { UpdateArticle } from "./updateArticals";
 import { UpdateSheet } from "../Shette";
@@ -41,12 +41,18 @@ export const Articlecolumns = [
           className="p-0 hover:bg-transparent"
         >
           Code Article
-          <ArrowUpDown  className="ml-2 h-4 w-4" />
+          {column.getIsSorted() === "asc" ? (
+            <ArrowUp className="ml-2 h-4 w-4" />
+          ) : column.getIsSorted() === "desc" ? (
+            <ArrowDown className="ml-2 h-4 w-4" />
+          ) : (
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          )}
         </Button>
       )
     },
     cell: ({ row }) => (
-      <div className="font-medium whitespace-nowrap">
+      <div className="font-medium whitespace-nowrap" title={row.getValue("codeArticle")}>
         {row.getValue("codeArticle")}
       </div>
     ),
@@ -62,12 +68,18 @@ export const Articlecolumns = [
           className="p-0 hover:bg-transparent"
         >
           Catégorie
-          <ArrowUpDown  className="ml-2 h-4 w-4" />
+          {column.getIsSorted() === "asc" ? (
+            <ArrowUp className="ml-2 h-4 w-4" />
+          ) : column.getIsSorted() === "desc" ? (
+            <ArrowDown className="ml-2 h-4 w-4" />
+          ) : (
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          )}
         </Button>
       )
     },
     cell: ({ row }) => (
-      <div className="whitespace-nowrap">
+      <div className="whitespace-nowrap" title={row.getValue("categorie")}>
         {row.getValue("categorie")}
       </div>
     ),
@@ -79,7 +91,7 @@ export const Articlecolumns = [
     accessorKey: "ArticleName",
     header: "Désignation",
     cell: ({ row }) => (
-      <div className="min-w-[150px]">
+      <div className="min-w-[150px]" title={row.getValue("ArticleName")}>
         {row.getValue("ArticleName")}
       </div>
     ),
@@ -94,13 +106,19 @@ export const Articlecolumns = [
           className="p-0 hover:bg-transparent"
         >
           Diamètre
-          <ArrowUpDown  className="ml-2 h-4 w-4" />
+          {column.getIsSorted() === "asc" ? (
+            <ArrowUp className="ml-2 h-4 w-4" />
+          ) : column.getIsSorted() === "desc" ? (
+            <ArrowDown className="ml-2 h-4 w-4" />
+          ) : (
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          )}
         </Button>
       </div>
     ),
     cell: ({ row }) => (
       <div className="text-center">
-        {row.getValue("Diametre")}
+        {row.getValue("Diametre") || '-'}
       </div>
     ),
   },
@@ -114,13 +132,19 @@ export const Articlecolumns = [
           className="p-0 hover:bg-transparent"
         >
           Épaisseur
-          <ArrowUpDown  className="ml-2 h-4 w-4" />
+          {column.getIsSorted() === "asc" ? (
+            <ArrowUp className="ml-2 h-4 w-4" />
+          ) : column.getIsSorted() === "desc" ? (
+            <ArrowDown className="ml-2 h-4 w-4" />
+          ) : (
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          )}
         </Button>
       </div>
     ),
     cell: ({ row }) => (
       <div className="text-center">
-        {row.getValue("Epaisseur")}
+        {row.getValue("Epaisseur") || '-'}
       </div>
     ),
   },
@@ -134,13 +158,19 @@ export const Articlecolumns = [
           className="p-0 hover:bg-transparent"
         >
           Poids
-          <ArrowUpDown  className="ml-2 h-4 w-4" />
+          {column.getIsSorted() === "asc" ? (
+            <ArrowUp className="ml-2 h-4 w-4" />
+          ) : column.getIsSorted() === "desc" ? (
+            <ArrowDown className="ml-2 h-4 w-4" />
+          ) : (
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          )}
         </Button>
       </div>
     ),
     cell: ({ row }) => (
       <div className="text-center">
-        {row.getValue("Poids")}
+        {row.getValue("Poids") || '-'}
       </div>
     ),
   },
@@ -149,7 +179,7 @@ export const Articlecolumns = [
     header: "Unité Stock",
     cell: ({ row }) => (
       <div className="text-center">
-        {row.getValue("Unite_Stock")}
+        {row.getValue("Unite_Stock") || '-'}
       </div>
     ),
   },
@@ -158,15 +188,17 @@ export const Articlecolumns = [
     header: "Actions",
     cell: ({ row }) => {
       const article = row.original;
-      const { mutate:deleteArticle, isDeleting } = useDeleteArticle();
+      const { mutate: deleteArticle, isPending: isDeleting } = useDeleteArticle();
+      const dialogCloseRef = useRef(null);
 
       const handleDelete = async () => {
         try {
           await deleteArticle(article.codeArticle);
           toast.success("Article supprimé avec succès");
+          dialogCloseRef.current?.click();
         } catch (error) {
           toast.error("Échec de la suppression", {
-            description: error.message,
+            description: error.response?.data?.message || error.message,
           });
         }
       };
@@ -215,18 +247,19 @@ export const Articlecolumns = [
                 <DialogHeader>
                   <DialogTitle>Confirmer la suppression</DialogTitle>
                   <DialogDescription>
-                    Êtes-vous sûr de vouloir supprimer l'article {article.codeArticle} ? 
+                    Êtes-vous sûr de vouloir supprimer l'article <strong>{article.codeArticle}</strong> ? 
                     Cette action est irréversible.
                   </DialogDescription>
                 </DialogHeader>
-                <DialogFooter>
+                <DialogFooter className="gap-2">
                   <DialogClose asChild>
-                    <Button variant="outline">Annuler</Button>
+                    <Button variant="outline" ref={dialogCloseRef}>Annuler</Button>
                   </DialogClose>
                   <Button 
                     variant="destructive" 
                     onClick={handleDelete}
                     disabled={isDeleting}
+                    className="min-w-24"
                   >
                     {isDeleting ? (
                       <>

@@ -14,7 +14,7 @@ class TubeStatutController extends Controller
     public function index()
     {
         try {
-            $statuts = TubeStatut::all();
+            $statuts = TubeStatut::orderBy('created_at', 'desc')->get();
             return TubeStatutResource::collection($statuts);
         } catch (Exception $e) {
             Log::error('Failed to fetch tube statuses: ' . $e->getMessage());

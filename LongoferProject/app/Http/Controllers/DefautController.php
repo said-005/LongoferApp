@@ -18,7 +18,7 @@ class DefautController extends Controller
     public function index(): JsonResponse | AnonymousResourceCollection
     {
         try {
-            $defauts = Defaut::all();
+            $defauts = Defaut::orderBy('created_at', 'desc')->get();
             return DefautResource::collection($defauts);
         } catch (\Exception $e) {
             return response()->json([

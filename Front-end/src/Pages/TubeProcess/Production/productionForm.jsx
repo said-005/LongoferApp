@@ -530,7 +530,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.inspectors}
-                      text="Sélectionnez un inspecteur"
+                      text="Sélectionnez un Contrôleur"
                       place="Choisissez parmi les suggestions"
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
@@ -554,7 +554,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
                     <Input
                       type="number"
                       min="1"
-                      max="10000"
+                    
                       placeholder="Entrez la quantité produite"
                       {...field}
                       onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}

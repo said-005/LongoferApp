@@ -19,7 +19,7 @@ class ClientController extends Controller
     public function index(): JsonResponse|AnonymousResourceCollection
     {
         try {
-            $clients = Clients::all();
+            $clients = Clients::orderBy('created_at', 'desc')->get();
             return ClientResource::collection($clients);
         } catch (\Exception $e) {
             Log::error('Failed to fetch clients: ' . $e->getMessage());

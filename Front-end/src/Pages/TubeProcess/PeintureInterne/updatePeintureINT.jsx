@@ -60,6 +60,7 @@ const formSchema = z.object({
 });
 
 export default function UpdatePeintureInt({ id }) {
+ 
   const queryOptions = {
     
     onError: (error) => toast.error(`Erreur de chargement: ${error.message}`),
@@ -70,8 +71,8 @@ export default function UpdatePeintureInt({ id }) {
     data: peintureData, 
     isLoading: isLoadingPeinture 
   } = useQuery({
-    queryKey: ['peinture_interne', id],
-    queryFn: () => PeintureIntApi.getPeinture_intById(id),
+    queryKey: ['peinture_interne_data', id],
+    queryFn: () => PeintureIntApi.getPeinture_inttById(id),
     ...queryOptions
   });
 
@@ -85,7 +86,7 @@ const formatted = response.data.data.map((pro) => ({
   label: `${pro.production_code}`,
   value: pro.production_code
 }));
-console.log(formatted);  // ✅ This will show you the final array
+// ✅ This will show you the final array
 return formatted;
     },
     ...queryOptions
@@ -207,26 +208,26 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
     mode: 'onBlur',
   });
 
-  // Reset form when peinture data is loaded
-  useEffect(() => {
-    if (peintureData?.data?.data) {
-      const data = peintureData.data.data;
-      form.reset({
-        ref_production: data.ref_production || '',
-        code_Peinture_internes: data.code_Peinture_internes || '',
-        date: data.date_Peinture_Interne ? new Date(data.date_Peinture_Interne) : undefined,
-        machine: data.machine || '',
-        status: data.statut || '',
-        defect: data.defaut || '',
-        cause: data.causse || '',
-        operator: data.operateur || '',
-        welder: data.soudeur || '',
-        inspector: data.controleur || '',
-        description: data.description || ''
-      });
-    }
-  }, [peintureData, form]);
-
+// Reset form when peinture data is loaded
+console.log(peintureData)
+useEffect(() => {
+  if (peintureData?.data?.data) {
+    const data = peintureData.data.data;
+    form.reset({
+      ref_production: data?.ref_production || '',
+      code_Peinture_internes: data?.code_Peinture_internes || '',
+      date: data?.date_Peinture_Interne ? new Date(data.date_Peinture_Interne) : undefined,
+      machine: data?.machine || '',
+      status: data?.statut || '',
+      defect: data?.defaut || '',
+      cause: data?.causse || '',
+      operator: data?.operateur || '',
+      welder: data?.soudeur || '',
+      inspector: data?.controleur || '',
+      description: data?.description || ''
+    });
+  }
+}, [peintureData, form]);
   const queryClient = useQueryClient();
   const { mutate: updatePeinture, isPending: isSubmitting } = useMutation({
     mutationFn: (peintureData) => 
@@ -521,7 +522,7 @@ return (
                 <FormControl>
                   <AutocompleteInput
                     data={operateurs.inspectors}
-                    text="Sélectionnez un inspecteur"
+                    text="Sélectionnez un Contrôleur"
                     place="Choisissez parmi les suggestions"
                     value={field.value}
                     onChange={field.onChange}

@@ -38,8 +38,6 @@ import { MAX_DESCRIPTION_LENGTH } from "../Production/productionForm";
 import SheetCloseComponent from "../../SheetClose";
 import { PeintureExtApi } from "../../../Api/peinture_extApi";
 
-
-
 const formSchema = z.object({
   ref_production: z.string().min(1, "La référence production est requise"),
   code_Peinture_Externe: z.string()
@@ -62,7 +60,6 @@ const formSchema = z.object({
 
 export default function UpdatePeintureExt({ id }) {
   const queryOptions = {
-   
     onError: (error) => toast.error(`Erreur de chargement: ${error.message}`),
   };
 
@@ -81,13 +78,13 @@ export default function UpdatePeintureExt({ id }) {
     isLoading: isLoadingProductions 
   } = useQuery({
     queryKey: ['productionsOptions'],
-    queryFn: async () => {const response = await ProductionApi.getAll();
-const formatted = response.data.data.map((pro) => ({
-  label: `${pro.production_code}`,
-  value: pro.production_code
-}));
- // ✅ This will show you the final array
-return formatted;
+    queryFn: async () => {
+      const response = await ProductionApi.getAll();
+      const formatted = response.data.data.map((pro) => ({
+        label: `${pro.production_code}`,
+        value: pro.production_code
+      }));
+      return formatted;
     },
     ...queryOptions
   });
@@ -121,17 +118,18 @@ return formatted;
     },
     ...queryOptions
   });
-const { data: defects = [], isLoading: isLoadingDefects } = useQuery({
-  queryKey: ['defectsOptions'],
-  queryFn: async () => {
-    const res = await DefautApi.getAll();
-    return res.data.data.map((defect) => ({
-      label: `${defect.codeDefaut}-${defect.defautDescription.substring(0, 30)}${defect.defautDescription.length > 30 ? '...' : ''}`, // Shows first 30 chars + ellipsis if longer
-      value: defect.codeDefaut
-    }));
-  },
-  ...queryOptions
-});
+
+  const { data: defects = [], isLoading: isLoadingDefects } = useQuery({
+    queryKey: ['defectsOptions'],
+    queryFn: async () => {
+      const res = await DefautApi.getAll();
+      return res.data.data.map((defect) => ({
+        label: `${defect.codeDefaut}-${defect.defautDescription.substring(0, 30)}${defect.defautDescription.length > 30 ? '...' : ''}`,
+        value: defect.codeDefaut
+      }));
+    },
+    ...queryOptions
+  });
 
   const { 
     data: causes = [], 
@@ -147,49 +145,48 @@ const { data: defects = [], isLoading: isLoadingDefects } = useQuery({
     },
     ...queryOptions
   });
-const normalizeString = (str) => 
-  str
-    .normalize("NFD") // Decomposes accents (é → e + ´)
-    .replace(/[\u0300-\u036f]/g, "") // Removes accent marks
-    .toLowerCase(); // Converts to lowercase for case-insensitive comparison
 
-const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoadingOperateurs } = useQuery({
-  queryKey: ['operateursOptions'],
-  queryFn: async () => {
-    const response = await OperateurApi.getAll();
-    const data = response.data.data;
+  const normalizeString = (str) => 
+    str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
 
-    return {
-      // 1. Opérateurs (matches "opérateur", "operateur", "OPÉRATEUR", etc.)
-      operators: data
-        .filter(op => normalizeString(op.Fonction) === normalizeString('opérateur'))
-        .sort((a, b) => a.nom_complete.localeCompare(b.nom_complete, 'fr'))
-        .map(op => ({
-          label: `${op.operateur} - ${op.nom_complete}`,
-          value: op.operateur
-        })),
+  const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoadingOperateurs } = useQuery({
+    queryKey: ['operateursOptions'],
+    queryFn: async () => {
+      const response = await OperateurApi.getAll();
+      const data = response.data.data;
 
-      // 2. Soudeurs (matches "soudeur", "SOUDEUR", etc. - usually no accent)
-      welders: data
-        .filter(op => normalizeString(op.Fonction) === normalizeString('soudeur'))
-        .sort((a, b) => a.nom_complete.localeCompare(b.nom_complete, 'fr'))
-        .map(op => ({
-          label: `${op.operateur} - ${op.nom_complete}`,
-          value: op.operateur
-        })),
+      return {
+        operators: data
+          .filter(op => normalizeString(op.Fonction) === normalizeString('opérateur'))
+          .sort((a, b) => a.nom_complete.localeCompare(b.nom_complete, 'fr'))
+          .map(op => ({
+            label: `${op.operateur} - ${op.nom_complete}`,
+            value: op.operateur
+          })),
 
-      // 3. Contrôleurs (matches "controleur", "contrôleur", "CONTROLEUR", etc.)
-      inspectors: data
-        .filter(op => normalizeString(op.Fonction) === normalizeString('contrôleur'))
-        .sort((a, b) => a.nom_complete.localeCompare(b.nom_complete, 'fr'))
-        .map(op => ({
-          label: `${op.operateur} - ${op.nom_complete}`,
-          value: op.operateur
-        }))
-    };
-  },
-  ...queryOptions
-});
+        welders: data
+          .filter(op => normalizeString(op.Fonction) === normalizeString('soudeur'))
+          .sort((a, b) => a.nom_complete.localeCompare(b.nom_complete, 'fr'))
+          .map(op => ({
+            label: `${op.operateur} - ${op.nom_complete}`,
+            value: op.operateur
+          })),
+
+        inspectors: data
+          .filter(op => normalizeString(op.Fonction) === normalizeString('contrôleur'))
+          .sort((a, b) => a.nom_complete.localeCompare(b.nom_complete, 'fr'))
+          .map(op => ({
+            label: `${op.operateur} - ${op.nom_complete}`,
+            value: op.operateur
+          }))
+      };
+    },
+    ...queryOptions
+  });
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -227,7 +224,8 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
       });
     }
   }, [PeintureextData, form]);
-  const queryClinet=useQueryClient()
+  
+  const queryClinet = useQueryClient()
   const { mutate: updatePeintureEXT, isPending: isSubmitting } = useMutation({
     mutationFn: (Data) => 
       PeintureExtApi.updatePeinture_ext(id,Data),
@@ -254,7 +252,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
       operateur: values.operator,
       soudeur: values.welder,
       controleur: values.inspector,
-      description : values.description
+      description: values.description
     };
     
     updatePeintureEXT(payload);
@@ -267,15 +265,15 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
   if (isLoadingData) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Chargement des données...</span>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2 text-foreground">Chargement des données...</span>
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-6 max-w-6xl mx-auto bg-white rounded-lg shadow-md mt-8 md:mt-12">
-      <h1 className="text-xl md:text-2xl font-bold mb-6 text-center text-gray-800">
+    <div className="p-4 md:p-6 max-w-6xl mx-auto bg-background rounded-lg shadow-md mt-8 md:mt-12 border">
+      <h1 className="text-xl md:text-2xl font-bold mb-6 text-center text-foreground">
         Modifier la Réparation
       </h1>
       
@@ -288,7 +286,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
               name="ref_production"
               render={({ field }) => (
                 <FormItem>
-        
+                  <FormLabel>Référence Production</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={productions}
@@ -315,6 +313,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
                     <Input
                       placeholder="Entrez une Référence Peinture Externe"
                       {...field}
+                      className="bg-background"
                     />
                   </FormControl>
                   <FormMessage />
@@ -335,7 +334,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full pl-3 text-left font-normal",
+                            "w-full pl-3 text-left font-normal bg-background",
                             !field.value && "text-muted-foreground"
                           )}
                         >
@@ -354,6 +353,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
+                        className="bg-background"
                       />
                     </PopoverContent>
                   </Popover>
@@ -390,7 +390,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
               name="status"
               render={({ field }) => (
                 <FormItem>
-             
+                  <FormLabel>Statut</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={statusOptions}
@@ -412,7 +412,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
               name="defect"
               render={({ field }) => (
                 <FormItem>
-                
+                  <FormLabel>Défaut (optionnel)</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={defects}
@@ -433,7 +433,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
               name="cause"
               render={({ field }) => (
                 <FormItem>
-                 
+                  <FormLabel>Cause (optionnel)</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={causes}
@@ -454,7 +454,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
               name="operator"
               render={({ field }) => (
                 <FormItem>
-                 
+                  <FormLabel>Opérateur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.operators}
@@ -476,7 +476,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
               name="welder"
               render={({ field }) => (
                 <FormItem>
-               
+                  <FormLabel>Soudeur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.welders}
@@ -498,11 +498,11 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
               name="inspector"
               render={({ field }) => (
                 <FormItem>
-              
+                  <FormLabel>Contrôleur</FormLabel>
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.inspectors}
-                      text="Sélectionnez un inspecteur"
+                      text="Sélectionnez un Contrôleur"
                       place="Choisissez parmi les suggestions"
                       value={field.value}
                       onChange={field.onChange}
@@ -514,43 +514,39 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
               )}
             />
           </div>
-  {/* Description */}
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-700 dark:text-gray-300">Description du tube</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Textarea
-                              placeholder="Décrivez en détail le tube"
-                              className={cn(
-                                "min-h-[120px]",
-                                "dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                              )}
-                              {...field}
-                              value={field.value || ''}
-                            />
-                            <div className={cn(
-                              "absolute bottom-2 right-2 text-xs",
-                              "text-muted-foreground dark:text-gray-400"
-                            )}>
-                              {field.value?.length || 0}/{MAX_DESCRIPTION_LENGTH}
-                            </div>
-                          </div>
-                        </FormControl>
-                        <FormMessage className="text-red-500 dark:text-red-400" />
-                      </FormItem>
-                    )}
-                  />
+
+          {/* Description */}
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description du tube</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Textarea
+                      placeholder="Décrivez en détail le tube"
+                      className="min-h-[120px] bg-background"
+                      {...field}
+                      value={field.value || ''}
+                    />
+                    <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+                      {field.value?.length || 0}/{MAX_DESCRIPTION_LENGTH}
+                    </div>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <div className="flex justify-center items-center gap-4 mt-8 pt-4 border-t">
-           <div className="w-1/3">
-            <SheetCloseComponent/>
-           </div>
+            <div className="w-1/3">
+              <SheetCloseComponent variant="outline" className="w-full" />
+            </div>
             <Button 
               type="submit"
-              className="min-w-[120px] bg-blue-600 hover:bg-blue-700" 
+              className="min-w-[120px] w-1/3" 
               disabled={isSubmitting}
             >
               {isSubmitting ? (

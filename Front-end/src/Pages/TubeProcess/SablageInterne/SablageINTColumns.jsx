@@ -270,7 +270,6 @@ export const SablageIntColumns = [
       const handleDelete = () => {
         mutate(sablageInt.code_Sablage_Interne , {
           onSuccess: () => {
-            toast.success("Réparation supprimée avec succès");
             setDeleteDialogOpen(false);
           },
           onError: (error) => {

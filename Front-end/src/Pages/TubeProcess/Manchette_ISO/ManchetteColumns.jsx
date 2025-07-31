@@ -256,7 +256,7 @@ export const ManchetteColumns = [
       const handleDelete = () => {
         mutate(manchette.code_Manchette, {
           onSuccess: () => {
-            toast.success("Manchette supprimée avec succès");
+          
             setDeleteDialogOpen(false);
           },
           onError: (error) => {

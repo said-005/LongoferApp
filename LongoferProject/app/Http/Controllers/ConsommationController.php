@@ -18,7 +18,7 @@ class ConsommationController extends Controller
     public function index(): JsonResponse|AnonymousResourceCollection
     {
         try {
-            $consommations = Consommation::all();
+            $consommations = Consommation::orderBy('created_at', 'desc')->get();
             return ConsommationResource::collection($consommations);
         } catch (\Exception $e) {
             return response()->json([

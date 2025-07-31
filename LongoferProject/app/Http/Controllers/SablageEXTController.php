@@ -21,7 +21,7 @@ class SablageEXTController extends Controller
     public function index()
     {
         try {
-            $sablages = Sablage_Externe::all();
+            $sablages = Sablage_Externe::orderBy('created_at', 'desc')->get();
             
             Log::info('Retrieved all external sandblasting records', ['count' => $sablages->count()]);
             

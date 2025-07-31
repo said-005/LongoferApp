@@ -226,12 +226,11 @@ export const PeintureINTColumns = [
       const handleDelete = () => {
         mutate(peinture_int.code_Peinture_internes, {
           onSuccess: () => {
-            toast.success("Réparation supprimée avec succès");
             setDeleteDialogOpen(false);
           },
           onError: (error) => {
             toast.error("Échec de la suppression", {
-              description: error.message,
+              description: error.response.data.message,
             });
           },
         });

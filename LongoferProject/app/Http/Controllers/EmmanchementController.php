@@ -21,7 +21,7 @@ class EmmanchementController extends Controller
     public function index()
     {
         try {
-            $emmanchements = Emmanchement::all();
+            $emmanchements = Emmanchement::orderBy('created_at', 'desc')->get();
 
             return EmmanchementResource::collection($emmanchements);
             

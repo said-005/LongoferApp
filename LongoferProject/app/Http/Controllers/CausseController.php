@@ -16,20 +16,19 @@ class CausseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse|AnonymousResourceCollection
-    {
-        try {
-            $causses = Causses::all();
-            return CausseResource::collection($causses);
-        } catch (\Exception $e) {
-            Log::error('Failed to fetch causses: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Failed to retrieve causses',
-                'error' => config('app.debug') ? $e->getMessage() : null
-            ], 500);
-        }
+public function index(): JsonResponse|AnonymousResourceCollection
+{
+    try {
+        $causses = Causses::orderBy('created_at', 'desc')->get();
+        return CausseResource::collection($causses);
+    } catch (\Exception $e) {
+        Log::error('Failed to fetch causses: ' . $e->getMessage());
+        return response()->json([
+            'message' => 'Failed to retrieve causses',
+            'error' => config('app.debug') ? $e->getMessage() : null
+        ], 500);
     }
-
+}
     /**
      * Store a newly created resource in storage.
      */

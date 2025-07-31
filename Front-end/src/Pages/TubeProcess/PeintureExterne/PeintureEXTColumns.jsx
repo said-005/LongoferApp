@@ -212,7 +212,7 @@ export const PeintureExtColumns = [
       const handleDelete = () => {
         mutate(peinture_ext.code_Peinture_Externe, {
           onSuccess: () => {
-            toast.success("Réparation supprimée avec succès");
+          
             setDeleteDialogOpen(false);
           },
           onError: (error) => {

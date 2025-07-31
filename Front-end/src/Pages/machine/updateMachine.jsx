@@ -62,6 +62,7 @@ export function UpdateMachine({ id }) {
         className: "bg-red-100 dark:bg-red-900/50 dark:text-red-200 border-red-200 dark:border-red-800",
       });
     },
+    
   });
 
   // Initialize the form
@@ -74,11 +75,12 @@ export function UpdateMachine({ id }) {
   });
 
   // Update form defaults when data is loaded
+  
   useEffect(() => {
     if (machineData) {
       form.reset({
-        codeMachine: machineData.data.codeMachine || "",
-        MachineName: machineData.data.MachineName || "",
+        codeMachine: machineData?.data?.data?.codeMachine || "",
+        MachineName: machineData?.data?.data?.MachineName || "",
       });
     }
   }, [machineData, form]);

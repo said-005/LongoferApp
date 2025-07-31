@@ -207,7 +207,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
     onSuccess: () => {
       toast.success("Sablage Int créée avec succès");
       form.reset();
-      navigate('/sablage_int');
+      navigate('/peinture_int');
     },
     onError: (error) => {
       toast.error("Erreur lors de la création", {
@@ -483,7 +483,7 @@ return (
                 <FormControl>
                   <AutocompleteInput
                     data={operateurs.inspectors}
-                    text="Sélectionnez un inspecteur"
+                    text="Sélectionnez un Contrôleur"
                     place="Choisissez parmi les suggestions"
                     value={field.value || ''}
                     onChange={(value) => field.onChange(value || '')}

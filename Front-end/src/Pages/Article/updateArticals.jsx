@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AutocompleteInput from "../../AutoComplet/AutoCompletInput";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
@@ -43,6 +43,7 @@ const unités = [
 ];
 
 export function UpdateArticle({ id }) {
+  const queryClient=useQueryClient()
   const form = useForm({
     resolver: zodResolver(schemaArticle),
     defaultValues: {
@@ -99,7 +100,8 @@ export function UpdateArticle({ id }) {
     mutationFn: (values) => ArticleApi.updateArticle(id, values),
     onSuccess: () => {
       toast.success("Article mis à jour avec succès");
-      document.querySelector('button[data-rsbs-dismiss]')?.click();
+      queryClient.invalidateQueries('articles')
+
     },
     onError: (error) => {
       toast.error("Échec de la mise à jour", {

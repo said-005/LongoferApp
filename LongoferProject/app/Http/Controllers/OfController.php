@@ -20,7 +20,7 @@ class OfController extends Controller
 public function index(): AnonymousResourceCollection | JsonResponse
 {
     try {
-        $ofs = Of::all();
+        $ofs = Of::orderBy('created_at', 'desc')->get();
         return OfResource::collection($ofs);
     } catch (\Exception $e) {
         return response()->json([

@@ -190,13 +190,12 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
 // get data for Production
 
 const { data: productionData, isLoading: isLoadingProduction } = useQuery({
-    queryKey: ['production', id],
+    queryKey: ['selectedproduction', id],
     queryFn: async () => {
       if (!id) return null;  // Skip if no ID (create mode)
       const response = await ProductionApi.getProductionById(id);
       return response.data;
     },
-    staleTime: 1000 * 60 * 5,
     onError: (error) => toast.error(`Erreur de chargement des données de production: ${error.message}`),
   });
 
@@ -219,26 +218,30 @@ const { data: productionData, isLoading: isLoadingProduction } = useQuery({
     },
     mode: 'onBlur',
   });
-// Populate form when productionData is loaded
+  // Populate form when productionData is loaded
+  
   useEffect(() => {
     if (productionData) {
+      
       form.reset({
-        refOF: productionData.Num_OF  || '',
-        articleCode: productionData.production_code  || '',
-        refArticle: productionData.ref_article  || '',
-        date: productionData.date_production ? new Date(productionData.date_production) : undefined,
-        machine: productionData.machine || '',
-        status: productionData.statut  || '',
-        defect: productionData.defaut  || '',
-        cause: productionData.causse || '',
-        operator: productionData.operateur  || '',
-        welder: productionData.soudeur  || '',
-        inspector: productionData.controleur  || '',
-        description: productionData.description || ''
+        refOF:productionData.data?.Num_OF  || '',
+        articleCode: productionData.data?.production_code  || '',
+        refArticle: productionData.data?.ref_article  || '',
+        date: productionData.data?.date_production ? new Date(productionData.data?.date_production) : undefined,
+        machine: productionData.data?.machine || '',
+        status: productionData.data?.statut  || '',
+        defect: productionData.data?.defaut  || '',
+        cause: productionData.data?.causse || '',
+        operator: productionData.data?.operateur  || '',
+        welder: productionData.data?.soudeur  || '',
+        inspector: productionData.data?.controleur  || '',
+        description: productionData.data?.description || '',
+        qte_produite: productionData.data?.qte_produite || 1
       });
     }
     
   }, [productionData, form]);
+
 const isLoadingData = isLoadingOFs || isLoadingArticles || isLoadingMachines || 
                       isLoadingStatus || isLoadingDefects || isLoadingCauses || 
                       isLoadingOperateurs || isLoadingProduction;
@@ -549,7 +552,7 @@ const onSubmit = (values) => {
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.inspectors}
-                      text="Sélectionnez un inspecteur"
+                      text="Sélectionnez un Contrôleur"
                       place="Choisissez parmi les suggestions"
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}
@@ -573,7 +576,7 @@ const onSubmit = (values) => {
                     <Input
                       type="number"
                       min="1"
-                      max="10000"
+                     
                       placeholder="Entrez la quantité produite"
                       {...field}
                       onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}

@@ -1,4 +1,5 @@
-import { MoreHorizontal, Loader2, Copy, Edit, Trash2, ArrowUpDown } from "lucide-react";
+import { useRef } from 'react';
+import { MoreHorizontal, Loader2, Copy, Edit, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -51,7 +52,13 @@ export const ClientColumns = [
         className="-ml-4 hover:bg-transparent px-0"
       >
         Client Code
-        <ArrowUpDown className="ml-2 h-4 w-4" />
+        {column.getIsSorted() === "asc" ? (
+          <ArrowUp className="ml-2 h-4 w-4" />
+        ) : column.getIsSorted() === "desc" ? (
+          <ArrowDown className="ml-2 h-4 w-4" />
+        ) : (
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        )}
       </Button>
     ),
     cell: ({ row }) => (
@@ -59,7 +66,9 @@ export const ClientColumns = [
         {row.getValue("codeClient")}
       </div>
     ),
-    filterFn: "includesString",
+    filterFn: (row, id, value) => {
+      return row.getValue(id).toLowerCase().includes(value.toLowerCase());
+    },
     sortingFn: "text",
   },
   {
@@ -71,7 +80,13 @@ export const ClientColumns = [
         className="-ml-4 hover:bg-transparent px-0"
       >
         Client Name
-        <ArrowUpDown className="ml-2 h-4 w-4" />
+        {column.getIsSorted() === "asc" ? (
+          <ArrowUp className="ml-2 h-4 w-4" />
+        ) : column.getIsSorted() === "desc" ? (
+          <ArrowDown className="ml-2 h-4 w-4" />
+        ) : (
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        )}
       </Button>
     ),
     cell: ({ row }) => (
@@ -79,18 +94,23 @@ export const ClientColumns = [
         {row.getValue("Client")}
       </div>
     ),
-    filterFn: "includesString",
+    filterFn: (row, id, value) => {
+      return row.getValue(id).toLowerCase().includes(value.toLowerCase());
+    },
     sortingFn: "text",
   },
   {
     accessorKey: "address",
     header: "Address",
     cell: ({ row }) => (
-      <div className="text-sm text-gray-600 line-clamp-1">
+      <div className="text-sm text-gray-600 line-clamp-1" title={row.getValue("address")}>
         {row.getValue("address") || "-"}
       </div>
     ),
-    filterFn: "includesString",
+    filterFn: (row, id, value) => {
+      const address = row.getValue(id) || "";
+      return address.toLowerCase().includes(value.toLowerCase());
+    },
     enableSorting: false,
   },
   {
@@ -116,7 +136,13 @@ export const ClientColumns = [
         className="-ml-4 hover:bg-transparent px-0"
       >
         Email
-        <ArrowUpDown className="ml-2 h-4 w-4" />
+        {column.getIsSorted() === "asc" ? (
+          <ArrowUp className="ml-2 h-4 w-4" />
+        ) : column.getIsSorted() === "desc" ? (
+          <ArrowDown className="ml-2 h-4 w-4" />
+        ) : (
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        )}
       </Button>
     ),
     cell: ({ row }) => {
@@ -124,7 +150,8 @@ export const ClientColumns = [
       return email ? (
         <a 
           href={`mailto:${email}`} 
-          className="text-sm text-blue-600 hover:underline"
+          className="text-sm text-blue-600 hover:underline break-all"
+          title={email}
         >
           {email}
         </a>
@@ -132,17 +159,30 @@ export const ClientColumns = [
         <span className="text-sm text-gray-400">-</span>
       );
     },
-    filterFn: "includesString",
+    filterFn: (row, id, value) => {
+      const email = row.getValue(id) || "";
+      return email.toLowerCase().includes(value.toLowerCase());
+    },
     sortingFn: "text",
   },
   {
-    accessorKey: "actions",
+    id: "actions",
     header: "Actions",
     cell: ({ row }) => {
       const client = row.original;
-      const { mutate:deleteClient, isPending } = useDeleteClient();
-      const handleDelete = () => {
-         deleteClient(client.codeClient)
+      const { mutate: deleteClient, isPending } = useDeleteClient();
+      const dialogCloseRef = useRef(null);
+
+      const handleDelete = async () => {
+        try {
+          await deleteClient(client.codeClient);
+          toast.success("Client deleted successfully");
+          dialogCloseRef.current?.click();
+        } catch (error) {
+          toast.error("Failed to delete client", {
+            description: error.response?.data?.message || "Please try again",
+          });
+        }
       };
 
       return (
@@ -227,14 +267,15 @@ export const ClientColumns = [
                       Are you sure you want to delete <strong>{client.Client}</strong>? This action cannot be undone.
                     </DialogDescription>
                   </DialogHeader>
-                  <DialogFooter>
+                  <DialogFooter className="gap-2">
                     <DialogClose asChild>
-                      <Button variant="outline">Cancel</Button>
+                      <Button variant="outline" ref={dialogCloseRef}>Cancel</Button>
                     </DialogClose>
                     <Button
                       variant="destructive"
                       disabled={isPending}
                       onClick={handleDelete}
+                      className="min-w-24"
                     >
                       {isPending ? (
                         <>

@@ -1,4 +1,5 @@
-import { MoreHorizontal, Trash2, ArrowUpDown, Search } from "lucide-react";
+import { useRef } from 'react';
+import { MoreHorizontal, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,7 +23,12 @@ import { UpdateCategorie } from "./updateCategorie";
 import { toast } from "sonner";
 import { UpdateSheet } from './../Shette';
 import { useDeleteCategorie } from "./deleteCategorieHook";
-import { Input } from "@/components/ui/input";
+
+const handleCopy = (text) => {
+  navigator.clipboard.writeText(text)
+    .then(() => toast.success("Copié dans le presse-papiers"))
+    .catch(() => toast.error("Échec de la copie"));
+};
 
 export const CategorieColumns = [
   {
@@ -34,13 +40,19 @@ export const CategorieColumns = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="px-0 hover:bg-transparent"
         >
-          Article Categorie
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          Catégorie d'Article
+          {column.getIsSorted() === "asc" ? (
+            <ArrowUp className="ml-2 h-4 w-4" />
+          ) : column.getIsSorted() === "desc" ? (
+            <ArrowDown className="ml-2 h-4 w-4" />
+          ) : (
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          )}
         </Button>
       )
     },
     cell: ({ row }) => (
-      <div className="font-medium capitalize">
+      <div className="font-medium capitalize" title={row.getValue("CategorieArticle")}>
         {row.getValue("CategorieArticle")}
       </div>
     ),
@@ -49,19 +61,21 @@ export const CategorieColumns = [
     },
   },
   {
-    accessorKey: 'Actions',
+    id: "actions",
     header: 'Actions',
     cell: ({ row }) => {
       const categorie = row.original;
       const { mutate: deleteCategorie, isPending: isDeleting } = useDeleteCategorie();
+      const dialogCloseRef = useRef(null);
 
       const handleDelete = async () => {
         try {
           await deleteCategorie(categorie.CategorieArticle);
           toast.success("Catégorie supprimée avec succès");
+          dialogCloseRef.current?.click();
         } catch (error) {
           toast.error("Échec de la suppression", {
-            description: error instanceof Error ? error.message : "Une erreur inconnue est survenue",
+            description: error.response?.data?.message || "Une erreur est survenue",
           });
         }
       };
@@ -79,7 +93,20 @@ export const CategorieColumns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <UpdateSheet Component={UpdateCategorie} id={categorie.CategorieArticle}/>
+            
+            <DropdownMenuItem
+              onClick={() => handleCopy(categorie.CategorieArticle)}
+              className="cursor-pointer"
+            >
+              <Copy className="mr-2 h-4 w-4" />
+              Copier le nom
+            </DropdownMenuItem>
+            
+            <UpdateSheet 
+              Component={UpdateCategorie} 
+              id={categorie.CategorieArticle}
+              text="Modifier la catégorie"
+            />
 
             <DropdownMenuSeparator />
             
@@ -97,18 +124,19 @@ export const CategorieColumns = [
                 <DialogHeader>
                   <DialogTitle>Confirmer la suppression</DialogTitle>
                   <DialogDescription>
-                    Êtes-vous sûr de vouloir supprimer la catégorie "{categorie.CategorieArticle}" ?
+                    Êtes-vous sûr de vouloir supprimer la catégorie <strong>"{categorie.CategorieArticle}"</strong> ?
                     Cette action est irréversible.
                   </DialogDescription>
                 </DialogHeader>
-                <DialogFooter>
+                <DialogFooter className="gap-2">
                   <DialogClose asChild>
-                    <Button variant="outline">Annuler</Button>
+                    <Button variant="outline" ref={dialogCloseRef}>Annuler</Button>
                   </DialogClose>
                   <Button 
                     variant="destructive" 
                     onClick={handleDelete}
                     disabled={isDeleting}
+                    className="min-w-24"
                   >
                     {isDeleting ? (
                       <>
@@ -124,6 +152,5 @@ export const CategorieColumns = [
         </DropdownMenu>
       );
     },
-   
   }
 ];

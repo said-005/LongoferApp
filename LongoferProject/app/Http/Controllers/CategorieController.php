@@ -19,7 +19,7 @@ class CategorieController extends Controller
     public function index(): JsonResponse|AnonymousResourceCollection
     {
         try {
-            $categories = CategorieArticle::all();
+            $categories = CategorieArticle::orderBy('created_at', 'desc')->get();
             return CategorieResource::collection($categories);
         } catch (\Exception $e) {
             Log::error('Failed to fetch categories: ' . $e->getMessage());

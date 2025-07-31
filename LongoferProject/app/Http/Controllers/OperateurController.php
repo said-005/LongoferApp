@@ -16,7 +16,9 @@ class OperateurController extends Controller
 public function index(): AnonymousResourceCollection | JsonResponse
 {
     try {
-        $operateurs = Operateur::with('machine')->get(); // chargement de la relation
+        $operateurs = Operateur::with('machine')
+            ->orderBy('created_at', 'desc')  // Explicitly order by creation date
+            ->get();
       
         return OperateurResource::collection($operateurs);
     } catch (\Exception $e) {

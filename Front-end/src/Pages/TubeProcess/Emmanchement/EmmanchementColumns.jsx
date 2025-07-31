@@ -195,7 +195,7 @@ export const EmmanchementColumns = [
       const handleDelete = () => {
         mutate(emmanchement.code_Emmanchement, {
           onSuccess: () => {
-            toast.success("Réparation supprimée avec succès");
+
             setDeleteDialogOpen(false);
           },
           onError: (error) => {

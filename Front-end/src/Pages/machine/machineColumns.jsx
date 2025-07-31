@@ -1,5 +1,6 @@
+import { useRef } from 'react';
 import { toast } from "sonner";
-import { MoreHorizontal, Copy, Edit, Trash2,ArrowUpDown ,ArrowUp ,ArrowDown  } from "lucide-react";
+import { MoreHorizontal, Copy, Edit, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,12 +14,12 @@ import { UpdateSheet } from "../Shette";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
   DialogClose,
-  DialogTrigger 
+  DialogTrigger
 } from "@/components/ui/dialog";
 import { useDeleteMachine } from './deleteMachineHokk';
 import { UpdateMachine } from "./updateMachine";
@@ -90,11 +91,14 @@ export const Machinecolumns = [
     cell: ({ row }) => {
       const machine = row.original;
       const { mutate: deleteMachine, isDeleting } = useDeleteMachine();
+      const dialogCloseRef = useRef(null);
 
       const handleDelete = async () => {
         try {
           await deleteMachine(machine.codeMachine);
           toast.success("Machine supprimée avec succès");
+          // Close dialog after successful deletion
+          dialogCloseRef.current?.click();
         } catch (error) {
           toast.error("Échec de la suppression", {
             description: error.response?.data?.message || "Une erreur est survenue",
@@ -150,14 +154,15 @@ export const Machinecolumns = [
                     Cette action est irréversible.
                   </DialogDescription>
                 </DialogHeader>
-                <DialogFooter>
+                <DialogFooter className="gap-2">
                   <DialogClose asChild>
-                    <Button variant="outline">Annuler</Button>
+                    <Button variant="outline" ref={dialogCloseRef}>Annuler</Button>
                   </DialogClose>
                   <Button 
                     variant="destructive" 
                     onClick={handleDelete}
                     disabled={isDeleting}
+                    className="min-w-24"
                   >
                     {isDeleting ? (
                       <>

@@ -112,6 +112,28 @@ export function UpdateOf({ id }) {
       isoSleeve: false,
     },
   });
+  // Initialize form with fetched data
+  useEffect(() => {
+    if (ofData?.data) {
+      const data = ofData.data.data;
+      form.reset({
+        ofNumber: data.codeOf || "",
+        client: data.client || "",
+        article1: data.Article_1 || "",
+        article2: data.Article_2 || "",
+        article3: data.Article_3 || "",
+        article4: data.Article_4 || "",
+        article5: data.Article_5 || "",
+        ofDate: data.Date_OF ? new Date(data.Date_OF) : new Date(),
+        deliveryDate: data.date_Prevue_Livraison ? new Date(data.date_Prevue_Livraison) : new Date(),
+        externalCoating: Boolean(data.Revetement_Ext),
+        externalSandblasting: Boolean(data.Sablage_Ext),
+        internalSandblasting: Boolean(data.Sablage_Int),
+        internalCoating: Boolean(data.Revetement_Int),
+        isoSleeve: Boolean(data.Manchette_ISO),
+      });
+    }
+  }, [ofData, form]);
 
   // Mutation for updating OF
   const { mutate: updateOF, isPending: isUpdating } = useMutation({
@@ -146,28 +168,6 @@ export function UpdateOf({ id }) {
     Date_OF: format(values.ofDate, 'yyyy-MM-dd')
   });
 
-  // Initialize form with fetched data
-  useEffect(() => {
-    if (ofData?.data) {
-      const data = ofData.data;
-      form.reset({
-        ofNumber: data.codeOf || "",
-        client: data.client || "",
-        article1: data.Article_1 || "",
-        article2: data.Article_2 || "",
-        article3: data.Article_3 || "",
-        article4: data.Article_4 || "",
-        article5: data.Article_5 || "",
-        ofDate: data.Date_OF ? new Date(data.Date_OF) : new Date(),
-        deliveryDate: data.date_Prevue_Livraison ? new Date(data.date_Prevue_Livraison) : new Date(),
-        externalCoating: Boolean(data.Revetement_Ext),
-        externalSandblasting: Boolean(data.Sablage_Ext),
-        internalSandblasting: Boolean(data.Sablage_Int),
-        internalCoating: Boolean(data.Revetement_Int),
-        isoSleeve: Boolean(data.Manchette_ISO),
-      });
-    }
-  }, [ofData, form]);
 
   const isLoading = isOfLoading;
 

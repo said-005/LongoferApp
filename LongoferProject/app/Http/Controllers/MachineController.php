@@ -18,7 +18,7 @@ class MachineController extends Controller
     public function index(): JsonResponse | AnonymousResourceCollection
     {
         try {
-            $machines = Machine::all();
+            $machines = Machine::orderBy('created_at', 'desc')->get();
             return MachineResource::collection($machines);
         } catch (\Exception $e) {
             return response()->json([

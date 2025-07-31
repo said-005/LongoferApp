@@ -226,7 +226,6 @@ export const SablageExtColumns = [
       const handleDelete = () => {
         mutate(sablageExt.code_Sablage_Externe, {
           onSuccess: () => {
-            toast.success("Sablage externe supprimé avec succès");
             setDeleteDialogOpen(false);
           },
           onError: (error) => {

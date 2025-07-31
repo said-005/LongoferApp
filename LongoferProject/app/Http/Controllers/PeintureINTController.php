@@ -22,7 +22,7 @@ class PeintureINTController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $peintures = Peinture_Interne::all();
+            $peintures = Peinture_Interne::orderBy('created_at', 'desc')->get();
             
             Log::info('Retrieved all internal paintings', ['count' => $peintures->count()]);
             
@@ -88,7 +88,7 @@ class PeintureINTController extends Controller
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(int $id): JsonResponse
+    public function show($id): JsonResponse
     {
         try {
             $peinture = Peinture_Interne::findOrFail($id);
@@ -126,7 +126,7 @@ class PeintureINTController extends Controller
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdatePeinture_InterneRequest $request, int $id): JsonResponse
+    public function update(UpdatePeinture_InterneRequest $request,  $id): JsonResponse
     {
         try {
             $peinture = Peinture_Interne::findOrFail($id);
@@ -176,7 +176,7 @@ class PeintureINTController extends Controller
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy($id): JsonResponse
     {
         try {
             $peinture = Peinture_Interne::findOrFail($id);

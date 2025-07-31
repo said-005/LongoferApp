@@ -20,7 +20,7 @@ class PeintureEXTController extends Controller
     public function index()
     {
         try {
-            $peintures = Peinture_Externe::all();
+            $peintures = Peinture_Externe::orderBy('created_at', 'desc')->get();
 
             return PeintureExtResource::collection($peintures);
             

@@ -23,7 +23,7 @@ class ReparationController extends Controller
     public function index()
     {
         try {
-            $reparations = Reparation::all();
+            $reparations = Reparation::orderBy('created_at', 'desc')->get();
             Log::info('Retrieved all reparations', ['count' => $reparations->count()]);
             return ReparationResource::collection($reparations);
         } catch (Exception $e) {

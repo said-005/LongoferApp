@@ -23,7 +23,7 @@ class ProductionController extends Controller
     public function index()
     {
         try {
-            $productions = Production::all();
+            $productions = Production::orderBy('created_at', 'desc')->get();
             Log::info('Retrieved all productions', ['count' => $productions->count()]);
             return ProductionResource::collection($productions);
         } catch (Exception $e) {

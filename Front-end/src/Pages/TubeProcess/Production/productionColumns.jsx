@@ -271,7 +271,6 @@ export const ProductionColumns = [
       const handleDelete = () => {
         deleteProduction(production.production_code, {
           onSuccess: () => {
-            toast.success("Production deleted successfully");
             setDeleteDialogOpen(false);
           },
           onError: (error) => {

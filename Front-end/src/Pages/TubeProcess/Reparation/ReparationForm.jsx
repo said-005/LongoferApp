@@ -479,7 +479,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
                   <FormControl>
                     <AutocompleteInput
                       data={operateurs.inspectors}
-                      text="Sélectionnez un inspecteur"
+                      text="Sélectionnez un Contrôleur"
                       place="Choisissez parmi les suggestions"
                       value={field.value || ''}
                       onChange={(value) => field.onChange(value || '')}

@@ -21,7 +21,7 @@ class TubeHSshuteController extends Controller
     public function index()
     {
         try {
-            $tubeHS = Tube_HS_Shute::all();
+            $tubeHS = Tube_HS_Shute::orderBy('created_at', 'desc')->get();
             return TubeHSshuteResource::collection($tubeHS);
         } catch (Exception $e) {
             Log::error('Failed to fetch HS/Shute tubes: ' . $e->getMessage());
