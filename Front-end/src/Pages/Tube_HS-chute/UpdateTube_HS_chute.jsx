@@ -68,7 +68,7 @@ export function UpdateTubeHS({ id }) {
       });
     }
   });
-console.log('the tube HS data',tubeHS)
+
   // Populate form when data is loaded
   useEffect(() => {
     if (tubeHS) {

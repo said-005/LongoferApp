@@ -82,8 +82,7 @@ export default function UpdateReparation({ id }) {
 const formatted = response.data.data.map((pro) => ({
   label: `${pro.production_code}`,
   value: pro.production_code
-}));
-console.log(formatted);  // ✅ This will show you the final array
+}));  // ✅ This will show you the final array
 return formatted;
     },
     ...queryOptions

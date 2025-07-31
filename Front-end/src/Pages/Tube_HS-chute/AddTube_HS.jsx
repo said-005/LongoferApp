@@ -81,7 +81,6 @@ export function TubeHSForm() {
     label: `${pro.production_code}`,
     value: pro.production_code
   }));
-  console.log(formatted);  // ✅ This will show you the final array
   return formatted;
       }
     });

@@ -78,7 +78,7 @@ export default function SablageINTForm() {
     },
     ...queryOptions
   });
-console.log(productions)
+
   const { data: machines = [], isLoading: isLoadingMachines } = useQuery({
     queryKey: ['machinesOptions'],
     queryFn: async () => {
@@ -220,7 +220,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
       controleur: values.inspector,
       description: values.description
     };
-    console.log(payload)
+
     
     createSablageINT(payload);
   };

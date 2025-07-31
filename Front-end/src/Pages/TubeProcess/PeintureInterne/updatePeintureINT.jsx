@@ -209,7 +209,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
   });
 
 // Reset form when peinture data is loaded
-console.log(peintureData)
+
 useEffect(() => {
   if (peintureData?.data?.data) {
     const data = peintureData.data.data;
