@@ -259,11 +259,6 @@ export const ReparationColumns = [
             toast.success("Réparation supprimée avec succès");
             setDeleteDialogOpen(false);
           },
-          onError: (error) => {
-            toast.error("Échec de la suppression", {
-              description: error.message,
-            });
-          }
         });
       };
 

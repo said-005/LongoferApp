@@ -215,11 +215,8 @@ export const PeintureExtColumns = [
           
             setDeleteDialogOpen(false);
           },
-          onError: (error) => {
-            toast.error("Échec de la suppression", {
-              description: error.message,
-            });
-          }
+         
+          
         });
       };
 

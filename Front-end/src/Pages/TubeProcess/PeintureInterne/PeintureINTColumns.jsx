@@ -228,11 +228,7 @@ export const PeintureINTColumns = [
           onSuccess: () => {
             setDeleteDialogOpen(false);
           },
-          onError: (error) => {
-            toast.error("Échec de la suppression", {
-              description: error.response.data.message,
-            });
-          },
+         
         });
       };
 

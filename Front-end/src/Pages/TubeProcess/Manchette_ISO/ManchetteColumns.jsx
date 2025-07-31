@@ -259,11 +259,6 @@ export const ManchetteColumns = [
           
             setDeleteDialogOpen(false);
           },
-          onError: (error) => {
-            toast.error("Échec de la suppression", {
-              description: error.message,
-            });
-          }
         });
       };
 

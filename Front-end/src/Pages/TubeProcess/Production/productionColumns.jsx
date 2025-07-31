@@ -41,7 +41,7 @@ export const ProductionColumns = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="px-0"
         >
-           Référence Production
+          Référence Production
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -103,7 +103,7 @@ export const ProductionColumns = [
             <TooltipContent>
               <Input
                 type="text"
-                placeholder="Filter OF..."
+                placeholder="Filtrer OF..."
                 onChange={(e) => column.setFilterValue(e.target.value)}
                 className="h-8"
               />
@@ -130,7 +130,7 @@ export const ProductionColumns = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="px-0"
         >
-          Reference Article
+          Référence Article
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -153,7 +153,7 @@ export const ProductionColumns = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="px-0"
         >
-          Quantity Produced
+          Quantité Produite
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -178,7 +178,7 @@ export const ProductionColumns = [
   },
   {
     accessorKey: "statut",
-    header: "Status",
+    header: "Statut",
     cell: ({ row }) => (
       <div className="capitalize">
         {row.getValue("statut") || '-'}
@@ -190,7 +190,7 @@ export const ProductionColumns = [
   },
   {
     accessorKey: "defaut",
-    header: "Defect",
+    header: "Défaut",
     cell: ({ row }) => (
       <div className="capitalize">
         {row.getValue("defaut") || '-'}
@@ -214,7 +214,7 @@ export const ProductionColumns = [
   },
   {
     accessorKey: "soudeur",
-    header: "soudeur",
+    header: "Soudeur",
     cell: ({ row }) => (
       <div className="capitalize">
         {row.getValue("soudeur") || '-'}
@@ -226,7 +226,7 @@ export const ProductionColumns = [
   },
   {
     accessorKey: "operateur",
-    header: "operateur",
+    header: "Opérateur",
     cell: ({ row }) => (
       <div className="capitalize">
         {row.getValue("operateur") || '-'}
@@ -238,7 +238,7 @@ export const ProductionColumns = [
   },
   {
     accessorKey: "controleur",
-    header: "controleur",
+    header: "Contrôleur",
     cell: ({ row }) => (
       <div className="capitalize">
         {row.getValue("controleur") || '-'}
@@ -250,7 +250,7 @@ export const ProductionColumns = [
   },
   {
     accessorKey: "description",
-    header: "description",
+    header: "Description",
     cell: ({ row }) => (
       <div className="font-mono uppercase text-xs sm:text-sm">
         {row.getValue("description") || '-'}
@@ -273,11 +273,8 @@ export const ProductionColumns = [
           onSuccess: () => {
             setDeleteDialogOpen(false);
           },
-          onError: (error) => {
-            toast.error("Failed to delete production", {
-              description: error.message,
-            });
-          }
+         
+          
         });
       };
 
@@ -288,11 +285,11 @@ export const ProductionColumns = [
               <Button 
                 variant="ghost" 
                 className="h-8 w-8 p-0 hover:bg-gray-100"
-                aria-label="Open actions menu"
+                aria-label="Ouvrir le menu des actions"
                 disabled={isDeleting}
               >
                 <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">Ouvrir le menu</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
@@ -300,7 +297,7 @@ export const ProductionColumns = [
               <DropdownMenuItem asChild>
                 <UpdateSheet 
                   Component={UpdateProduction} 
-                  text="Edit Production" 
+                  text="Modifier Production" 
                   id={production.production_code}
                   data={production}
                 />
@@ -312,7 +309,7 @@ export const ProductionColumns = [
                 disabled={isDeleting}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Delete
+                Supprimer
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -320,14 +317,14 @@ export const ProductionColumns = [
           <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will permanently delete this production record and cannot be undone.
+                  Cette action supprimera définitivement cet enregistrement de production et ne peut pas être annulée.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel disabled={isDeleting}>
-                  Cancel
+                  Annuler
                 </AlertDialogCancel>
                 <AlertDialogAction 
                   className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
@@ -340,9 +337,9 @@ export const ProductionColumns = [
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Deleting...
+                      Suppression...
                     </span>
-                  ) : "Confirm Delete"}
+                  ) : "Confirmer la suppression"}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
