@@ -60,7 +60,6 @@ export function PasswordChangeForm() {
     },
     onError: (error) => {
       toast.error("Échec de la modification du mot de passe");
-      console.error("Erreur de changement de mot de passe:", error);
     }
   });
 
