@@ -70,18 +70,19 @@ class ProductionReportExport implements FromCollection, WithHeadings
         $bindings = [];
 
         if (!empty($this->filters['client'])) {
-            $conditions[] = "c.Client = ?";
+            $conditions[] = "c.codeClient = ?";
             $bindings[] = $this->filters['client'];
         }
 
         if (!empty($this->filters['from']) && !empty($this->filters['to'])) {
-            $conditions[] = "p.date_production BETWEEN ? AND ?";
-            $bindings[] = $this->filters['from'];
-            $bindings[] = $this->filters['to'];
-        }
+    $conditions[] = "c.created_at BETWEEN ? AND ?";
+    $bindings[] = $this->filters['from'];
+    $bindings[] = $this->filters['to'];
+}
+
 
         if (!empty($conditions)) {
-            $query .= " WHERE " . implode(' AND ', $conditions);
+            $query .= " WHERE " . implode(' \AA ', $conditions);
         }
 
         return collect(DB::select($query, $bindings));
@@ -91,21 +92,21 @@ class ProductionReportExport implements FromCollection, WithHeadings
     {
         return [
             'Client',
-            'Code OF',
+            'OF',
             'Article 1',
             'Article 2',
             'Article 3',
             'Article 4',
             'Article 5',
             'Date Production',
-            'Production Code',
-            'Emmanchements',
-            'Manchette Isos',
-            'Reparations',
-            'Peinture Internes',
-            'Peinture Externes',
-            'Sablage Internes',
-            'Sablage Externes',
+            'Reference Production',
+            'Emmanchement',
+            'Manchette ISO',
+            'Reparation',
+            'Peinture Interne',
+            'Peinture Externe',
+            'Sablage Interne',
+            'Sablage Externe',
         ];
     }
 }

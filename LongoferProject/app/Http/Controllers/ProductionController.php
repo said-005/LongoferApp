@@ -15,7 +15,8 @@ use Illuminate\Database\QueryException;
 use App\Exports\ProductionReportExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
-
+use App\Models\Clients;
+use Illuminate\Support\Str;
 class ProductionController extends Controller
 {
     /**
@@ -213,24 +214,27 @@ class ProductionController extends Controller
  */
 public function export(Request $request)
 {
-    try {
-        $filters = [
-            'client' => $request->client,
-            'from' => $request->from,
-            'to' => $request->to,
-        ];
+    $filters = [
+        'client' => $request->client, // this is the code
+        'from' => $request->from,
+        'to' => $request->to,
+    ];
 
-        Log::info('Exporting production report', ['filters' => $filters]);
-        
-        return Excel::download(new ProductionReportExport($filters), 'production_report.xlsx');
-        
-    } catch (Exception $e) {
-        Log::error('Failed to export production report: ' . $e->getMessage());
-        
-        return response()->json([
-            'message' => 'Failed to generate export',
-            'error' => config('app.debug') ? $e->getMessage() : null
-        ], Response::HTTP_INTERNAL_SERVER_ERROR);
-    }
+    // 🔍 Lookup client name from the database
+    $client = Clients::where('codeClient', $request->client)->first();
+
+    // 🧼 Fallback to code if name not found
+    $clientName = $client ? $client->Client : $request->client;
+
+    // 🧼 Clean name (remove symbols, spaces, etc.)
+    $safeName = Str::slug($clientName); // e.g., "Société Générale" => "societe-generale"
+
+    // 📁 Create the filename
+    $fileName = $safeName . '_production_report.xlsx';
+
+   return Excel::download(new ProductionReportExport($filters), $fileName, \Maatwebsite\Excel\Excel::XLSX, [
+    'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+]);
+;
 }
 }

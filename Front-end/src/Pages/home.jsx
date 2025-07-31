@@ -126,29 +126,34 @@ export default function TableauDeBord() {
   const error = queries.find((query) => query.error)?.error;
 
   const formatDate = useCallback((date) => format(date, 'yy-MM-dd HH:mm'), []);
+const onSubmit = async (data) => {
+  try {
+    const payload = {
+      code_Client: data.client,
+      from: formatDate(data.from),
+      to: formatDate(data.to),
+    };
+    
+    const response = await exportMutation.mutateAsync(payload);
 
-  const onSubmit = useCallback(async (data) => {
-    try {
-      const payload = {
-        code_Client: data.client,
-        from: formatDate(data.from),
-        to: formatDate(data.to)
-      };
-      
-      const response = await exportMutation.mutateAsync(payload);
-      
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'production-report.xlsx');
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Export error:', err);
-    }
-  }, [exportMutation, formatDate]);
+    // استخراج اسم الملف من الهيدر
+    const disposition = response.headers['content-disposition'];
+    const fileNameMatch = disposition && disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+    const fileName = fileNameMatch ? fileNameMatch[1].replace(/['"]/g, '') : 'production-report.xlsx';
+
+    // إنشاء الملف وتحميله
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error('Export error:', err);
+  }
+};
 
   if (error) {
     return (

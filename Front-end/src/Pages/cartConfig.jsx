@@ -70,16 +70,6 @@ export const cardConfig = [
 
   // Opérateurs & Production
   {
-    key: "operateurs",
-    title: "Opérateurs",
-    description: "Personnel actif",
-    api: OperateurApi.getAll,
-    buttonText: "Gérer les opérateurs",
-    icon: UserCog,
-    bgColor: "bg-orange-100 dark:bg-orange-900/50",
-    textColor: "text-orange-600 dark:text-orange-300",
-  },
-  {
     key: "production",
     title: "Production",
     description: "Ordres actifs",
@@ -91,25 +81,13 @@ export const cardConfig = [
   },
   {
     key: "ofs",
-    title: "Ordres de travail",
+    title: "Ordres de fabrication",
     description: "OF actifs",
     api: OfApi.getAll,
     buttonText: "Voir les ordres",
     icon: ClipboardList,
     bgColor: "bg-indigo-100 dark:bg-indigo-900/50",
     textColor: "text-indigo-600 dark:text-indigo-300",
-  },
-
-  // Contrôle qualité
-  {
-    key: "defauts",
-    title: "Défauts",
-    description: "Problèmes enregistrés",
-    api: DefautApi.getAll,
-    buttonText: "Inspecter les défauts",
-    icon: AlertCircle,
-    bgColor: "bg-red-100 dark:bg-red-900/50",
-    textColor: "text-red-600 dark:text-red-300",
   },
   {
     key: "tube_hs",
@@ -121,27 +99,6 @@ export const cardConfig = [
     bgColor: "bg-rose-100 dark:bg-rose-900/50",
     textColor: "text-rose-600 dark:text-rose-300",
   },
-  {
-    key: "statuts",
-    title: "Statuts",
-    description: "Statuts du système",
-    api: StatutApi.getAll,
-    buttonText: "Voir les statuts",
-    icon: Gauge,
-    bgColor: "bg-teal-100 dark:bg-teal-900/50",
-    textColor: "text-teal-600 dark:text-teal-300",
-  },
-  {
-    key: "causses",
-    title: "Causes",
-    description: "Causes des défauts",
-    api: CausseApi.getAll,
-    buttonText: "Voir les causes",
-    icon: AlertCircle,
-    bgColor: "bg-red-100 dark:bg-red-900/50",
-    textColor: "text-red-600 dark:text-red-300",
-  },
-
   // Maintenance & Réparations
   {
     key: "reparations",
@@ -152,16 +109,6 @@ export const cardConfig = [
     icon: Wrench,
     bgColor: "bg-yellow-100 dark:bg-yellow-900/50",
     textColor: "text-yellow-600 dark:text-yellow-300",
-  },
-  {
-    key: "categories",
-    title: "Catégories",
-    description: "Catégories de produits",
-    api: CategorieApi.getAll,
-    buttonText: "Voir les catégories",
-    icon: Layers,
-    bgColor: "bg-violet-100 dark:bg-violet-900/50",
-    textColor: "text-violet-600 dark:text-violet-300",
   },
 
   // Processus de fabrication
