@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Log;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
+use App\Exports\ProductionReportExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Http\Request;
 
 class ProductionController extends Controller
 {
@@ -201,4 +204,33 @@ class ProductionController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+   
+/**
+ * Export productions to Excel
+ * 
+ * @param Request $request
+ * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|JsonResponse
+ */
+public function export(Request $request)
+{
+    try {
+        $filters = [
+            'client' => $request->client,
+            'from' => $request->from,
+            'to' => $request->to,
+        ];
+
+        Log::info('Exporting production report', ['filters' => $filters]);
+        
+        return Excel::download(new ProductionReportExport($filters), 'production_report.xlsx');
+        
+    } catch (Exception $e) {
+        Log::error('Failed to export production report: ' . $e->getMessage());
+        
+        return response()->json([
+            'message' => 'Failed to generate export',
+            'error' => config('app.debug') ? $e->getMessage() : null
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
 }

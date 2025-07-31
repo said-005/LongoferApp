@@ -17,20 +17,20 @@ import {
   SidebarMenuSub,
   SidebarMenuSubItem,
 } from "../components/ui/sidebar";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../components/ui/collapsible";
-
-// Organized menu items with consistent structure
+import { Button } from '@/components/ui/button'
+// Éléments de menu organisés avec une structure cohérente
 const menuItems = {
   processes: {
-    title: "Tube Processes",
+    title: "Processus Tubes",
     items: [
       { title: "Production", url: "/production", icon: Factory },
-      { title: "Reparation", url: "/reparation", icon: Wrench },
+      { title: "Réparation", url: "/reparation", icon: Wrench },
       { title: "Manchette ISO", url: "/manchette", icon: CircleDashed },
       { title: "Sablage Externe", url: "/sablage_ext", icon: SprayCan },
       { title: "Peinture Externe", url: "/peinture_ext", icon: Paintbrush },
@@ -40,7 +40,7 @@ const menuItems = {
     ]
   },
   data: {
-    title: "Data Management",
+    title: "Gestion des Données",
     items: [
       {
         title: "Client",
@@ -61,13 +61,13 @@ const menuItems = {
         color: "text-emerald-400",
       },
       {
-        title: "Categorie Article",
+        title: "Catégorie Article",
         url: "/categorie",
         icon: Box,
         color: "text-amber-400",
       },
       {
-        title: "Defaut",
+        title: "Défaut",
         url: "/defaut",
         icon: CircleDashed,
         color: "text-rose-400",
@@ -79,7 +79,7 @@ const menuItems = {
         color: "text-cyan-400",
       },
       {
-        title: "Tube HS-shute",
+        title: "Tube HS-rebut",
         url: "/tubeHS",
         icon: Layers,
         color: "text-fuchsia-400",
@@ -91,7 +91,7 @@ const menuItems = {
         color: "text-sky-400",
       },
       {
-        title: "Operateur",
+        title: "Opérateur",
         url: "/operateur",
         icon: HardHat,
         color: "text-orange-400",
@@ -103,7 +103,7 @@ const menuItems = {
         color: "text-violet-400",
       },
       {
-        title: "Causse",
+        title: "Cause",
         url: "/causse",
         icon: Sliders,
         color: "text-lime-400",
@@ -113,6 +113,7 @@ const menuItems = {
 };
 
 export function AppSidebar() {
+  const navigate=useNavigate()
   const location = useLocation();
   
   const isActive = (url) => {
@@ -121,7 +122,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="h-screen w-74 fixed left-0 mt-13 top-0 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto flex flex-col">
-      {/* Logo and Title */}
+      {/* Logo et Titre */}
       <div className="p-4 pb-3 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg flex items-center justify-center">
@@ -130,14 +131,14 @@ export function AppSidebar() {
             </svg>
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Tube Management</h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Industrial Solutions</p>
+            <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Gestion des Tubes</h1>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Solutions Industrielles</p>
           </div>
         </div>
       </div>
 
       <SidebarContent className="flex-1 px-3 py-4">
-        {/* Process Group */}
+        {/* Groupe Processus */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">
             {menuItems.processes.title}
@@ -156,7 +157,7 @@ export function AppSidebar() {
                     >
                       <div className="flex items-center gap-2">
                         <SquareChartGantt className="w-5 h-5 opacity-80" />
-                        <span className="text-sm">Manufacturing Flow</span>
+                        <span className="text-sm">Flux de Fabrication</span>
                       </div>
                       <ChevronDown className="w-4 h-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180 text-gray-400" />
                     </SidebarMenuButton>
@@ -164,19 +165,24 @@ export function AppSidebar() {
                   <CollapsibleContent className="mt-1 ">
                     <SidebarMenuSub className="ml-2 pl-5 border-l border-gray-200 dark:border-gray-700 space-y-1">
                       {menuItems.processes.items.map((item) => (
-                        <SidebarMenuSubItem 
-                          key={item.url}
-                          className={`px-2.5 py-2 rounded-md text-sm transition-colors flex items-center gap-2 ${
-                            isActive(item.url) ? 
-                            'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 font-medium' : 
-                            'hover:bg-gray-100 dark:hover:bg-gray-700/50 text-gray-600 dark:text-gray-400'
-                          }`}
-                        >
-                          <Link to={item.url} className="w-full flex items-center gap-2">
-                            <item.icon className="w-4 h-4 opacity-70" />
-                            <span>{item.title}</span>
-                          </Link>
-                        </SidebarMenuSubItem>
+                     <SidebarMenuSubItem 
+                                  key={item.url}
+                                  asChild
+                                      onClick={() => navigate(item.url)}
+                                  className={`px-2.5 py-2 rounded-md text-sm transition-colors flex items-center gap-2 ${
+                                    isActive(item.url) ? 
+                                    'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 font-medium' : 
+                                    'hover:bg-gray-100 dark:hover:bg-gray-700/50 text-gray-600 dark:text-gray-400'
+                                  }`}
+                                >
+                                  <div 
+
+                                    className="w-full flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <item.icon className="w-4 h-4 opacity-70" />
+                                    <span>{item.title}</span>
+                                  </div>
+                                </SidebarMenuSubItem>
                       ))}
                     </SidebarMenuSub>
                   </CollapsibleContent>
@@ -186,7 +192,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Data Management Group */}
+        {/* Groupe Gestion des Données */}
         <SidebarGroup className="mt-6">
           <SidebarGroupLabel className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">
             {menuItems.data.title}

@@ -68,4 +68,6 @@ Route::post('/change-password', function (Request $request) {
     $user->save();
 
     return response()->json(['message' => 'Password updated successfully']);
-});
+ 
+});  
+ Route::get('/export-production', [ProductionController::class, 'export']);
