@@ -82,7 +82,7 @@ class ProductionReportExport implements FromCollection, WithHeadings
 
 
         if (!empty($conditions)) {
-            $query .= " WHERE " . implode(' \AA ', $conditions);
+          $query .= " WHERE " . implode(' AND ', $conditions);
         }
 
         return collect(DB::select($query, $bindings));
