@@ -20,11 +20,13 @@ import { Calendar } from "@/components/ui/calendar"
 const AutocompleteInput = lazy(() => import('./../AutoComplet/AutoCompletInput'));
 
 const formSchema = z.object({
-  client: z.string().min(1, "Client is required"),
-  from: z.date(),
-  to: z.date(),
+  client: z.preprocess(
+    (val) => val === undefined ? null : val,
+    z.string().nullable()
+  ),
+  from: z.date().nullable().optional(),
+  to: z.date().nullable().optional(),
 });
-
 const DashboardCard = React.memo(({ config, data, isLoading }) => {
   const Icon = config.icon;
   
@@ -85,8 +87,8 @@ export default function TableauDeBord() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       client: "",
-      from: new Date(),
-      to: new Date(),
+      from: '',
+      to:'',
     },
   });
   
@@ -202,16 +204,16 @@ const onSubmit = async (data) => {
                           place="Choisissez parmi les suggestions"
                           value={field.value}
                           onChange={field.onChange}
-                          required
+                        
                           className="dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                         />
                       )}
                     />
-                    {form.formState.errors.client && (
+                    {/* {form.formState.errors.client && (
                       <p className="col-span-4 text-right text-sm text-red-500">
                         {form.formState.errors.client.message}
                       </p>
-                    )}
+                    )} */}
                   </div>
 
                   <div className="grid grid-cols-4 items-center gap-4">
