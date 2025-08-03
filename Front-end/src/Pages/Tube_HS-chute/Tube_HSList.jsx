@@ -70,7 +70,7 @@ export default function TubeHSList() {
         <Alert variant="destructive">
           <AlertTitle>Erreur de chargement</AlertTitle>
           <AlertDescription>
-            {error.response.data.message}
+            {error?.response?.data?.message}
             <Button 
               variant="outline" 
               size="sm" 

@@ -3,6 +3,6 @@ import { customAxios } from "../Axios/axiosApi"
 
 export const LogoutApi={
     getSCRFtoken: ()=>{
-        return  customAxios.post('/logout')
+        return  customAxios.post('logout')
     },
 }

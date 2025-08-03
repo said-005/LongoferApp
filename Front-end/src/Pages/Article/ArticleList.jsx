@@ -63,7 +63,7 @@ export default function ListeArticles() {
         <Alert variant="destructive">
           <AlertTitle>Erreur de chargement</AlertTitle>
           <AlertDescription>
-            {erreurDetail.response.data.message}
+            {erreurDetail?.response?.data?.message}
             <Button 
               variant="outline" 
               size="sm" 

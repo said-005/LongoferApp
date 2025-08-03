@@ -84,7 +84,7 @@ export default function CausseList() {
           <Alert variant="destructive">
             <AlertTitle>Erreur de chargement</AlertTitle>
             <AlertDescription>
-              {(error).response.data.message || 'Erreur lors du chargement des causses'}
+              {(error).response.data?.message || 'Erreur lors du chargement des causses'}
             </AlertDescription>
               <div className="flex gap-2">
             <Button 

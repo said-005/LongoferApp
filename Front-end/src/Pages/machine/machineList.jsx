@@ -83,7 +83,7 @@ export default function MachineList() {
           <Alert variant="destructive">
             <AlertTitle>Échec du chargement</AlertTitle>
             <AlertDescription>
-              {(error).response.data.message || 'Erreur inconnue lors du chargement des machines'}
+              {(error).response?.data?.message || 'Erreur inconnue lors du chargement des machines'}
             </AlertDescription>
                <div className="flex gap-2">
             <Button 

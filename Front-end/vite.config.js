@@ -17,4 +17,5 @@ export default defineConfig({
     server: {
     historyApiFallback: true, // 🟢 هذا هو المفتاح
   },
+    base: '/back-end/public/'
 })

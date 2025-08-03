@@ -7,8 +7,7 @@ import { ClientApi } from "../../Api/ClientApi";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ClientColumns } from "./ClientColumns";
-import { Input } from "@/components/ui/input"; // Ajout de cette importation
+import { ClientColumns } from "./ClientColumns";// Ajout de cette importation
 import { configurationQuery } from '../../configurationQueryClient/configuration';
 
 export default function ListeClients() {
@@ -27,7 +26,7 @@ export default function ListeClients() {
     staleTime: 1000 * 60 * 5,
     onError: (error) => {
       toast.error("Erreur lors du chargement des clients", {
-        description: error.message || "Veuillez réessayer plus tard",
+        description: error?.message || "Veuillez réessayer plus tard",
       });
     },
     ...configurationQuery
@@ -63,7 +62,7 @@ export default function ListeClients() {
         <Alert variant="destructive">
           <AlertTitle>Échec du chargement des données clients</AlertTitle>
           <AlertDescription>
-            {error.response.data.message || "Erreur inconnue"}
+            {error?.response?.data?.message || "Erreur inconnue"}
             <Button 
               variant="outline" 
               size="sm" 

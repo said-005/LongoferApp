@@ -121,7 +121,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar className="h-screen w-74 fixed left-0 mt-13 top-0 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto flex flex-col">
+    <Sidebar className="h-screen w-68 mr-35  fixed left-0 mt-13 top-0 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto flex flex-col">
       {/* Logo et Titre */}
       <div className="p-4 pb-3 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-3">

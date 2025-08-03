@@ -66,8 +66,10 @@ import EmmanchementForm from '../Pages/TubeProcess/Emmanchement/EmmanchementForm
 import Home from "../Pages/home";
 import { PasswordChangeForm } from "../Pages/ChangePassword";
 
-export const Routers = createBrowserRouter([
+export const Routers = createBrowserRouter(
+  [
   {
+     
     element: <MainLayout />,
     children: [
         {
@@ -267,4 +269,8 @@ export const Routers = createBrowserRouter([
     element: <PasswordChangeForm/>
   }
 
-])
+],
+   {
+    basename: "/back-end/public",
+  }
+)

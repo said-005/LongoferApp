@@ -66,7 +66,7 @@ export default function OperatorList() {
         <Alert variant="destructive">
           <AlertTitle>Erreur de chargement</AlertTitle>
           <AlertDescription>
-            {error?.response.data.message || 'Impossible de charger les données'}
+            {error?.response?.data?.message || 'Impossible de charger les données'}
             <Button 
               variant="outline" 
               className="mt-2"

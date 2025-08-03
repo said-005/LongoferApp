@@ -62,7 +62,7 @@ export default function ListeCategories() {
         <Alert variant="destructive" className="mb-4">
           <AlertTitle>Erreur de chargement</AlertTitle>
           <AlertDescription>
-            Impossible de récupérer les catégories. {detailErreur?.response.data.message || ''}
+            Impossible de récupérer les catégories. {detailErreur?.response.data?.message || ''}
             <div className="mt-3">
               <Button 
                 variant="outline" 

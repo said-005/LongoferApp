@@ -57,7 +57,7 @@ export default function ConsommationList() {
         <Alert variant="destructive">
           <AlertTitle>Erreur lors du chargement des données</AlertTitle>
           <AlertDescription>
-            {(error).response.data.message || "Une erreur est survenue lors du chargement des consommations."}
+            {(error).response?.data?.message || "Une erreur est survenue lors du chargement des consommations."}
           </AlertDescription>
           <AlertTitle>
             <Button 

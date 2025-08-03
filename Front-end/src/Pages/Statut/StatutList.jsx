@@ -86,7 +86,7 @@ export default function StatutsList() {
           <Alert variant="destructive">
             <AlertTitle>Erreur de chargement</AlertTitle>
             <AlertDescription>
-              {(error).response.data.message || 'Impossible de charger les statuts qualité'}
+              {(error).response?.data?.message || 'Impossible de charger les statuts qualité'}
             </AlertDescription>
             <AlertTitle>
                 <div className="flex gap-2">
