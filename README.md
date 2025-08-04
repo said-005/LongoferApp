@@ -1,2 +1,1 @@
-# LogoferProject
-# LogoferProject
+# LongoferApp
