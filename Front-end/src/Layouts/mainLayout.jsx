@@ -13,11 +13,11 @@ export default function MainLayout() {
   const [authChecked, setAuthChecked] = useState(true);
 
   useEffect(() => {
-    // if (!localStorage.getItem('authenticated')) {
-    //   navigate('/login');
-    // } else {
-    //   setAuthChecked(true);
-    // }
+    if (!localStorage.getItem('authenticated')) {
+      navigate('/login');
+    } else {
+      setAuthChecked(true);
+    }
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
