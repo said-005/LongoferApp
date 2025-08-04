@@ -158,7 +158,7 @@ export function ArticleForm() {
                   control={form.control}
                   name="category"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="-mt-1">
            
                       <FormControl>
                         <div className="-mt-1">

@@ -169,9 +169,7 @@ export function TubeHSForm() {
                 name="article"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-foreground/80 dark:text-foreground/70">
-                      Article
-                    </FormLabel>
+                  
                     <FormControl>
                       <AutocompleteInput
                         data={articlesOptions}
@@ -195,9 +193,7 @@ export function TubeHSForm() {
                 name="of"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-foreground/80 dark:text-foreground/70">
-                      OF
-                    </FormLabel>
+                   
                     <FormControl>
                       <AutocompleteInput
                         data={ofsOptions}

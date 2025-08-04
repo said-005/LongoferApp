@@ -276,7 +276,8 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 alig align-content-center">
             {/* Reference OF */}
             <FormField
               control={form.control}
@@ -301,6 +302,7 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
             />
 
             {/* Reference Article */}
+         
             <FormField
               control={form.control}
               name="refArticle"
@@ -324,11 +326,12 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
             />
 
             {/* Article Code */}
-            <FormField
+       
+                    <FormField
               control={form.control}
               name="articleCode"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="mt-1.5">
                   <FormLabel className="text-gray-700 dark:text-gray-300">Référence Production</FormLabel>
                   <FormControl>
                     <Input
@@ -340,15 +343,18 @@ const { data: operateurs = { operators: [], welders: [], inspectors: [] }, isLoa
                   </FormControl>
                   <FormMessage className="text-red-500 dark:text-red-400" />
                 </FormItem>
+
               )}
-            />
+            /> 
+            
+     
 
             {/* Date */}
             <FormField
               control={form.control}
               name="date"
               render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem className="flex flex-col mt-1.5">
                   <FormLabel className="text-gray-700 dark:text-gray-300">Date</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>

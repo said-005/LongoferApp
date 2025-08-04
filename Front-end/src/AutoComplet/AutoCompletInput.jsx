@@ -1,4 +1,4 @@
-import { ChevronDownIcon, XIcon, Loader2 } from "lucide-react";
+import { ChevronDownIcon, XIcon, Loader2, CheckIcon } from "lucide-react";
 import { 
   useState, 
   KeyboardEvent, 
@@ -13,11 +13,6 @@ import { Label } from '@/components/ui/label';
 import { cn } from "../lib/utils";
 import { useDebounce } from "./useDebouncyHook";
 
-// Constants
-const ARIA_LIVE_DELAY = 300;
-const DEBOUNCE_DELAY = 300;
-const BLUR_TIMEOUT = 200;
-
 export default function AutocompleteInput({
   data = [],
   text,
@@ -29,6 +24,9 @@ export default function AutocompleteInput({
   disabled = false,
   loading = false,
   noOptionsMessage = 'No options available',
+  className = '',
+  inputClassName = '',
+  dropdownClassName = ''
 }) {
   // Refs
   const wrapperRef = useRef(null);
@@ -75,7 +73,7 @@ export default function AutocompleteInput({
   }, [data]);
 
   // Debounced input value for filtering
-  const debouncedInputValue = useDebounce(inputValue, DEBOUNCE_DELAY);
+  const debouncedInputValue = useDebounce(inputValue, 300);
 
   // Filter suggestions
   const getFilteredSuggestions = useCallback((input, data) => {
@@ -175,7 +173,7 @@ export default function AutocompleteInput({
         setError("Please select a valid option from the list");
         onChange(undefined);
       }
-    }, BLUR_TIMEOUT);
+    }, 200);
   };
 
   const handleKeyDown = (e) => {
@@ -203,6 +201,8 @@ export default function AutocompleteInput({
         if (activeSuggestionIndex < filteredSuggestions.length - 1) {
           setActiveSuggestionIndex(activeSuggestionIndex + 1);
           scrollActiveIntoView();
+        } else if (filteredSuggestions.length === 0) {
+          setShowSuggestions(true);
         }
         break;
         
@@ -247,85 +247,54 @@ export default function AutocompleteInput({
     }
   };
 
-  // Render default input
-  const renderDefaultInput = () => (
-    <Input
-      ref={inputRef}
-      id={inputId}
-      type={type}
-      value={inputValue}
-      onChange={handleInputChange}
-      onKeyDown={handleKeyDown}
-      onBlur={handleBlur}
-      onFocus={() => {
-        setIsFocused(true);
-        setShowSuggestions(true);
-      }}
-      placeholder={place}
-      disabled={disabled || loading}
-      aria-autocomplete="list"
-      aria-expanded={showSuggestions}
-      aria-haspopup="listbox"
-      aria-controls={listboxId}
-      aria-activedescendant={
-        showSuggestions && filteredSuggestions.length > 0 
-          ? `suggestion-${filteredSuggestions[activeSuggestionIndex]?.value}`
-          : undefined
-      }
-      className={cn(
-        "w-full pr-10 transition-all duration-200 rounded-lg shadow-sm",
-        {
-          "border-red-500 focus:ring-red-500 focus:border-red-500": error,
-          "border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500": !error,
-          "bg-gray-100 dark:bg-gray-800 cursor-not-allowed": disabled || loading,
-          "bg-white dark:bg-gray-900 cursor-text": !disabled && !loading
-        }
-      )}
-    />
-  );
-
-  // Render default option
-  const renderDefaultOption = (item, index) => (
-    <li
-      key={`${item.label}-${item.value}`}
-      id={`suggestion-${item.value}`}
-      role="option"
-      aria-selected={index === activeSuggestionIndex}
-      onClick={() => handleSuggestionClick(item)}
-      onMouseDown={(e) => e.preventDefault()} // Prevent input blur before click
-      className={cn(
-        "relative cursor-default select-none py-2 pl-3 pr-9 transition-colors",
-        {
-          "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100": 
-            index === activeSuggestionIndex,
-          "text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700": 
-            index !== activeSuggestionIndex
-        }
-      )}
-    >
-      {item.label}
-      {index === activeSuggestionIndex && (
-        <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600 dark:text-blue-400">
-          ✓
-        </span>
-      )}
-    </li>
-  );
-
   // Combined loading state
   const isLoading = loading || internalLoading;
 
   return (
-    <div ref={wrapperRef} className="relative w-full">
+    <div ref={wrapperRef} className={cn("relative w-full", className)}>
       <Label 
         htmlFor={inputId}
         className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
       >
         {text}
+       
       </Label>
       
       <div className="relative">
-        {renderDefaultInput()}
+        <Input
+          ref={inputRef}
+          id={inputId}
+          type={type}
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
+          onFocus={() => {
+            setIsFocused(true);
+            setShowSuggestions(true);
+          }}
+          placeholder={place}
+          disabled={disabled || loading}
+          aria-autocomplete="list"
+          aria-expanded={showSuggestions}
+          aria-haspopup="listbox"
+          aria-controls={listboxId}
+          aria-activedescendant={
+            showSuggestions && filteredSuggestions.length > 0 
+              ? `suggestion-${filteredSuggestions[activeSuggestionIndex]?.value}`
+              : undefined
+          }
+          className={cn(
+            "w-full pr-10 transition-all duration-200 rounded-lg shadow-sm",
+            {
+              "border-red-500 focus:ring-red-500 focus:border-red-500": error,
+              "border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500": !error,
+              "bg-gray-100 dark:bg-gray-800 cursor-not-allowed": disabled || loading,
+              "bg-white dark:bg-gray-900 cursor-text": !disabled && !loading
+            },
+            inputClassName
+          )}
+        />
         
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1">
           {inputValue && !disabled && !isLoading && (
@@ -372,7 +341,10 @@ export default function AutocompleteInput({
           ref={listboxRef}
           id={listboxId}
           role="listbox"
-          className="absolute z-50 w-full mt-1 max-h-60 overflow-auto rounded-lg bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-opacity duration-200"
+          className={cn(
+            "absolute z-50 w-full mt-1 max-h-60 overflow-auto rounded-lg bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm transition-opacity duration-200",
+            dropdownClassName
+          )}
         >
           {isLoading ? (
             <li className="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-500 dark:text-gray-400 flex items-center justify-center">
@@ -380,7 +352,32 @@ export default function AutocompleteInput({
               Loading...
             </li>
           ) : filteredSuggestions.length > 0 ? (
-            filteredSuggestions.map((item, index) => renderDefaultOption(item, index))
+            filteredSuggestions.map((item, index) => (
+              <li
+                key={`${item.label}-${item.value}`}
+                id={`suggestion-${item.value}`}
+                role="option"
+                aria-selected={index === activeSuggestionIndex}
+                onClick={() => handleSuggestionClick(item)}
+                onMouseDown={(e) => e.preventDefault()} // Prevent input blur before click
+                className={cn(
+                  "relative cursor-default select-none py-2 pl-3 pr-9 transition-colors",
+                  {
+                    "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100": 
+                      index === activeSuggestionIndex,
+                    "text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700": 
+                      index !== activeSuggestionIndex
+                  }
+                )}
+              >
+                {item.label}
+                {index === activeSuggestionIndex && (
+                  <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600 dark:text-blue-400">
+                    <CheckIcon className="h-4 w-4" />
+                  </span>
+                )}
+              </li>
+            ))
           ) : (
             <li className="relative cursor-default select-none py-2 pl-3 pr-9 text-gray-500 dark:text-gray-400">
               {noOptionsMessage}

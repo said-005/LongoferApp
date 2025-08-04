@@ -158,6 +158,7 @@ export function OFForm() {
                         <Input 
                           placeholder="OF-12345" 
                           {...field} 
+                       
                         />
                       </FormControl>
                       <FormMessage />
@@ -169,7 +170,7 @@ export function OFForm() {
                   control={form.control}
                   name="client"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="-mt-2">
               
                       <FormControl>
                         <AutocompleteInput
@@ -216,7 +217,7 @@ export function OFForm() {
                   control={form.control}
                   name="ofDate"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem className="flex flex-col mt-1.5">
                       <FormLabel>Date OF</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
