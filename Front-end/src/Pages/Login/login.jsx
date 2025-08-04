@@ -42,8 +42,9 @@ export default function LoginPage() {
 
   const { mutate: login, isPending: isSubmitting } = useMutation({
     mutationFn: async (data) => {
+             
       try {
-        await LoginApi.getSCRFtoken();
+         await LoginApi.getSCRFtoken()
         return await LoginApi.login(data);
       } catch (error) {
         // Handle CSRF token failure
@@ -54,13 +55,14 @@ export default function LoginPage() {
         throw error;
       }
     },
-    onSuccess: (data) => {
-      setServerError(false);
-      localStorage.setItem('authenticated', true);
-      toast.success("Connexion réussie", {
-        description: "Vous avez été connecté avec succès",
-      });
-      form.reset();
+  onSuccess: (response) => {
+  if (response.data?.message === 'Invalid credentials') {
+    toast.error('Invalid email or password');
+    return;
+  }
+
+  toast.success('Login successful!');
+  localStorage.setItem('authenticated', 'true');
       navigate('/home');
     },
     onError: (error) => {

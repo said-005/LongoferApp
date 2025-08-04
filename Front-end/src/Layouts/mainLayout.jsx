@@ -10,14 +10,14 @@ import { LogOut } from "lucide-react";
 export default function MainLayout() {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
+  const [authChecked, setAuthChecked] = useState(true);
 
   useEffect(() => {
-    if (!localStorage.getItem('authenticated')) {
-      navigate('/login');
-    } else {
-      setAuthChecked(true);
-    }
+    // if (!localStorage.getItem('authenticated')) {
+    //   navigate('/login');
+    // } else {
+    //   setAuthChecked(true);
+    // }
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);

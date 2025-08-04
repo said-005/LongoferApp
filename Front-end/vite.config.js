@@ -16,6 +16,8 @@ export default defineConfig({
   },
     server: {
     historyApiFallback: true, // 🟢 هذا هو المفتاح
+       host: '192.168.0.102',
+    port: 3000
   },
-    base: '/back-end/public/'
+    base: '/'
 })

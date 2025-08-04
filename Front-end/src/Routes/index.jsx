@@ -72,10 +72,14 @@ export const Routers = createBrowserRouter(
      
     element: <MainLayout />,
     children: [
-        {
-            path: '/home',
-        element: <Home />  
-        },
+    {
+    path: '/home',
+    element: <Home />
+},
+{
+    index: true,
+    element: <Home />
+},
       // Tube Process Routes
 
       {
@@ -270,7 +274,4 @@ export const Routers = createBrowserRouter(
   }
 
 ],
-   {
-    basename: "/back-end/public",
-  }
 )

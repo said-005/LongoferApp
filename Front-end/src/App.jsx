@@ -10,7 +10,7 @@ function App() {
   return (
     <>
     <ThemeProvider>
-<RouterProvider router={Routers}  basename="/back-end/public"/>
+<RouterProvider router={Routers}  />
 
     </ThemeProvider>
 
